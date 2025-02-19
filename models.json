@@ -1,0 +1,72 @@
+{
+  "aihubmix_model": [
+    {
+      "Anthropic": [
+        "claude-3-5-sonnet-20241022"
+      ]
+    },
+    {
+      "google": [
+        "gemini-2.0-flash"
+      ]
+    },
+    {
+      "meta": [
+        "aihubmix-Llama-3-3-70B-Instruct"
+      ]
+    },
+    {
+      "OpenAI": [
+        "gpt-4o-2024-11-20"
+      ]
+    },
+    {
+      "Baichuan": [
+        "Baichuan4-Turbo"
+      ]
+    },
+    {
+      "Doubao": [
+        "Doubao-lite-128k",
+        "Doubao-1.5-pro-256k"
+      ]
+    },
+    {
+      "Qwen": [
+        "qwen-max-0125",
+        "Qwen/Qwen2.5-72B-Instruct",
+        "Qwen/Qwen2.5-Coder-32B-Instruct"
+      ]
+    },
+    {
+      "zero_oneAI": [
+        "yi-34b-chat-200k"
+      ]
+    },
+    {
+      "microsoft": [
+        "aihub-Phi-4"
+      ]
+    }
+  ],
+  "mindcraft_model": [
+
+    {
+      "Zhipu": [
+        "GLM-4-Plus"
+        ]
+    },
+    {
+      "Tencent": [
+        "hunyuan-large"
+        ]
+    },
+
+    {"baidu": ["ernie-4.0-turbo-128k"]},
+    {"Kimi": ["moonshot-v1-32k"]}
+  ],
+  "xunfei": [{"xunfei": ["generalv3","generalv3.5","4.0Ultra"]}
+  ],
+  "deepseek":[{"deepseek": ["deepseek-chat"]}
+  ]
+}
