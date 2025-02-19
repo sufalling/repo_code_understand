@@ -11,3 +11,7 @@ save_all_output按公司输出，all_out所有输出
 https://aihubmix.com/models
 
 https://www.mindcraft.com.cn/#/priceDetail
+
+计算meteor分数缺少wordnet
+
+见https://blog.csdn.net/mjj1024/article/details/105618784
