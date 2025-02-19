@@ -1,0 +1,2293 @@
+filename	comment	preds	stripped_code	model	model_output	prompt	runtime	meteor_score	bleu_4	rouge_1	rouge_2	rouge_L	LLM_as_judge	sentenceBERT_similarity
+openastroproject-openastro-ec7e71c/ext/ffmpeg/libavformat/utils.c	Add a new stream to a media file. When demuxing, it is called by the demuxer in read_header(). If the flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also be called in read_packet().	2	"AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c) {
+  AVStream *st;
+  int i;
+  AVStream **streams;
+
+  if (s->nb_streams >= FFMIN(s->max_streams, INT_MAX / sizeof(*streams))) {
+    if (s->max_streams < INT_MAX / sizeof(*streams))
+      av_log(s, AV_LOG_ERROR,
+             ""Number of streams exceeds max_streams parameter (%d), see the ""
+             ""documentation if you wish to increase it\n"",
+             s->max_streams);
+    return NULL;
+  }
+  streams = av_realloc_array(s->streams, s->nb_streams + 1, sizeof(*streams));
+  if (!streams)
+    return NULL;
+  s->streams = streams;
+
+  st = av_mallocz(sizeof(AVStream));
+  if (!st)
+    return NULL;
+  if (!(st->info = av_mallocz(sizeof(*st->info)))) {
+    av_free(st);
+    return NULL;
+  }
+  st->info->last_dts = AV_NOPTS_VALUE;
+
+  st->codec = avcodec_alloc_context3(c);
+  if (!st->codec) {
+    av_free(st->info);
+    av_free(st);
+    return NULL;
+  }
+  if (s->iformat) {
+
+    st->codec->bit_rate = 0;
+
+    avpriv_set_pts_info(st, 33, 1, 90000);
+  }
+
+  st->index = s->nb_streams;
+  st->start_time = AV_NOPTS_VALUE;
+  st->duration = AV_NOPTS_VALUE;
+
+  st->cur_dts = s->iformat ? RELATIVE_TS_BASE : 0;
+  st->first_dts = AV_NOPTS_VALUE;
+  st->probe_packets = MAX_PROBE_PACKETS;
+  st->pts_wrap_reference = AV_NOPTS_VALUE;
+  st->pts_wrap_behavior = AV_PTS_WRAP_IGNORE;
+
+  st->last_IP_pts = AV_NOPTS_VALUE;
+  st->last_dts_for_order_check = AV_NOPTS_VALUE;
+  for (i = 0; i < MAX_REORDER_DELAY + 1; i++)
+    st->pts_buffer[i] = AV_NOPTS_VALUE;
+
+  st->sample_aspect_ratio = (AVRational){0, 1};
+
+#if FF_API_R_FRAME_RATE
+  st->info->last_dts = AV_NOPTS_VALUE;
+#endif
+  st->info->fps_first_dts = AV_NOPTS_VALUE;
+  st->info->fps_last_dts = AV_NOPTS_VALUE;
+
+  st->inject_global_side_data = s->internal->inject_global_side_data;
+
+  s->streams[s->nb_streams++] = st;
+  return st;
+}"	claude-3-5-sonnet-20241022	The function creates and initializes a new AVStream structure within an AVFormatContext, allocating necessary memory and setting default values for stream parameters while linking it to an optional codec.	0	1	0.1044776119402985	0.01448407806230662	{'f': 0.1851851801851853, 'p': 0.18518518518518517, 'r': 0.18518518518518517}	{'f': 0.032786880279495514, 'p': 0.030303030303030304, 'r': 0.03571428571428571}	{'f': 0.1481481431481483, 'p': 0.14814814814814814, 'r': 0.14814814814814814}	0.4	0.5210719108581543
+dakami-autoclave-84ab84b/old_but_working_qemu/block/io.c	Add an active request to the tracked requests list	2	"static void tracked_request_begin(BdrvTrackedRequest *req, BlockDriverState *bs,
+                                  int64_t offset, unsigned int bytes,
+                                  enum BdrvTrackedRequestType type) {
+  *req = (BdrvTrackedRequest){
+      .bs = bs,
+      .offset = offset,
+      .bytes = bytes,
+      .type = type,
+      .co = qemu_coroutine_self(),
+      .serialising = false,
+      .overlap_offset = offset,
+      .overlap_bytes = bytes,
+  };
+
+  qemu_co_queue_init(&req->wait_queue);
+
+  QLIST_INSERT_HEAD(&bs->tracked_requests, req, list);
+}"	claude-3-5-sonnet-20241022	This function initializes and registers a new block device request tracking structure with specified parameters (including device state, offset, bytes, and type) and adds it to the block driver's tracked requests list.	0	1	0.5616759978327615	0.038002344890766274	{'f': 0.324324320642805, 'p': 0.6666666666666666, 'r': 0.21428571428571427}	{'f': 0.1538461505851414, 'p': 0.375, 'r': 0.0967741935483871}	{'f': 0.324324320642805, 'p': 0.6666666666666666, 'r': 0.21428571428571427}	0.85	0.33780738711357117
+gexpander-gex-client-c-9f870ec/gex/gex_settings.c	Write settings INI file via TinyFrame	2	"bool GEX_IniWrite(GexClient *gex, const char *buffer) {
+  uint8_t buf[8];
+  PayloadBuilder pb = pb_start(buf, 8, NULL);
+  pb_u32(&pb, (uint32_t)strlen(buffer));
+
+  GexBulk bw = (GexBulk){
+      .buffer = (uint8_t *)buffer,
+      .len = (uint32_t)strlen(buffer),
+      .req_cmd = MSG_INI_WRITE,
+      .req_data = buf,
+      .req_len = (uint32_t)pb_length(&pb),
+  };
+
+  return GEX_BulkWrite(GEX_SysUnit(gex), &bw);
+}"	claude-3-5-sonnet-20241022	This function writes initialization data from a buffer to a GEX client system by creating a bulk write operation with the buffer's length and content.	0	1	0.06329113924050632	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.25	0.22680526971817017
+rexmac-pebble-chronocode-5a85c4a/src/chronocode.c	Initialize the app	2	"static void init(void) {
+
+  SettingsStoreObject stored_settings;
+
+  if (persist_exists(STORAGE_SETTINGS_KEY)) {
+    persist_read_data(STORAGE_SETTINGS_KEY, &stored_settings,
+                      sizeof(stored_settings));
+    settings = stored_settings.flags;
+    language_setting = stored_settings.language;
+  } else {
+    settings = 0;
+    language_setting = LANG_EN_US;
+  }
+
+  window = window_create();
+  window_set_background_color(
+      window, (settings & SETTING_INVERTED) > 0 ? GColorWhite : GColorBlack);
+  window_set_window_handlers(
+      window, (WindowHandlers){.load = window_load, .unload = window_unload});
+  window_stack_push(window, true);
+
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
+  update_time(t);
+
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+
+  Tuplet initial_settings[] = {
+      TupletInteger(SETTING_SYNC_KEY_ALL_CAPS, (settings & SETTING_ALL_CAPS)),
+      TupletInteger(SETTING_SYNC_KEY_INVERTED, (settings & SETTING_INVERTED)),
+      TupletInteger(SETTING_SYNC_KEY_LANGUAGE, language_setting),
+      TupletInteger(SETTING_SYNC_KEY_TWO_MIN_DOTS,
+                    (settings & SETTING_TWO_MIN_DOTS))};
+  app_sync_init(
+      &settings_sync, settings_sync_buffer, sizeof(settings_sync_buffer),
+      initial_settings, ARRAY_LENGTH(initial_settings),
+      settings_sync_tuple_changed_callback, settings_sync_error_callback, NULL);
+  app_message_open(64, 64);
+}"	claude-3-5-sonnet-20241022	This function initializes a Pebble watchface app by creating a window, loading saved settings, setting up time display, and configuring synchronization with the phone app for user preferences.	0	1	0.27272727272727276	0.007987276352377327	{'f': 0.13793103262782402, 'p': 0.6666666666666666, 'r': 0.07692307692307693}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.13793103262782402, 'p': 0.6666666666666666, 'r': 0.07692307692307693}	0.45	0.42089956998825073
+freeciv-freeciv-e4ead30/client/gui-sdl2/spaceshipdlg.c	Popup (or raise) the spaceship dialog for the given player.	2	"void popup_spaceship_dialog(struct player *pPlayer) {
+  struct SMALL_DLG *pSpaceShp;
+
+  if (!(pSpaceShp = get_spaceship_dialog(pPlayer))) {
+    struct widget *pBuf, *pWindow;
+    utf8_str *pstr;
+    char cbuf[128];
+    SDL_Rect area;
+
+    pSpaceShp = fc_calloc(1, sizeof(struct SMALL_DLG));
+
+    fc_snprintf(cbuf, sizeof(cbuf), _(""The %s Spaceship""),
+                nation_adjective_for_player(pPlayer));
+    pstr = create_utf8_from_char(cbuf, adj_font(12));
+    pstr->style |= TTF_STYLE_BOLD;
+
+    pWindow = create_window_skeleton(NULL, pstr, 0);
+
+    pWindow->action = space_dialog_window_callback;
+    set_wstate(pWindow, FC_WS_NORMAL);
+    pWindow->data.player = pPlayer;
+    pWindow->private_data.small_dlg = pSpaceShp;
+    add_to_gui_list(ID_WINDOW, pWindow);
+    pSpaceShp->pEndWidgetList = pWindow;
+
+    area = pWindow->area;
+
+    pBuf = create_themeicon(current_theme->Small_CANCEL_Icon, pWindow->dst,
+                            WF_WIDGET_HAS_INFO_LABEL | WF_RESTORE_BACKGROUND);
+    pBuf->info_label =
+        create_utf8_from_char(_(""Close Dialog (Esc)""), adj_font(12));
+    pBuf->data.player = pPlayer;
+    pBuf->action = exit_space_dialog_callback;
+    set_wstate(pBuf, FC_WS_NORMAL);
+    pBuf->key = SDLK_ESCAPE;
+    area.w = MAX(area.w, (pBuf->size.w + adj_size(10)));
+
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pBuf = create_themeicon_button_from_chars(
+        current_theme->OK_Icon, pWindow->dst, _(""Launch""), adj_font(12), 0);
+
+    pBuf->action = launch_spaceship_callback;
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pstr = create_utf8_from_char(get_spaceship_descr(NULL), adj_font(12));
+    pstr->bgcol = (SDL_Color){0, 0, 0, 0};
+    pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_LABEL, pBuf);
+
+    pSpaceShp->pBeginWidgetList = pBuf;
+
+    area.w = MAX(area.w, adj_size(300) - (pWindow->size.w - pWindow->area.w));
+
+    resize_window(pWindow, NULL, NULL,
+                  (pWindow->size.w - pWindow->area.w) + area.w,
+                  (pWindow->size.h - pWindow->area.h) + area.h);
+
+    area = pWindow->area;
+
+    widget_set_position(pWindow, (main_window_width() - pWindow->size.w) / 2,
+                        (main_window_height() - pWindow->size.h) / 2);
+
+    pBuf = pWindow->prev;
+    pBuf->size.x = area.x + area.w - pBuf->size.w - 1;
+    pBuf->size.y = pWindow->size.y + adj_size(2);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + area.h - pBuf->size.h - adj_size(7);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + adj_size(7);
+
+    dialog_list_prepend(dialog_list, pSpaceShp);
+
+    refresh_spaceship_dialog(pPlayer);
+  } else {
+    if (select_window_group_dialog(pSpaceShp->pBeginWidgetList,
+                                   pSpaceShp->pEndWidgetList)) {
+      widget_flush(pSpaceShp->pEndWidgetList);
+    }
+  }
+}"	claude-3-5-sonnet-20241022	This function creates and displays a dialog window showing spaceship information for a player, including launch controls and status details, or brings an existing spaceship dialog to the front if it already exists.	0	1	0.3466576332429991	0.015721757597198516	{'f': 0.3157894700692521, 'p': 0.6666666666666666, 'r': 0.20689655172413793}	{'f': 0.048780484378346464, 'p': 0.1111111111111111, 'r': 0.03125}	{'f': 0.21052631217451526, 'p': 0.4444444444444444, 'r': 0.13793103448275862}	0.88	0.6483182311058044
+particle-iot-device-os-7fbf145/wiring/inc/spark_wiring_mesh.h	Determines if the given handler exists.	2	"#include ""scope_guard.h""
+#include <memory>
+
+#include ""spark_wiring_thread.h""
+
+namespace spark {
+
+class MeshSignal : public particle::Signal {
+public:
+  int rssi = 2;
+  int qual = 0;
+
+  MeshSignal() {}
+  virtual ~MeshSignal(){};
+
+  operator int8_t() const { return 2; }
+
+  virtual hal_net_access_tech_t getAccessTechnology() const {
+    return NET_ACCESS_TECHNOLOGY_IEEE802154;
+  }
+
+  virtual float getStrength() const { return 0.0f; }"	claude-3-5-sonnet-20241022	This code defines a MeshSignal class that inherits from Signal and provides functionality for handling mesh network signals with properties like RSSI and quality, along with methods for accessing network technology and signal strength.	0	1	0.0	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.0	0.10906778275966644
+dm-vdo-kvdo-8df6805/vdo/base/blockAllocator.c	Get the aggregated slab journal statistics for the slabs in this allocator.	2	"SlabJournalStatistics
+getSlabJournalStatistics(const BlockAllocator *allocator) {
+  const AtomicSlabJournalStatistics *atoms = &allocator->slabJournalStatistics;
+  return (SlabJournalStatistics){
+      .diskFullCount = atomicLoad64(&atoms->diskFullCount),
+      .flushCount = atomicLoad64(&atoms->flushCount),
+      .blockedCount = atomicLoad64(&atoms->blockedCount),
+      .blocksWritten = atomicLoad64(&atoms->blocksWritten),
+      .tailBusyCount = atomicLoad64(&atoms->tailBusyCount),
+  };
+}"	claude-3-5-sonnet-20241022	This function retrieves and returns various atomic statistics about slab journal operations from a BlockAllocator, including counts of disk full events, flushes, blocks written, and tail busy events.	0	1	0.23207720588235295	0.015718877363021206	{'f': 0.16216215798392997, 'p': 0.2727272727272727, 'r': 0.11538461538461539}	{'f': 0.05263157483379533, 'p': 0.09090909090909091, 'r': 0.037037037037037035}	{'f': 0.10810810392987599, 'p': 0.18181818181818182, 'r': 0.07692307692307693}	0.85	0.6646946668624878
+opalenzuela-opendomo-1adadbd/src/odbase/src/script.c	Process a comments line and format the output in HTML or XML.	2	"script_process_comments(const char *buf) {
+  char tipname[50];
+  char *classname = NULL;
+  char *contents = NULL;
+
+  if (strlen(buf) < 3)
+    return;
+
+  if (gui == html) {
+    if ((buf[0] == '-') && (buf[1] == '-')) {
+      printf(""\t<hr/>\n"");
+    } else if (SPELL3(buf, 'E', 'R', 'R')) {
+      printf(""\t<p class='error'>%s</p>\n"", T(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R')) {
+      printf(""\t<p class='warning'>%s</p>\n"", T(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F')) {
+      printf(""\t<p class='info'>%s</p>\n"", T(buf += 5));
+    } else if (SPELL3(buf, 'T', 'I', 'P')) {
+      printf(""\t<p class='tooltip tip'>%s</p>\n"", T(buf += 4));
+    } else if (SPELL3(buf, 'L', 'O', 'A')) {
+
+      printf(""\t<p class='loading'>%s</p>\n"", T(buf += 8));
+
+      printf(""<script type='text/Javascript'>\n""
+             ""$(function($){\n""
+             ""	$('p.loading').hide() ;\n""
+             ""});\n""
+             ""</script>\n"");
+    } else if (SPELL3(buf, 'U', 'R', 'L')) {
+      printf(""\t<p class='link'>""
+             ""<a href='%s' target='_blank'>%s</a></p>\n"",
+             buf += 4, buf);
+    } else if (buf[0] == '>') {
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    } else {
+
+      if (buf[0] == ' ') {
+        printf(""\t<p class='comments'>%s</p>\n"", T(buf += 1));
+      } else {
+        classname = strtok(buf, "" "");
+        contents = strtok(NULL, ""\n"");
+
+        printf(""\t<p class='%s'>%s</p>\n"", classname, T(contents));
+      }
+    }
+  } else {
+    if (SPELL3(buf, 'E', 'R', 'R') || SPELL3(buf, 'e', 'r', 'r')) {
+      printf(""\t<error description='%s'/>\n"", CT(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R') || SPELL3(buf, 'w', 'a', 'r')) {
+      printf(""\t<warning description='%s'/>\n"", CT(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F') || SPELL3(buf, 'i', 'n', 'f'))
+      printf(""\t<info description='%s'/>\n"", CT(buf += 5));
+    else if (buf[0] == '>')
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    else
+      printf(""\t<message description='%s'/>\n"", CT(buf += 1));
+  }
+}"	claude-3-5-sonnet-20241022	This function processes and formats different types of comments (like errors, warnings, info) and outputs them in either HTML or XML format based on the input buffer's content.	0	1	0.5470588235294117	0.04247869905261408	{'f': 0.41025640599605523, 'p': 0.6666666666666666, 'r': 0.2962962962962963}	{'f': 0.10526315378116359, 'p': 0.18181818181818182, 'r': 0.07407407407407407}	{'f': 0.3076923034319527, 'p': 0.5, 'r': 0.2222222222222222}	0.85	0.5858966112136841
+makestuff-neroJtag-b7f0313/LUFA-110528/LUFA/Drivers/USB/Class/Host/MassStorage.c	Retrieves the Mass Storage device's inquiry data for the specified LUN, indicating the device characteristics and properties.	0	"uint8_t MS_Host_GetInquiryData(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                               const uint8_t LUNIndex,
+                               SCSI_Inquiry_Response_t *const InquiryData) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  uint8_t ErrorCode;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .DataTransferLength = sizeof(SCSI_Inquiry_Response_t),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_INQUIRY, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Inquiry_Response_t), 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock,
+                                       InquiryData)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  if ((ErrorCode = MS_Host_GetReturnedStatus(
+           MSInterfaceInfo, &SCSICommandStatus)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  return PIPE_RWSTREAM_NoError;
+}"	claude-3-5-sonnet-20241022	This function sends a SCSI INQUIRY command to a USB mass storage device to retrieve device information and stores the response in the provided InquiryData structure.	0	1	0.3845092765018277	0.010275474580767148	{'f': 0.16216215734112505, 'p': 0.2, 'r': 0.13636363636363635}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.05405404923301723, 'p': 0.06666666666666667, 'r': 0.045454545454545456}	0.85	0.674667477607727
+seemk-TileSweep-627999b/tilesweep/third_party/h2o/lib/handler/mimemap.c	returns the default mime attributes given a mime type	2	"void h2o_mimemap_get_default_attributes(const char *_mime,
+                                        h2o_mime_attributes_t *attr) {
+  char *mime = alloca(strlen(_mime) + 1);
+  strcpy(mime, _mime);
+
+  const char *type_end_at;
+
+  if ((type_end_at = strchr(mime, ';')) == NULL)
+    type_end_at = mime + strlen(mime);
+
+  *attr = (h2o_mime_attributes_t){0};
+
+  if (h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/css"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/javascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/javascript""))) {
+    attr->is_compressible = 1;
+    attr->priority = H2O_MIME_ATTRIBUTE_PRIORITY_HIGHEST;
+  } else if (h2o_memis(mime, type_end_at - mime,
+                       H2O_STRLIT(""application/json"")) ||
+             strncmp(mime, ""text/"", 5) == 0 ||
+             h2o_strstr(mime, type_end_at - mime, H2O_STRLIT(""+xml"")) !=
+                 SIZE_MAX) {
+    attr->is_compressible = 1;
+  }
+}"	claude-3-5-sonnet-20241022	This function determines default MIME attributes by checking the MIME type string, setting compression flags and priority levels for different content types like CSS, JavaScript, JSON, text, and XML files.	0	1	0.5067567567567568	0.008830895300928163	{'f': 0.22222221876543213, 'p': 0.5, 'r': 0.14285714285714285}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.1666666632098766, 'p': 0.375, 'r': 0.10714285714285714}	0.85	0.6414018869400024
+openastroproject-openastro-ec7e71c/ext/ffmpeg/libavformat/utils.c	Add a new stream to a media file. When demuxing, it is called by the demuxer in read_header(). If the flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also be called in read_packet().	2	"AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c) {
+  AVStream *st;
+  int i;
+  AVStream **streams;
+
+  if (s->nb_streams >= FFMIN(s->max_streams, INT_MAX / sizeof(*streams))) {
+    if (s->max_streams < INT_MAX / sizeof(*streams))
+      av_log(s, AV_LOG_ERROR,
+             ""Number of streams exceeds max_streams parameter (%d), see the ""
+             ""documentation if you wish to increase it\n"",
+             s->max_streams);
+    return NULL;
+  }
+  streams = av_realloc_array(s->streams, s->nb_streams + 1, sizeof(*streams));
+  if (!streams)
+    return NULL;
+  s->streams = streams;
+
+  st = av_mallocz(sizeof(AVStream));
+  if (!st)
+    return NULL;
+  if (!(st->info = av_mallocz(sizeof(*st->info)))) {
+    av_free(st);
+    return NULL;
+  }
+  st->info->last_dts = AV_NOPTS_VALUE;
+
+  st->codec = avcodec_alloc_context3(c);
+  if (!st->codec) {
+    av_free(st->info);
+    av_free(st);
+    return NULL;
+  }
+  if (s->iformat) {
+
+    st->codec->bit_rate = 0;
+
+    avpriv_set_pts_info(st, 33, 1, 90000);
+  }
+
+  st->index = s->nb_streams;
+  st->start_time = AV_NOPTS_VALUE;
+  st->duration = AV_NOPTS_VALUE;
+
+  st->cur_dts = s->iformat ? RELATIVE_TS_BASE : 0;
+  st->first_dts = AV_NOPTS_VALUE;
+  st->probe_packets = MAX_PROBE_PACKETS;
+  st->pts_wrap_reference = AV_NOPTS_VALUE;
+  st->pts_wrap_behavior = AV_PTS_WRAP_IGNORE;
+
+  st->last_IP_pts = AV_NOPTS_VALUE;
+  st->last_dts_for_order_check = AV_NOPTS_VALUE;
+  for (i = 0; i < MAX_REORDER_DELAY + 1; i++)
+    st->pts_buffer[i] = AV_NOPTS_VALUE;
+
+  st->sample_aspect_ratio = (AVRational){0, 1};
+
+#if FF_API_R_FRAME_RATE
+  st->info->last_dts = AV_NOPTS_VALUE;
+#endif
+  st->info->fps_first_dts = AV_NOPTS_VALUE;
+  st->info->fps_last_dts = AV_NOPTS_VALUE;
+
+  st->inject_global_side_data = s->internal->inject_global_side_data;
+
+  s->streams[s->nb_streams++] = st;
+  return st;
+}"	claude-3-5-sonnet-20241022	This function creates a new stream in an AVFormatContext, allocates necessary memory and initializes stream properties with default values, returning a pointer to the newly created AVStream.	1	1	0.14402157259300116	0.03294693754260196	{'f': 0.2307692257766273, 'p': 0.2222222222222222, 'r': 0.24}	{'f': 0.06779660523987396, 'p': 0.06060606060606061, 'r': 0.07692307692307693}	{'f': 0.19230768731508888, 'p': 0.18518518518518517, 'r': 0.2}	0.6	0.5190774202346802
+dakami-autoclave-84ab84b/old_but_working_qemu/block/io.c	Add an active request to the tracked requests list	2	"static void tracked_request_begin(BdrvTrackedRequest *req, BlockDriverState *bs,
+                                  int64_t offset, unsigned int bytes,
+                                  enum BdrvTrackedRequestType type) {
+  *req = (BdrvTrackedRequest){
+      .bs = bs,
+      .offset = offset,
+      .bytes = bytes,
+      .type = type,
+      .co = qemu_coroutine_self(),
+      .serialising = false,
+      .overlap_offset = offset,
+      .overlap_bytes = bytes,
+  };
+
+  qemu_co_queue_init(&req->wait_queue);
+
+  QLIST_INSERT_HEAD(&bs->tracked_requests, req, list);
+}"	claude-3-5-sonnet-20241022	This function initializes and adds a new block device request tracking structure to the tracked requests list, setting up parameters like offset, bytes, and type for monitoring I/O operations.	1	1	0.611317254174397	0.12607162121844206	{'f': 0.324324320642805, 'p': 0.6666666666666666, 'r': 0.21428571428571427}	{'f': 0.22222221876543213, 'p': 0.5, 'r': 0.14285714285714285}	{'f': 0.324324320642805, 'p': 0.6666666666666666, 'r': 0.21428571428571427}	0.85	0.4278523325920105
+gexpander-gex-client-c-9f870ec/gex/gex_settings.c	Write settings INI file via TinyFrame	2	"bool GEX_IniWrite(GexClient *gex, const char *buffer) {
+  uint8_t buf[8];
+  PayloadBuilder pb = pb_start(buf, 8, NULL);
+  pb_u32(&pb, (uint32_t)strlen(buffer));
+
+  GexBulk bw = (GexBulk){
+      .buffer = (uint8_t *)buffer,
+      .len = (uint32_t)strlen(buffer),
+      .req_cmd = MSG_INI_WRITE,
+      .req_data = buf,
+      .req_len = (uint32_t)pb_length(&pb),
+  };
+
+  return GEX_BulkWrite(GEX_SysUnit(gex), &bw);
+}"	claude-3-5-sonnet-20241022	This function writes initialization data to a GEX system by creating a payload with the buffer length and sending it through a bulk write operation.	1	1	0.06329113924050632	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.15	0.21038088202476501
+rexmac-pebble-chronocode-5a85c4a/src/chronocode.c	Initialize the app	2	"static void init(void) {
+
+  SettingsStoreObject stored_settings;
+
+  if (persist_exists(STORAGE_SETTINGS_KEY)) {
+    persist_read_data(STORAGE_SETTINGS_KEY, &stored_settings,
+                      sizeof(stored_settings));
+    settings = stored_settings.flags;
+    language_setting = stored_settings.language;
+  } else {
+    settings = 0;
+    language_setting = LANG_EN_US;
+  }
+
+  window = window_create();
+  window_set_background_color(
+      window, (settings & SETTING_INVERTED) > 0 ? GColorWhite : GColorBlack);
+  window_set_window_handlers(
+      window, (WindowHandlers){.load = window_load, .unload = window_unload});
+  window_stack_push(window, true);
+
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
+  update_time(t);
+
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+
+  Tuplet initial_settings[] = {
+      TupletInteger(SETTING_SYNC_KEY_ALL_CAPS, (settings & SETTING_ALL_CAPS)),
+      TupletInteger(SETTING_SYNC_KEY_INVERTED, (settings & SETTING_INVERTED)),
+      TupletInteger(SETTING_SYNC_KEY_LANGUAGE, language_setting),
+      TupletInteger(SETTING_SYNC_KEY_TWO_MIN_DOTS,
+                    (settings & SETTING_TWO_MIN_DOTS))};
+  app_sync_init(
+      &settings_sync, settings_sync_buffer, sizeof(settings_sync_buffer),
+      initial_settings, ARRAY_LENGTH(initial_settings),
+      settings_sync_tuple_changed_callback, settings_sync_error_callback, NULL);
+  app_message_open(64, 64);
+}"	claude-3-5-sonnet-20241022	This function initializes app settings by reading stored values, creating a window, setting up time display, and configuring synchronization parameters with persistent storage and app message communication.	1	1	0.1851851851851852	0.006980361417366381	{'f': 0.07142856951530618, 'p': 0.3333333333333333, 'r': 0.04}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.07142856951530618, 'p': 0.3333333333333333, 'r': 0.04}	0.85	0.5576059222221375
+freeciv-freeciv-e4ead30/client/gui-sdl2/spaceshipdlg.c	Popup (or raise) the spaceship dialog for the given player.	2	"void popup_spaceship_dialog(struct player *pPlayer) {
+  struct SMALL_DLG *pSpaceShp;
+
+  if (!(pSpaceShp = get_spaceship_dialog(pPlayer))) {
+    struct widget *pBuf, *pWindow;
+    utf8_str *pstr;
+    char cbuf[128];
+    SDL_Rect area;
+
+    pSpaceShp = fc_calloc(1, sizeof(struct SMALL_DLG));
+
+    fc_snprintf(cbuf, sizeof(cbuf), _(""The %s Spaceship""),
+                nation_adjective_for_player(pPlayer));
+    pstr = create_utf8_from_char(cbuf, adj_font(12));
+    pstr->style |= TTF_STYLE_BOLD;
+
+    pWindow = create_window_skeleton(NULL, pstr, 0);
+
+    pWindow->action = space_dialog_window_callback;
+    set_wstate(pWindow, FC_WS_NORMAL);
+    pWindow->data.player = pPlayer;
+    pWindow->private_data.small_dlg = pSpaceShp;
+    add_to_gui_list(ID_WINDOW, pWindow);
+    pSpaceShp->pEndWidgetList = pWindow;
+
+    area = pWindow->area;
+
+    pBuf = create_themeicon(current_theme->Small_CANCEL_Icon, pWindow->dst,
+                            WF_WIDGET_HAS_INFO_LABEL | WF_RESTORE_BACKGROUND);
+    pBuf->info_label =
+        create_utf8_from_char(_(""Close Dialog (Esc)""), adj_font(12));
+    pBuf->data.player = pPlayer;
+    pBuf->action = exit_space_dialog_callback;
+    set_wstate(pBuf, FC_WS_NORMAL);
+    pBuf->key = SDLK_ESCAPE;
+    area.w = MAX(area.w, (pBuf->size.w + adj_size(10)));
+
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pBuf = create_themeicon_button_from_chars(
+        current_theme->OK_Icon, pWindow->dst, _(""Launch""), adj_font(12), 0);
+
+    pBuf->action = launch_spaceship_callback;
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pstr = create_utf8_from_char(get_spaceship_descr(NULL), adj_font(12));
+    pstr->bgcol = (SDL_Color){0, 0, 0, 0};
+    pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_LABEL, pBuf);
+
+    pSpaceShp->pBeginWidgetList = pBuf;
+
+    area.w = MAX(area.w, adj_size(300) - (pWindow->size.w - pWindow->area.w));
+
+    resize_window(pWindow, NULL, NULL,
+                  (pWindow->size.w - pWindow->area.w) + area.w,
+                  (pWindow->size.h - pWindow->area.h) + area.h);
+
+    area = pWindow->area;
+
+    widget_set_position(pWindow, (main_window_width() - pWindow->size.w) / 2,
+                        (main_window_height() - pWindow->size.h) / 2);
+
+    pBuf = pWindow->prev;
+    pBuf->size.x = area.x + area.w - pBuf->size.w - 1;
+    pBuf->size.y = pWindow->size.y + adj_size(2);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + area.h - pBuf->size.h - adj_size(7);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + adj_size(7);
+
+    dialog_list_prepend(dialog_list, pSpaceShp);
+
+    refresh_spaceship_dialog(pPlayer);
+  } else {
+    if (select_window_group_dialog(pSpaceShp->pBeginWidgetList,
+                                   pSpaceShp->pEndWidgetList)) {
+      widget_flush(pSpaceShp->pEndWidgetList);
+    }
+  }
+}"	claude-3-5-sonnet-20241022	This function creates and displays a dialog window for managing a player's spaceship, including options to view its description, launch it, and close the dialog.	1	1	0.21739130434782608	0.010713701843513142	{'f': 0.25806451200832464, 'p': 0.4444444444444444, 'r': 0.18181818181818182}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.19354838297606666, 'p': 0.3333333333333333, 'r': 0.13636363636363635}	0.85	0.6405893564224243
+particle-iot-device-os-7fbf145/wiring/inc/spark_wiring_mesh.h	Determines if the given handler exists.	2	"#include ""scope_guard.h""
+#include <memory>
+
+#include ""spark_wiring_thread.h""
+
+namespace spark {
+
+class MeshSignal : public particle::Signal {
+public:
+  int rssi = 2;
+  int qual = 0;
+
+  MeshSignal() {}
+  virtual ~MeshSignal(){};
+
+  operator int8_t() const { return 2; }
+
+  virtual hal_net_access_tech_t getAccessTechnology() const {
+    return NET_ACCESS_TECHNOLOGY_IEEE802154;
+  }
+
+  virtual float getStrength() const { return 0.0f; }"	claude-3-5-sonnet-20241022	This code defines a `MeshSignal` class that represents signal information for mesh networking, inheriting from `particle::Signal` with basic properties like RSSI and quality, and methods for accessing signal characteristics.	1	1	0.0	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.0	0.081065334379673
+dm-vdo-kvdo-8df6805/vdo/base/blockAllocator.c	Get the aggregated slab journal statistics for the slabs in this allocator.	2	"SlabJournalStatistics
+getSlabJournalStatistics(const BlockAllocator *allocator) {
+  const AtomicSlabJournalStatistics *atoms = &allocator->slabJournalStatistics;
+  return (SlabJournalStatistics){
+      .diskFullCount = atomicLoad64(&atoms->diskFullCount),
+      .flushCount = atomicLoad64(&atoms->flushCount),
+      .blockedCount = atomicLoad64(&atoms->blockedCount),
+      .blocksWritten = atomicLoad64(&atoms->blocksWritten),
+      .tailBusyCount = atomicLoad64(&atoms->tailBusyCount),
+  };
+}"	claude-3-5-sonnet-20241022	This function retrieves and returns various statistical metrics about slab journal operations from a BlockAllocator by atomically loading values from its slabJournalStatistics structure.	1	1	0.24093511450381674	0.017514895362802613	{'f': 0.12121211676767694, 'p': 0.18181818181818182, 'r': 0.09090909090909091}	{'f': 0.060606056161616496, 'p': 0.09090909090909091, 'r': 0.045454545454545456}	{'f': 0.12121211676767694, 'p': 0.18181818181818182, 'r': 0.09090909090909091}	0.85	0.7138853073120117
+opalenzuela-opendomo-1adadbd/src/odbase/src/script.c	Process a comments line and format the output in HTML or XML.	2	"script_process_comments(const char *buf) {
+  char tipname[50];
+  char *classname = NULL;
+  char *contents = NULL;
+
+  if (strlen(buf) < 3)
+    return;
+
+  if (gui == html) {
+    if ((buf[0] == '-') && (buf[1] == '-')) {
+      printf(""\t<hr/>\n"");
+    } else if (SPELL3(buf, 'E', 'R', 'R')) {
+      printf(""\t<p class='error'>%s</p>\n"", T(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R')) {
+      printf(""\t<p class='warning'>%s</p>\n"", T(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F')) {
+      printf(""\t<p class='info'>%s</p>\n"", T(buf += 5));
+    } else if (SPELL3(buf, 'T', 'I', 'P')) {
+      printf(""\t<p class='tooltip tip'>%s</p>\n"", T(buf += 4));
+    } else if (SPELL3(buf, 'L', 'O', 'A')) {
+
+      printf(""\t<p class='loading'>%s</p>\n"", T(buf += 8));
+
+      printf(""<script type='text/Javascript'>\n""
+             ""$(function($){\n""
+             ""	$('p.loading').hide() ;\n""
+             ""});\n""
+             ""</script>\n"");
+    } else if (SPELL3(buf, 'U', 'R', 'L')) {
+      printf(""\t<p class='link'>""
+             ""<a href='%s' target='_blank'>%s</a></p>\n"",
+             buf += 4, buf);
+    } else if (buf[0] == '>') {
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    } else {
+
+      if (buf[0] == ' ') {
+        printf(""\t<p class='comments'>%s</p>\n"", T(buf += 1));
+      } else {
+        classname = strtok(buf, "" "");
+        contents = strtok(NULL, ""\n"");
+
+        printf(""\t<p class='%s'>%s</p>\n"", classname, T(contents));
+      }
+    }
+  } else {
+    if (SPELL3(buf, 'E', 'R', 'R') || SPELL3(buf, 'e', 'r', 'r')) {
+      printf(""\t<error description='%s'/>\n"", CT(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R') || SPELL3(buf, 'w', 'a', 'r')) {
+      printf(""\t<warning description='%s'/>\n"", CT(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F') || SPELL3(buf, 'i', 'n', 'f'))
+      printf(""\t<info description='%s'/>\n"", CT(buf += 5));
+    else if (buf[0] == '>')
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    else
+      printf(""\t<message description='%s'/>\n"", CT(buf += 1));
+  }
+}"	claude-3-5-sonnet-20241022	This function processes and formats different types of comments (errors, warnings, info, tips, etc.) and outputs them in either HTML or XML format based on the input string and GUI mode.	1	1	0.535251798561151	0.03815225843185609	{'f': 0.3902438982986318, 'p': 0.6666666666666666, 'r': 0.27586206896551724}	{'f': 0.09756097168352187, 'p': 0.18181818181818182, 'r': 0.06666666666666667}	{'f': 0.2926829226888757, 'p': 0.5, 'r': 0.20689655172413793}	0.85	0.6079678535461426
+makestuff-neroJtag-b7f0313/LUFA-110528/LUFA/Drivers/USB/Class/Host/MassStorage.c	Retrieves the Mass Storage device's inquiry data for the specified LUN, indicating the device characteristics and properties.	0	"uint8_t MS_Host_GetInquiryData(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                               const uint8_t LUNIndex,
+                               SCSI_Inquiry_Response_t *const InquiryData) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  uint8_t ErrorCode;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .DataTransferLength = sizeof(SCSI_Inquiry_Response_t),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_INQUIRY, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Inquiry_Response_t), 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock,
+                                       InquiryData)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  if ((ErrorCode = MS_Host_GetReturnedStatus(
+           MSInterfaceInfo, &SCSICommandStatus)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  return PIPE_RWSTREAM_NoError;
+}"	claude-3-5-sonnet-20241022	This function sends a SCSI INQUIRY command to a USB Mass Storage device to retrieve information about a specific Logical Unit Number (LUN) and stores the response data in the provided buffer.	1	1	0.3435135135135135	0.017448767890681335	{'f': 0.32558139080584103, 'p': 0.4666666666666667, 'r': 0.25}	{'f': 0.0425531869986424, 'p': 0.0625, 'r': 0.03225806451612903}	{'f': 0.18604650708491086, 'p': 0.26666666666666666, 'r': 0.14285714285714285}	0.95	0.7035620212554932
+seemk-TileSweep-627999b/tilesweep/third_party/h2o/lib/handler/mimemap.c	returns the default mime attributes given a mime type	2	"void h2o_mimemap_get_default_attributes(const char *_mime,
+                                        h2o_mime_attributes_t *attr) {
+  char *mime = alloca(strlen(_mime) + 1);
+  strcpy(mime, _mime);
+
+  const char *type_end_at;
+
+  if ((type_end_at = strchr(mime, ';')) == NULL)
+    type_end_at = mime + strlen(mime);
+
+  *attr = (h2o_mime_attributes_t){0};
+
+  if (h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/css"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/javascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/javascript""))) {
+    attr->is_compressible = 1;
+    attr->priority = H2O_MIME_ATTRIBUTE_PRIORITY_HIGHEST;
+  } else if (h2o_memis(mime, type_end_at - mime,
+                       H2O_STRLIT(""application/json"")) ||
+             strncmp(mime, ""text/"", 5) == 0 ||
+             h2o_strstr(mime, type_end_at - mime, H2O_STRLIT(""+xml"")) !=
+                 SIZE_MAX) {
+    attr->is_compressible = 1;
+  }
+}"	claude-3-5-sonnet-20241022	This function determines default MIME attributes for file types, setting compression and priority flags based on the MIME type, particularly for text-based files like CSS, JavaScript, JSON, and XML.	1	1	0.5113636363636364	0.009152541620698935	{'f': 0.23529411404844294, 'p': 0.5, 'r': 0.15384615384615385}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.17647058463667825, 'p': 0.375, 'r': 0.11538461538461539}	0.85	0.5475469827651978
+openastroproject-openastro-ec7e71c/ext/ffmpeg/libavformat/utils.c	Add a new stream to a media file. When demuxing, it is called by the demuxer in read_header(). If the flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also be called in read_packet().	2	"AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c) {
+  AVStream *st;
+  int i;
+  AVStream **streams;
+
+  if (s->nb_streams >= FFMIN(s->max_streams, INT_MAX / sizeof(*streams))) {
+    if (s->max_streams < INT_MAX / sizeof(*streams))
+      av_log(s, AV_LOG_ERROR,
+             ""Number of streams exceeds max_streams parameter (%d), see the ""
+             ""documentation if you wish to increase it\n"",
+             s->max_streams);
+    return NULL;
+  }
+  streams = av_realloc_array(s->streams, s->nb_streams + 1, sizeof(*streams));
+  if (!streams)
+    return NULL;
+  s->streams = streams;
+
+  st = av_mallocz(sizeof(AVStream));
+  if (!st)
+    return NULL;
+  if (!(st->info = av_mallocz(sizeof(*st->info)))) {
+    av_free(st);
+    return NULL;
+  }
+  st->info->last_dts = AV_NOPTS_VALUE;
+
+  st->codec = avcodec_alloc_context3(c);
+  if (!st->codec) {
+    av_free(st->info);
+    av_free(st);
+    return NULL;
+  }
+  if (s->iformat) {
+
+    st->codec->bit_rate = 0;
+
+    avpriv_set_pts_info(st, 33, 1, 90000);
+  }
+
+  st->index = s->nb_streams;
+  st->start_time = AV_NOPTS_VALUE;
+  st->duration = AV_NOPTS_VALUE;
+
+  st->cur_dts = s->iformat ? RELATIVE_TS_BASE : 0;
+  st->first_dts = AV_NOPTS_VALUE;
+  st->probe_packets = MAX_PROBE_PACKETS;
+  st->pts_wrap_reference = AV_NOPTS_VALUE;
+  st->pts_wrap_behavior = AV_PTS_WRAP_IGNORE;
+
+  st->last_IP_pts = AV_NOPTS_VALUE;
+  st->last_dts_for_order_check = AV_NOPTS_VALUE;
+  for (i = 0; i < MAX_REORDER_DELAY + 1; i++)
+    st->pts_buffer[i] = AV_NOPTS_VALUE;
+
+  st->sample_aspect_ratio = (AVRational){0, 1};
+
+#if FF_API_R_FRAME_RATE
+  st->info->last_dts = AV_NOPTS_VALUE;
+#endif
+  st->info->fps_first_dts = AV_NOPTS_VALUE;
+  st->info->fps_last_dts = AV_NOPTS_VALUE;
+
+  st->inject_global_side_data = s->internal->inject_global_side_data;
+
+  s->streams[s->nb_streams++] = st;
+  return st;
+}"	claude-3-5-sonnet-20241022	This function creates and initializes a new AVStream structure within an AVFormatContext, allocating necessary memory and setting default values for various stream parameters.	2	1	0.060790273556231	0.012015014667407578	{'f': 0.12244897464389858, 'p': 0.1111111111111111, 'r': 0.13636363636363635}	{'f': 0.036363631563637, 'p': 0.030303030303030304, 'r': 0.045454545454545456}	{'f': 0.12244897464389858, 'p': 0.1111111111111111, 'r': 0.13636363636363635}	0.4	0.537792980670929
+dakami-autoclave-84ab84b/old_but_working_qemu/block/io.c	Add an active request to the tracked requests list	2	"static void tracked_request_begin(BdrvTrackedRequest *req, BlockDriverState *bs,
+                                  int64_t offset, unsigned int bytes,
+                                  enum BdrvTrackedRequestType type) {
+  *req = (BdrvTrackedRequest){
+      .bs = bs,
+      .offset = offset,
+      .bytes = bytes,
+      .type = type,
+      .co = qemu_coroutine_self(),
+      .serialising = false,
+      .overlap_offset = offset,
+      .overlap_bytes = bytes,
+  };
+
+  qemu_co_queue_init(&req->wait_queue);
+
+  QLIST_INSERT_HEAD(&bs->tracked_requests, req, list);
+}"	claude-3-5-sonnet-20241022	This function initializes and registers a new block device request tracking structure (BdrvTrackedRequest) with specified parameters and adds it to the block driver state's tracked request list.	2	1	0.4440665154950869	0.018561813742586367	{'f': 0.30303029906336093, 'p': 0.5555555555555556, 'r': 0.20833333333333334}	{'f': 0.058823525813149015, 'p': 0.125, 'r': 0.038461538461538464}	{'f': 0.30303029906336093, 'p': 0.5555555555555556, 'r': 0.20833333333333334}	0.85	0.39098289608955383
+gexpander-gex-client-c-9f870ec/gex/gex_settings.c	Write settings INI file via TinyFrame	2	"bool GEX_IniWrite(GexClient *gex, const char *buffer) {
+  uint8_t buf[8];
+  PayloadBuilder pb = pb_start(buf, 8, NULL);
+  pb_u32(&pb, (uint32_t)strlen(buffer));
+
+  GexBulk bw = (GexBulk){
+      .buffer = (uint8_t *)buffer,
+      .len = (uint32_t)strlen(buffer),
+      .req_cmd = MSG_INI_WRITE,
+      .req_data = buf,
+      .req_len = (uint32_t)pb_length(&pb),
+  };
+
+  return GEX_BulkWrite(GEX_SysUnit(gex), &bw);
+}"	claude-3-5-sonnet-20241022	This function writes initialization data to a GEX system by creating a payload with the buffer length and sending it through a bulk write operation.	2	1	0.06329113924050632	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.25	0.21038088202476501
+rexmac-pebble-chronocode-5a85c4a/src/chronocode.c	Initialize the app	2	"static void init(void) {
+
+  SettingsStoreObject stored_settings;
+
+  if (persist_exists(STORAGE_SETTINGS_KEY)) {
+    persist_read_data(STORAGE_SETTINGS_KEY, &stored_settings,
+                      sizeof(stored_settings));
+    settings = stored_settings.flags;
+    language_setting = stored_settings.language;
+  } else {
+    settings = 0;
+    language_setting = LANG_EN_US;
+  }
+
+  window = window_create();
+  window_set_background_color(
+      window, (settings & SETTING_INVERTED) > 0 ? GColorWhite : GColorBlack);
+  window_set_window_handlers(
+      window, (WindowHandlers){.load = window_load, .unload = window_unload});
+  window_stack_push(window, true);
+
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
+  update_time(t);
+
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+
+  Tuplet initial_settings[] = {
+      TupletInteger(SETTING_SYNC_KEY_ALL_CAPS, (settings & SETTING_ALL_CAPS)),
+      TupletInteger(SETTING_SYNC_KEY_INVERTED, (settings & SETTING_INVERTED)),
+      TupletInteger(SETTING_SYNC_KEY_LANGUAGE, language_setting),
+      TupletInteger(SETTING_SYNC_KEY_TWO_MIN_DOTS,
+                    (settings & SETTING_TWO_MIN_DOTS))};
+  app_sync_init(
+      &settings_sync, settings_sync_buffer, sizeof(settings_sync_buffer),
+      initial_settings, ARRAY_LENGTH(initial_settings),
+      settings_sync_tuple_changed_callback, settings_sync_error_callback, NULL);
+  app_message_open(64, 64);
+}"	claude-3-5-sonnet-20241022	This function initializes the app by loading stored settings from persistent storage, creating the main window, setting up time display, and configuring synchronization settings for the Pebble smartwatch application.	2	1	0.26785714285714285	0.013686241957588646	{'f': 0.13793103262782402, 'p': 0.6666666666666666, 'r': 0.07692307692307693}	{'f': 0.06666666542222224, 'p': 0.5, 'r': 0.03571428571428571}	{'f': 0.13793103262782402, 'p': 0.6666666666666666, 'r': 0.07692307692307693}	0.75	0.5637854337692261
+freeciv-freeciv-e4ead30/client/gui-sdl2/spaceshipdlg.c	Popup (or raise) the spaceship dialog for the given player.	2	"void popup_spaceship_dialog(struct player *pPlayer) {
+  struct SMALL_DLG *pSpaceShp;
+
+  if (!(pSpaceShp = get_spaceship_dialog(pPlayer))) {
+    struct widget *pBuf, *pWindow;
+    utf8_str *pstr;
+    char cbuf[128];
+    SDL_Rect area;
+
+    pSpaceShp = fc_calloc(1, sizeof(struct SMALL_DLG));
+
+    fc_snprintf(cbuf, sizeof(cbuf), _(""The %s Spaceship""),
+                nation_adjective_for_player(pPlayer));
+    pstr = create_utf8_from_char(cbuf, adj_font(12));
+    pstr->style |= TTF_STYLE_BOLD;
+
+    pWindow = create_window_skeleton(NULL, pstr, 0);
+
+    pWindow->action = space_dialog_window_callback;
+    set_wstate(pWindow, FC_WS_NORMAL);
+    pWindow->data.player = pPlayer;
+    pWindow->private_data.small_dlg = pSpaceShp;
+    add_to_gui_list(ID_WINDOW, pWindow);
+    pSpaceShp->pEndWidgetList = pWindow;
+
+    area = pWindow->area;
+
+    pBuf = create_themeicon(current_theme->Small_CANCEL_Icon, pWindow->dst,
+                            WF_WIDGET_HAS_INFO_LABEL | WF_RESTORE_BACKGROUND);
+    pBuf->info_label =
+        create_utf8_from_char(_(""Close Dialog (Esc)""), adj_font(12));
+    pBuf->data.player = pPlayer;
+    pBuf->action = exit_space_dialog_callback;
+    set_wstate(pBuf, FC_WS_NORMAL);
+    pBuf->key = SDLK_ESCAPE;
+    area.w = MAX(area.w, (pBuf->size.w + adj_size(10)));
+
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pBuf = create_themeicon_button_from_chars(
+        current_theme->OK_Icon, pWindow->dst, _(""Launch""), adj_font(12), 0);
+
+    pBuf->action = launch_spaceship_callback;
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pstr = create_utf8_from_char(get_spaceship_descr(NULL), adj_font(12));
+    pstr->bgcol = (SDL_Color){0, 0, 0, 0};
+    pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_LABEL, pBuf);
+
+    pSpaceShp->pBeginWidgetList = pBuf;
+
+    area.w = MAX(area.w, adj_size(300) - (pWindow->size.w - pWindow->area.w));
+
+    resize_window(pWindow, NULL, NULL,
+                  (pWindow->size.w - pWindow->area.w) + area.w,
+                  (pWindow->size.h - pWindow->area.h) + area.h);
+
+    area = pWindow->area;
+
+    widget_set_position(pWindow, (main_window_width() - pWindow->size.w) / 2,
+                        (main_window_height() - pWindow->size.h) / 2);
+
+    pBuf = pWindow->prev;
+    pBuf->size.x = area.x + area.w - pBuf->size.w - 1;
+    pBuf->size.y = pWindow->size.y + adj_size(2);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + area.h - pBuf->size.h - adj_size(7);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + adj_size(7);
+
+    dialog_list_prepend(dialog_list, pSpaceShp);
+
+    refresh_spaceship_dialog(pPlayer);
+  } else {
+    if (select_window_group_dialog(pSpaceShp->pBeginWidgetList,
+                                   pSpaceShp->pEndWidgetList)) {
+      widget_flush(pSpaceShp->pEndWidgetList);
+    }
+  }
+}"	claude-3-5-sonnet-20241022	This function creates and displays a spaceship dialog window with launch controls and information, or brings an existing spaceship dialog to the front if one already exists for the given player.	2	1	0.6198347107438017	0.09594785034023696	{'f': 0.388888885138889, 'p': 0.7777777777777778, 'r': 0.25925925925925924}	{'f': 0.21052631217451526, 'p': 0.4444444444444444, 'r': 0.13793103448275862}	{'f': 0.388888885138889, 'p': 0.7777777777777778, 'r': 0.25925925925925924}	0.85	0.6681942939758301
+particle-iot-device-os-7fbf145/wiring/inc/spark_wiring_mesh.h	Determines if the given handler exists.	2	"#include ""scope_guard.h""
+#include <memory>
+
+#include ""spark_wiring_thread.h""
+
+namespace spark {
+
+class MeshSignal : public particle::Signal {
+public:
+  int rssi = 2;
+  int qual = 0;
+
+  MeshSignal() {}
+  virtual ~MeshSignal(){};
+
+  operator int8_t() const { return 2; }
+
+  virtual hal_net_access_tech_t getAccessTechnology() const {
+    return NET_ACCESS_TECHNOLOGY_IEEE802154;
+  }
+
+  virtual float getStrength() const { return 0.0f; }"	claude-3-5-sonnet-20241022	This code defines a MeshSignal class that represents signal information for mesh networking, inheriting from particle::Signal and providing basic signal strength and quality attributes along with related functionality.	2	1	0.0	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.0	0.07959616184234619
+dm-vdo-kvdo-8df6805/vdo/base/blockAllocator.c	Get the aggregated slab journal statistics for the slabs in this allocator.	2	"SlabJournalStatistics
+getSlabJournalStatistics(const BlockAllocator *allocator) {
+  const AtomicSlabJournalStatistics *atoms = &allocator->slabJournalStatistics;
+  return (SlabJournalStatistics){
+      .diskFullCount = atomicLoad64(&atoms->diskFullCount),
+      .flushCount = atomicLoad64(&atoms->flushCount),
+      .blockedCount = atomicLoad64(&atoms->blockedCount),
+      .blocksWritten = atomicLoad64(&atoms->blocksWritten),
+      .tailBusyCount = atomicLoad64(&atoms->tailBusyCount),
+  };
+}"	claude-3-5-sonnet-20241022	This function retrieves atomic statistics about slab journal operations (like disk full events, flushes, and blocks written) from a BlockAllocator and returns them in a non-atomic structure.	2	1	0.27555555555555555	0.017554679594930896	{'f': 0.22222221797839511, 'p': 0.36363636363636365, 'r': 0.16}	{'f': 0.054054049875822095, 'p': 0.09090909090909091, 'r': 0.038461538461538464}	{'f': 0.16666666242283962, 'p': 0.2727272727272727, 'r': 0.12}	0.85	0.6614096164703369
+opalenzuela-opendomo-1adadbd/src/odbase/src/script.c	Process a comments line and format the output in HTML or XML.	2	"script_process_comments(const char *buf) {
+  char tipname[50];
+  char *classname = NULL;
+  char *contents = NULL;
+
+  if (strlen(buf) < 3)
+    return;
+
+  if (gui == html) {
+    if ((buf[0] == '-') && (buf[1] == '-')) {
+      printf(""\t<hr/>\n"");
+    } else if (SPELL3(buf, 'E', 'R', 'R')) {
+      printf(""\t<p class='error'>%s</p>\n"", T(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R')) {
+      printf(""\t<p class='warning'>%s</p>\n"", T(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F')) {
+      printf(""\t<p class='info'>%s</p>\n"", T(buf += 5));
+    } else if (SPELL3(buf, 'T', 'I', 'P')) {
+      printf(""\t<p class='tooltip tip'>%s</p>\n"", T(buf += 4));
+    } else if (SPELL3(buf, 'L', 'O', 'A')) {
+
+      printf(""\t<p class='loading'>%s</p>\n"", T(buf += 8));
+
+      printf(""<script type='text/Javascript'>\n""
+             ""$(function($){\n""
+             ""	$('p.loading').hide() ;\n""
+             ""});\n""
+             ""</script>\n"");
+    } else if (SPELL3(buf, 'U', 'R', 'L')) {
+      printf(""\t<p class='link'>""
+             ""<a href='%s' target='_blank'>%s</a></p>\n"",
+             buf += 4, buf);
+    } else if (buf[0] == '>') {
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    } else {
+
+      if (buf[0] == ' ') {
+        printf(""\t<p class='comments'>%s</p>\n"", T(buf += 1));
+      } else {
+        classname = strtok(buf, "" "");
+        contents = strtok(NULL, ""\n"");
+
+        printf(""\t<p class='%s'>%s</p>\n"", classname, T(contents));
+      }
+    }
+  } else {
+    if (SPELL3(buf, 'E', 'R', 'R') || SPELL3(buf, 'e', 'r', 'r')) {
+      printf(""\t<error description='%s'/>\n"", CT(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R') || SPELL3(buf, 'w', 'a', 'r')) {
+      printf(""\t<warning description='%s'/>\n"", CT(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F') || SPELL3(buf, 'i', 'n', 'f'))
+      printf(""\t<info description='%s'/>\n"", CT(buf += 5));
+    else if (buf[0] == '>')
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    else
+      printf(""\t<message description='%s'/>\n"", CT(buf += 1));
+  }
+}"	claude-3-5-sonnet-20241022	This function processes and formats different types of comments (errors, warnings, info, etc.) and converts them into either HTML or XML output depending on the GUI mode.	2	1	0.5098308184727938	0.04269823452354303	{'f': 0.3684210483102493, 'p': 0.5833333333333334, 'r': 0.2692307692307692}	{'f': 0.10810810392987599, 'p': 0.18181818181818182, 'r': 0.07692307692307693}	{'f': 0.2631578904155125, 'p': 0.4166666666666667, 'r': 0.19230769230769232}	0.85	0.535248875617981
+makestuff-neroJtag-b7f0313/LUFA-110528/LUFA/Drivers/USB/Class/Host/MassStorage.c	Retrieves the Mass Storage device's inquiry data for the specified LUN, indicating the device characteristics and properties.	0	"uint8_t MS_Host_GetInquiryData(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                               const uint8_t LUNIndex,
+                               SCSI_Inquiry_Response_t *const InquiryData) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  uint8_t ErrorCode;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .DataTransferLength = sizeof(SCSI_Inquiry_Response_t),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_INQUIRY, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Inquiry_Response_t), 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock,
+                                       InquiryData)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  if ((ErrorCode = MS_Host_GetReturnedStatus(
+           MSInterfaceInfo, &SCSICommandStatus)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  return PIPE_RWSTREAM_NoError;
+}"	claude-3-5-sonnet-20241022	This function sends a SCSI INQUIRY command to a USB Mass Storage device to retrieve information about a specific Logical Unit Number (LUN) and stores the response data in the provided buffer.	2	1	0.3435135135135135	0.017448767890681335	{'f': 0.32558139080584103, 'p': 0.4666666666666667, 'r': 0.25}	{'f': 0.0425531869986424, 'p': 0.0625, 'r': 0.03225806451612903}	{'f': 0.18604650708491086, 'p': 0.26666666666666666, 'r': 0.14285714285714285}	0.95	0.7035620212554932
+seemk-TileSweep-627999b/tilesweep/third_party/h2o/lib/handler/mimemap.c	returns the default mime attributes given a mime type	2	"void h2o_mimemap_get_default_attributes(const char *_mime,
+                                        h2o_mime_attributes_t *attr) {
+  char *mime = alloca(strlen(_mime) + 1);
+  strcpy(mime, _mime);
+
+  const char *type_end_at;
+
+  if ((type_end_at = strchr(mime, ';')) == NULL)
+    type_end_at = mime + strlen(mime);
+
+  *attr = (h2o_mime_attributes_t){0};
+
+  if (h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/css"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/javascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/javascript""))) {
+    attr->is_compressible = 1;
+    attr->priority = H2O_MIME_ATTRIBUTE_PRIORITY_HIGHEST;
+  } else if (h2o_memis(mime, type_end_at - mime,
+                       H2O_STRLIT(""application/json"")) ||
+             strncmp(mime, ""text/"", 5) == 0 ||
+             h2o_strstr(mime, type_end_at - mime, H2O_STRLIT(""+xml"")) !=
+                 SIZE_MAX) {
+    attr->is_compressible = 1;
+  }
+}"	claude-3-5-sonnet-20241022	This function assigns default compression and priority attributes to MIME types, particularly marking text-based formats (CSS, JavaScript, JSON, and XML) as compressible and setting their priority levels.	2	1	0.3444444444444445	0.008301095462822575	{'f': 0.12499999625000012, 'p': 0.25, 'r': 0.08333333333333333}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.12499999625000012, 'p': 0.25, 'r': 0.08333333333333333}	0.65	0.4108516573905945
+openastroproject-openastro-ec7e71c/ext/ffmpeg/libavformat/utils.c	Add a new stream to a media file. When demuxing, it is called by the demuxer in read_header(). If the flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also be called in read_packet().	2	"AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c) {
+  AVStream *st;
+  int i;
+  AVStream **streams;
+
+  if (s->nb_streams >= FFMIN(s->max_streams, INT_MAX / sizeof(*streams))) {
+    if (s->max_streams < INT_MAX / sizeof(*streams))
+      av_log(s, AV_LOG_ERROR,
+             ""Number of streams exceeds max_streams parameter (%d), see the ""
+             ""documentation if you wish to increase it\n"",
+             s->max_streams);
+    return NULL;
+  }
+  streams = av_realloc_array(s->streams, s->nb_streams + 1, sizeof(*streams));
+  if (!streams)
+    return NULL;
+  s->streams = streams;
+
+  st = av_mallocz(sizeof(AVStream));
+  if (!st)
+    return NULL;
+  if (!(st->info = av_mallocz(sizeof(*st->info)))) {
+    av_free(st);
+    return NULL;
+  }
+  st->info->last_dts = AV_NOPTS_VALUE;
+
+  st->codec = avcodec_alloc_context3(c);
+  if (!st->codec) {
+    av_free(st->info);
+    av_free(st);
+    return NULL;
+  }
+  if (s->iformat) {
+
+    st->codec->bit_rate = 0;
+
+    avpriv_set_pts_info(st, 33, 1, 90000);
+  }
+
+  st->index = s->nb_streams;
+  st->start_time = AV_NOPTS_VALUE;
+  st->duration = AV_NOPTS_VALUE;
+
+  st->cur_dts = s->iformat ? RELATIVE_TS_BASE : 0;
+  st->first_dts = AV_NOPTS_VALUE;
+  st->probe_packets = MAX_PROBE_PACKETS;
+  st->pts_wrap_reference = AV_NOPTS_VALUE;
+  st->pts_wrap_behavior = AV_PTS_WRAP_IGNORE;
+
+  st->last_IP_pts = AV_NOPTS_VALUE;
+  st->last_dts_for_order_check = AV_NOPTS_VALUE;
+  for (i = 0; i < MAX_REORDER_DELAY + 1; i++)
+    st->pts_buffer[i] = AV_NOPTS_VALUE;
+
+  st->sample_aspect_ratio = (AVRational){0, 1};
+
+#if FF_API_R_FRAME_RATE
+  st->info->last_dts = AV_NOPTS_VALUE;
+#endif
+  st->info->fps_first_dts = AV_NOPTS_VALUE;
+  st->info->fps_last_dts = AV_NOPTS_VALUE;
+
+  st->inject_global_side_data = s->internal->inject_global_side_data;
+
+  s->streams[s->nb_streams++] = st;
+  return st;
+}"	claude-3-5-sonnet-20241022	This function creates and initializes a new AVStream structure within an AVFormatContext, allocating necessary memory and setting default values for stream parameters like timestamps and codec information.	3	1	0.06006006006006006	0.012605595221428385	{'f': 0.11538461039201205, 'p': 0.1111111111111111, 'r': 0.12}	{'f': 0.033898300155128555, 'p': 0.030303030303030304, 'r': 0.038461538461538464}	{'f': 0.11538461039201205, 'p': 0.1111111111111111, 'r': 0.12}	0.48	0.567955732345581
+dakami-autoclave-84ab84b/old_but_working_qemu/block/io.c	Add an active request to the tracked requests list	2	"static void tracked_request_begin(BdrvTrackedRequest *req, BlockDriverState *bs,
+                                  int64_t offset, unsigned int bytes,
+                                  enum BdrvTrackedRequestType type) {
+  *req = (BdrvTrackedRequest){
+      .bs = bs,
+      .offset = offset,
+      .bytes = bytes,
+      .type = type,
+      .co = qemu_coroutine_self(),
+      .serialising = false,
+      .overlap_offset = offset,
+      .overlap_bytes = bytes,
+  };
+
+  qemu_co_queue_init(&req->wait_queue);
+
+  QLIST_INSERT_HEAD(&bs->tracked_requests, req, list);
+}"	claude-3-5-sonnet-20241022	This function initializes a new block device request tracking structure and adds it to the list of tracked requests for a given block device state.	3	1	0.54004620716211	0.02507378338946741	{'f': 0.38709677007284077, 'p': 0.6666666666666666, 'r': 0.2727272727272727}	{'f': 0.1290322542351718, 'p': 0.25, 'r': 0.08695652173913043}	{'f': 0.32258064104058276, 'p': 0.5555555555555556, 'r': 0.22727272727272727}	0.85	0.4248981475830078
+gexpander-gex-client-c-9f870ec/gex/gex_settings.c	Write settings INI file via TinyFrame	2	"bool GEX_IniWrite(GexClient *gex, const char *buffer) {
+  uint8_t buf[8];
+  PayloadBuilder pb = pb_start(buf, 8, NULL);
+  pb_u32(&pb, (uint32_t)strlen(buffer));
+
+  GexBulk bw = (GexBulk){
+      .buffer = (uint8_t *)buffer,
+      .len = (uint32_t)strlen(buffer),
+      .req_cmd = MSG_INI_WRITE,
+      .req_data = buf,
+      .req_len = (uint32_t)pb_length(&pb),
+  };
+
+  return GEX_BulkWrite(GEX_SysUnit(gex), &bw);
+}"	claude-3-5-sonnet-20241022	This function writes initialization data from a buffer to a GEX system unit by creating a bulk write request with the buffer's length and content.	3	1	0.06329113924050632	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.25	0.22618481516838074
+rexmac-pebble-chronocode-5a85c4a/src/chronocode.c	Initialize the app	2	"static void init(void) {
+
+  SettingsStoreObject stored_settings;
+
+  if (persist_exists(STORAGE_SETTINGS_KEY)) {
+    persist_read_data(STORAGE_SETTINGS_KEY, &stored_settings,
+                      sizeof(stored_settings));
+    settings = stored_settings.flags;
+    language_setting = stored_settings.language;
+  } else {
+    settings = 0;
+    language_setting = LANG_EN_US;
+  }
+
+  window = window_create();
+  window_set_background_color(
+      window, (settings & SETTING_INVERTED) > 0 ? GColorWhite : GColorBlack);
+  window_set_window_handlers(
+      window, (WindowHandlers){.load = window_load, .unload = window_unload});
+  window_stack_push(window, true);
+
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
+  update_time(t);
+
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+
+  Tuplet initial_settings[] = {
+      TupletInteger(SETTING_SYNC_KEY_ALL_CAPS, (settings & SETTING_ALL_CAPS)),
+      TupletInteger(SETTING_SYNC_KEY_INVERTED, (settings & SETTING_INVERTED)),
+      TupletInteger(SETTING_SYNC_KEY_LANGUAGE, language_setting),
+      TupletInteger(SETTING_SYNC_KEY_TWO_MIN_DOTS,
+                    (settings & SETTING_TWO_MIN_DOTS))};
+  app_sync_init(
+      &settings_sync, settings_sync_buffer, sizeof(settings_sync_buffer),
+      initial_settings, ARRAY_LENGTH(initial_settings),
+      settings_sync_tuple_changed_callback, settings_sync_error_callback, NULL);
+  app_message_open(64, 64);
+}"	claude-3-5-sonnet-20241022	This function initializes a watchface application by setting up persistent storage, creating a window, configuring display settings, and establishing synchronization with the phone app through AppSync.	3	1	0.2830188679245283	0.008640609739997756	{'f': 0.14285714094387758, 'p': 0.6666666666666666, 'r': 0.08}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.14285714094387758, 'p': 0.6666666666666666, 'r': 0.08}	0.65	0.4816240966320038
+freeciv-freeciv-e4ead30/client/gui-sdl2/spaceshipdlg.c	Popup (or raise) the spaceship dialog for the given player.	2	"void popup_spaceship_dialog(struct player *pPlayer) {
+  struct SMALL_DLG *pSpaceShp;
+
+  if (!(pSpaceShp = get_spaceship_dialog(pPlayer))) {
+    struct widget *pBuf, *pWindow;
+    utf8_str *pstr;
+    char cbuf[128];
+    SDL_Rect area;
+
+    pSpaceShp = fc_calloc(1, sizeof(struct SMALL_DLG));
+
+    fc_snprintf(cbuf, sizeof(cbuf), _(""The %s Spaceship""),
+                nation_adjective_for_player(pPlayer));
+    pstr = create_utf8_from_char(cbuf, adj_font(12));
+    pstr->style |= TTF_STYLE_BOLD;
+
+    pWindow = create_window_skeleton(NULL, pstr, 0);
+
+    pWindow->action = space_dialog_window_callback;
+    set_wstate(pWindow, FC_WS_NORMAL);
+    pWindow->data.player = pPlayer;
+    pWindow->private_data.small_dlg = pSpaceShp;
+    add_to_gui_list(ID_WINDOW, pWindow);
+    pSpaceShp->pEndWidgetList = pWindow;
+
+    area = pWindow->area;
+
+    pBuf = create_themeicon(current_theme->Small_CANCEL_Icon, pWindow->dst,
+                            WF_WIDGET_HAS_INFO_LABEL | WF_RESTORE_BACKGROUND);
+    pBuf->info_label =
+        create_utf8_from_char(_(""Close Dialog (Esc)""), adj_font(12));
+    pBuf->data.player = pPlayer;
+    pBuf->action = exit_space_dialog_callback;
+    set_wstate(pBuf, FC_WS_NORMAL);
+    pBuf->key = SDLK_ESCAPE;
+    area.w = MAX(area.w, (pBuf->size.w + adj_size(10)));
+
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pBuf = create_themeicon_button_from_chars(
+        current_theme->OK_Icon, pWindow->dst, _(""Launch""), adj_font(12), 0);
+
+    pBuf->action = launch_spaceship_callback;
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pstr = create_utf8_from_char(get_spaceship_descr(NULL), adj_font(12));
+    pstr->bgcol = (SDL_Color){0, 0, 0, 0};
+    pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_LABEL, pBuf);
+
+    pSpaceShp->pBeginWidgetList = pBuf;
+
+    area.w = MAX(area.w, adj_size(300) - (pWindow->size.w - pWindow->area.w));
+
+    resize_window(pWindow, NULL, NULL,
+                  (pWindow->size.w - pWindow->area.w) + area.w,
+                  (pWindow->size.h - pWindow->area.h) + area.h);
+
+    area = pWindow->area;
+
+    widget_set_position(pWindow, (main_window_width() - pWindow->size.w) / 2,
+                        (main_window_height() - pWindow->size.h) / 2);
+
+    pBuf = pWindow->prev;
+    pBuf->size.x = area.x + area.w - pBuf->size.w - 1;
+    pBuf->size.y = pWindow->size.y + adj_size(2);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + area.h - pBuf->size.h - adj_size(7);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + adj_size(7);
+
+    dialog_list_prepend(dialog_list, pSpaceShp);
+
+    refresh_spaceship_dialog(pPlayer);
+  } else {
+    if (select_window_group_dialog(pSpaceShp->pBeginWidgetList,
+                                   pSpaceShp->pEndWidgetList)) {
+      widget_flush(pSpaceShp->pEndWidgetList);
+    }
+  }
+}"	claude-3-5-sonnet-20241022	This function creates and displays a dialog window for managing a player's spaceship, including options to view its description, launch it, and close the dialog.	3	1	0.21739130434782608	0.010713701843513142	{'f': 0.25806451200832464, 'p': 0.4444444444444444, 'r': 0.18181818181818182}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.19354838297606666, 'p': 0.3333333333333333, 'r': 0.13636363636363635}	0.75	0.6405893564224243
+particle-iot-device-os-7fbf145/wiring/inc/spark_wiring_mesh.h	Determines if the given handler exists.	2	"#include ""scope_guard.h""
+#include <memory>
+
+#include ""spark_wiring_thread.h""
+
+namespace spark {
+
+class MeshSignal : public particle::Signal {
+public:
+  int rssi = 2;
+  int qual = 0;
+
+  MeshSignal() {}
+  virtual ~MeshSignal(){};
+
+  operator int8_t() const { return 2; }
+
+  virtual hal_net_access_tech_t getAccessTechnology() const {
+    return NET_ACCESS_TECHNOLOGY_IEEE802154;
+  }
+
+  virtual float getStrength() const { return 0.0f; }"	claude-3-5-sonnet-20241022	This code defines a MeshSignal class that inherits from particle::Signal and handles mesh network signal information with properties like RSSI and quality, specifically for IEEE802154 technology.	3	1	0.0	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.0	0.06496262550354004
+dm-vdo-kvdo-8df6805/vdo/base/blockAllocator.c	Get the aggregated slab journal statistics for the slabs in this allocator.	2	"SlabJournalStatistics
+getSlabJournalStatistics(const BlockAllocator *allocator) {
+  const AtomicSlabJournalStatistics *atoms = &allocator->slabJournalStatistics;
+  return (SlabJournalStatistics){
+      .diskFullCount = atomicLoad64(&atoms->diskFullCount),
+      .flushCount = atomicLoad64(&atoms->flushCount),
+      .blockedCount = atomicLoad64(&atoms->blockedCount),
+      .blocksWritten = atomicLoad64(&atoms->blocksWritten),
+      .tailBusyCount = atomicLoad64(&atoms->tailBusyCount),
+  };
+}"	claude-3-5-sonnet-20241022	This function retrieves and returns various statistics about slab journal operations from a BlockAllocator by atomically loading counter values from its slabJournalStatistics structure.	3	1	0.24093511450381674	0.019383418023456653	{'f': 0.18181817737373748, 'p': 0.2727272727272727, 'r': 0.13636363636363635}	{'f': 0.060606056161616496, 'p': 0.09090909090909091, 'r': 0.045454545454545456}	{'f': 0.12121211676767694, 'p': 0.18181818181818182, 'r': 0.09090909090909091}	0.85	0.7296473979949951
+opalenzuela-opendomo-1adadbd/src/odbase/src/script.c	Process a comments line and format the output in HTML or XML.	2	"script_process_comments(const char *buf) {
+  char tipname[50];
+  char *classname = NULL;
+  char *contents = NULL;
+
+  if (strlen(buf) < 3)
+    return;
+
+  if (gui == html) {
+    if ((buf[0] == '-') && (buf[1] == '-')) {
+      printf(""\t<hr/>\n"");
+    } else if (SPELL3(buf, 'E', 'R', 'R')) {
+      printf(""\t<p class='error'>%s</p>\n"", T(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R')) {
+      printf(""\t<p class='warning'>%s</p>\n"", T(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F')) {
+      printf(""\t<p class='info'>%s</p>\n"", T(buf += 5));
+    } else if (SPELL3(buf, 'T', 'I', 'P')) {
+      printf(""\t<p class='tooltip tip'>%s</p>\n"", T(buf += 4));
+    } else if (SPELL3(buf, 'L', 'O', 'A')) {
+
+      printf(""\t<p class='loading'>%s</p>\n"", T(buf += 8));
+
+      printf(""<script type='text/Javascript'>\n""
+             ""$(function($){\n""
+             ""	$('p.loading').hide() ;\n""
+             ""});\n""
+             ""</script>\n"");
+    } else if (SPELL3(buf, 'U', 'R', 'L')) {
+      printf(""\t<p class='link'>""
+             ""<a href='%s' target='_blank'>%s</a></p>\n"",
+             buf += 4, buf);
+    } else if (buf[0] == '>') {
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    } else {
+
+      if (buf[0] == ' ') {
+        printf(""\t<p class='comments'>%s</p>\n"", T(buf += 1));
+      } else {
+        classname = strtok(buf, "" "");
+        contents = strtok(NULL, ""\n"");
+
+        printf(""\t<p class='%s'>%s</p>\n"", classname, T(contents));
+      }
+    }
+  } else {
+    if (SPELL3(buf, 'E', 'R', 'R') || SPELL3(buf, 'e', 'r', 'r')) {
+      printf(""\t<error description='%s'/>\n"", CT(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R') || SPELL3(buf, 'w', 'a', 'r')) {
+      printf(""\t<warning description='%s'/>\n"", CT(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F') || SPELL3(buf, 'i', 'n', 'f'))
+      printf(""\t<info description='%s'/>\n"", CT(buf += 5));
+    else if (buf[0] == '>')
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    else
+      printf(""\t<message description='%s'/>\n"", CT(buf += 1));
+  }
+}"	claude-3-5-sonnet-20241022	This function processes and formats different types of comment messages (like errors, warnings, info) and displays them in either HTML or XML format depending on the output mode.	3	1	0.6091911764705882	0.04701040821391918	{'f': 0.41025640599605523, 'p': 0.6666666666666666, 'r': 0.2962962962962963}	{'f': 0.15789473272853197, 'p': 0.2727272727272727, 'r': 0.1111111111111111}	{'f': 0.25641025214990143, 'p': 0.4166666666666667, 'r': 0.18518518518518517}	0.85	0.5455939769744873
+makestuff-neroJtag-b7f0313/LUFA-110528/LUFA/Drivers/USB/Class/Host/MassStorage.c	Retrieves the Mass Storage device's inquiry data for the specified LUN, indicating the device characteristics and properties.	0	"uint8_t MS_Host_GetInquiryData(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                               const uint8_t LUNIndex,
+                               SCSI_Inquiry_Response_t *const InquiryData) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  uint8_t ErrorCode;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .DataTransferLength = sizeof(SCSI_Inquiry_Response_t),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_INQUIRY, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Inquiry_Response_t), 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock,
+                                       InquiryData)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  if ((ErrorCode = MS_Host_GetReturnedStatus(
+           MSInterfaceInfo, &SCSICommandStatus)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  return PIPE_RWSTREAM_NoError;
+}"	claude-3-5-sonnet-20241022	The function retrieves device inquiry data from a USB Mass Storage device by sending a SCSI INQUIRY command and storing the response in the provided buffer.	3	1	0.3836742231866661	0.02584145048742771	{'f': 0.36842104785318563, 'p': 0.4666666666666667, 'r': 0.30434782608695654}	{'f': 0.09756097085068434, 'p': 0.125, 'r': 0.08}	{'f': 0.15789473206371207, 'p': 0.2, 'r': 0.13043478260869565}	0.85	0.7178124189376831
+seemk-TileSweep-627999b/tilesweep/third_party/h2o/lib/handler/mimemap.c	returns the default mime attributes given a mime type	2	"void h2o_mimemap_get_default_attributes(const char *_mime,
+                                        h2o_mime_attributes_t *attr) {
+  char *mime = alloca(strlen(_mime) + 1);
+  strcpy(mime, _mime);
+
+  const char *type_end_at;
+
+  if ((type_end_at = strchr(mime, ';')) == NULL)
+    type_end_at = mime + strlen(mime);
+
+  *attr = (h2o_mime_attributes_t){0};
+
+  if (h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/css"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/javascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/javascript""))) {
+    attr->is_compressible = 1;
+    attr->priority = H2O_MIME_ATTRIBUTE_PRIORITY_HIGHEST;
+  } else if (h2o_memis(mime, type_end_at - mime,
+                       H2O_STRLIT(""application/json"")) ||
+             strncmp(mime, ""text/"", 5) == 0 ||
+             h2o_strstr(mime, type_end_at - mime, H2O_STRLIT(""+xml"")) !=
+                 SIZE_MAX) {
+    attr->is_compressible = 1;
+  }
+}"	claude-3-5-sonnet-20241022	The function determines default MIME attributes for different content types, setting compression and priority flags based on the MIME type string provided as input.	3	1	0.6044703595724004	0.011191021613657745	{'f': 0.25806451229968785, 'p': 0.5, 'r': 0.17391304347826086}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.1935483832674298, 'p': 0.375, 'r': 0.13043478260869565}	0.85	0.5683164596557617
+openastroproject-openastro-ec7e71c/ext/ffmpeg/libavformat/utils.c	Add a new stream to a media file. When demuxing, it is called by the demuxer in read_header(). If the flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also be called in read_packet().	2	"AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c) {
+  AVStream *st;
+  int i;
+  AVStream **streams;
+
+  if (s->nb_streams >= FFMIN(s->max_streams, INT_MAX / sizeof(*streams))) {
+    if (s->max_streams < INT_MAX / sizeof(*streams))
+      av_log(s, AV_LOG_ERROR,
+             ""Number of streams exceeds max_streams parameter (%d), see the ""
+             ""documentation if you wish to increase it\n"",
+             s->max_streams);
+    return NULL;
+  }
+  streams = av_realloc_array(s->streams, s->nb_streams + 1, sizeof(*streams));
+  if (!streams)
+    return NULL;
+  s->streams = streams;
+
+  st = av_mallocz(sizeof(AVStream));
+  if (!st)
+    return NULL;
+  if (!(st->info = av_mallocz(sizeof(*st->info)))) {
+    av_free(st);
+    return NULL;
+  }
+  st->info->last_dts = AV_NOPTS_VALUE;
+
+  st->codec = avcodec_alloc_context3(c);
+  if (!st->codec) {
+    av_free(st->info);
+    av_free(st);
+    return NULL;
+  }
+  if (s->iformat) {
+
+    st->codec->bit_rate = 0;
+
+    avpriv_set_pts_info(st, 33, 1, 90000);
+  }
+
+  st->index = s->nb_streams;
+  st->start_time = AV_NOPTS_VALUE;
+  st->duration = AV_NOPTS_VALUE;
+
+  st->cur_dts = s->iformat ? RELATIVE_TS_BASE : 0;
+  st->first_dts = AV_NOPTS_VALUE;
+  st->probe_packets = MAX_PROBE_PACKETS;
+  st->pts_wrap_reference = AV_NOPTS_VALUE;
+  st->pts_wrap_behavior = AV_PTS_WRAP_IGNORE;
+
+  st->last_IP_pts = AV_NOPTS_VALUE;
+  st->last_dts_for_order_check = AV_NOPTS_VALUE;
+  for (i = 0; i < MAX_REORDER_DELAY + 1; i++)
+    st->pts_buffer[i] = AV_NOPTS_VALUE;
+
+  st->sample_aspect_ratio = (AVRational){0, 1};
+
+#if FF_API_R_FRAME_RATE
+  st->info->last_dts = AV_NOPTS_VALUE;
+#endif
+  st->info->fps_first_dts = AV_NOPTS_VALUE;
+  st->info->fps_last_dts = AV_NOPTS_VALUE;
+
+  st->inject_global_side_data = s->internal->inject_global_side_data;
+
+  s->streams[s->nb_streams++] = st;
+  return st;
+}"	claude-3-5-sonnet-20241022	The function creates and initializes a new AVStream structure within an AVFormatContext, setting up necessary parameters for media streaming and returning the newly created stream.	4	1	0.10574018126888216	0.014054682713491752	{'f': 0.19607842638985018, 'p': 0.18518518518518517, 'r': 0.20833333333333334}	{'f': 0.03508771442290003, 'p': 0.030303030303030304, 'r': 0.041666666666666664}	{'f': 0.15686274011534043, 'p': 0.14814814814814814, 'r': 0.16666666666666666}	0.7	0.5527968406677246
+dakami-autoclave-84ab84b/old_but_working_qemu/block/io.c	Add an active request to the tracked requests list	2	"static void tracked_request_begin(BdrvTrackedRequest *req, BlockDriverState *bs,
+                                  int64_t offset, unsigned int bytes,
+                                  enum BdrvTrackedRequestType type) {
+  *req = (BdrvTrackedRequest){
+      .bs = bs,
+      .offset = offset,
+      .bytes = bytes,
+      .type = type,
+      .co = qemu_coroutine_self(),
+      .serialising = false,
+      .overlap_offset = offset,
+      .overlap_bytes = bytes,
+  };
+
+  qemu_co_queue_init(&req->wait_queue);
+
+  QLIST_INSERT_HEAD(&bs->tracked_requests, req, list);
+}"	claude-3-5-sonnet-20241022	The function initializes a tracked request structure with given parameters and adds it to the block driver state's tracked request list for managing I/O operations.	4	1	0.45244512899499423	0.020144990145560468	{'f': 0.31249999595703126, 'p': 0.5555555555555556, 'r': 0.21739130434782608}	{'f': 0.06451612520291386, 'p': 0.125, 'r': 0.043478260869565216}	{'f': 0.31249999595703126, 'p': 0.5555555555555556, 'r': 0.21739130434782608}	0.9	0.4218270778656006
+gexpander-gex-client-c-9f870ec/gex/gex_settings.c	Write settings INI file via TinyFrame	2	"bool GEX_IniWrite(GexClient *gex, const char *buffer) {
+  uint8_t buf[8];
+  PayloadBuilder pb = pb_start(buf, 8, NULL);
+  pb_u32(&pb, (uint32_t)strlen(buffer));
+
+  GexBulk bw = (GexBulk){
+      .buffer = (uint8_t *)buffer,
+      .len = (uint32_t)strlen(buffer),
+      .req_cmd = MSG_INI_WRITE,
+      .req_data = buf,
+      .req_len = (uint32_t)pb_length(&pb),
+  };
+
+  return GEX_BulkWrite(GEX_SysUnit(gex), &bw);
+}"	claude-3-5-sonnet-20241022	The function writes initialization data from a buffer to a GEX system unit by creating a bulk write request with the buffer's length and content.	4	1	0.06329113924050632	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.25	0.2014019787311554
+rexmac-pebble-chronocode-5a85c4a/src/chronocode.c	Initialize the app	2	"static void init(void) {
+
+  SettingsStoreObject stored_settings;
+
+  if (persist_exists(STORAGE_SETTINGS_KEY)) {
+    persist_read_data(STORAGE_SETTINGS_KEY, &stored_settings,
+                      sizeof(stored_settings));
+    settings = stored_settings.flags;
+    language_setting = stored_settings.language;
+  } else {
+    settings = 0;
+    language_setting = LANG_EN_US;
+  }
+
+  window = window_create();
+  window_set_background_color(
+      window, (settings & SETTING_INVERTED) > 0 ? GColorWhite : GColorBlack);
+  window_set_window_handlers(
+      window, (WindowHandlers){.load = window_load, .unload = window_unload});
+  window_stack_push(window, true);
+
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
+  update_time(t);
+
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+
+  Tuplet initial_settings[] = {
+      TupletInteger(SETTING_SYNC_KEY_ALL_CAPS, (settings & SETTING_ALL_CAPS)),
+      TupletInteger(SETTING_SYNC_KEY_INVERTED, (settings & SETTING_INVERTED)),
+      TupletInteger(SETTING_SYNC_KEY_LANGUAGE, language_setting),
+      TupletInteger(SETTING_SYNC_KEY_TWO_MIN_DOTS,
+                    (settings & SETTING_TWO_MIN_DOTS))};
+  app_sync_init(
+      &settings_sync, settings_sync_buffer, sizeof(settings_sync_buffer),
+      initial_settings, ARRAY_LENGTH(initial_settings),
+      settings_sync_tuple_changed_callback, settings_sync_error_callback, NULL);
+  app_message_open(64, 64);
+}"	claude-3-5-sonnet-20241022	This function initializes the app by loading stored settings, creating a window, setting up time display, and configuring synchronization settings for a Pebble smartwatch application.	4	1	0.5662393162393163	0.016020720994064933	{'f': 0.15384615180473374, 'p': 0.6666666666666666, 'r': 0.08695652173913043}	{'f': 0.0769230755029586, 'p': 0.5, 'r': 0.041666666666666664}	{'f': 0.15384615180473374, 'p': 0.6666666666666666, 'r': 0.08695652173913043}	0.85	0.5791561603546143
+freeciv-freeciv-e4ead30/client/gui-sdl2/spaceshipdlg.c	Popup (or raise) the spaceship dialog for the given player.	2	"void popup_spaceship_dialog(struct player *pPlayer) {
+  struct SMALL_DLG *pSpaceShp;
+
+  if (!(pSpaceShp = get_spaceship_dialog(pPlayer))) {
+    struct widget *pBuf, *pWindow;
+    utf8_str *pstr;
+    char cbuf[128];
+    SDL_Rect area;
+
+    pSpaceShp = fc_calloc(1, sizeof(struct SMALL_DLG));
+
+    fc_snprintf(cbuf, sizeof(cbuf), _(""The %s Spaceship""),
+                nation_adjective_for_player(pPlayer));
+    pstr = create_utf8_from_char(cbuf, adj_font(12));
+    pstr->style |= TTF_STYLE_BOLD;
+
+    pWindow = create_window_skeleton(NULL, pstr, 0);
+
+    pWindow->action = space_dialog_window_callback;
+    set_wstate(pWindow, FC_WS_NORMAL);
+    pWindow->data.player = pPlayer;
+    pWindow->private_data.small_dlg = pSpaceShp;
+    add_to_gui_list(ID_WINDOW, pWindow);
+    pSpaceShp->pEndWidgetList = pWindow;
+
+    area = pWindow->area;
+
+    pBuf = create_themeicon(current_theme->Small_CANCEL_Icon, pWindow->dst,
+                            WF_WIDGET_HAS_INFO_LABEL | WF_RESTORE_BACKGROUND);
+    pBuf->info_label =
+        create_utf8_from_char(_(""Close Dialog (Esc)""), adj_font(12));
+    pBuf->data.player = pPlayer;
+    pBuf->action = exit_space_dialog_callback;
+    set_wstate(pBuf, FC_WS_NORMAL);
+    pBuf->key = SDLK_ESCAPE;
+    area.w = MAX(area.w, (pBuf->size.w + adj_size(10)));
+
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pBuf = create_themeicon_button_from_chars(
+        current_theme->OK_Icon, pWindow->dst, _(""Launch""), adj_font(12), 0);
+
+    pBuf->action = launch_spaceship_callback;
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pstr = create_utf8_from_char(get_spaceship_descr(NULL), adj_font(12));
+    pstr->bgcol = (SDL_Color){0, 0, 0, 0};
+    pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_LABEL, pBuf);
+
+    pSpaceShp->pBeginWidgetList = pBuf;
+
+    area.w = MAX(area.w, adj_size(300) - (pWindow->size.w - pWindow->area.w));
+
+    resize_window(pWindow, NULL, NULL,
+                  (pWindow->size.w - pWindow->area.w) + area.w,
+                  (pWindow->size.h - pWindow->area.h) + area.h);
+
+    area = pWindow->area;
+
+    widget_set_position(pWindow, (main_window_width() - pWindow->size.w) / 2,
+                        (main_window_height() - pWindow->size.h) / 2);
+
+    pBuf = pWindow->prev;
+    pBuf->size.x = area.x + area.w - pBuf->size.w - 1;
+    pBuf->size.y = pWindow->size.y + adj_size(2);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + area.h - pBuf->size.h - adj_size(7);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + adj_size(7);
+
+    dialog_list_prepend(dialog_list, pSpaceShp);
+
+    refresh_spaceship_dialog(pPlayer);
+  } else {
+    if (select_window_group_dialog(pSpaceShp->pBeginWidgetList,
+                                   pSpaceShp->pEndWidgetList)) {
+      widget_flush(pSpaceShp->pEndWidgetList);
+    }
+  }
+}"	claude-3-5-sonnet-20241022	This function creates and displays a dialog window for managing a player's spaceship, showing launch controls and spaceship description, or brings an existing spaceship dialog to the front if it already exists.	4	1	0.34949908925318757	0.015514392335273455	{'f': 0.2777777740277778, 'p': 0.5555555555555556, 'r': 0.18518518518518517}	{'f': 0.04999999651250024, 'p': 0.1111111111111111, 'r': 0.03225806451612903}	{'f': 0.22222221847222226, 'p': 0.4444444444444444, 'r': 0.14814814814814814}	0.85	0.6417052745819092
+particle-iot-device-os-7fbf145/wiring/inc/spark_wiring_mesh.h	Determines if the given handler exists.	2	"#include ""scope_guard.h""
+#include <memory>
+
+#include ""spark_wiring_thread.h""
+
+namespace spark {
+
+class MeshSignal : public particle::Signal {
+public:
+  int rssi = 2;
+  int qual = 0;
+
+  MeshSignal() {}
+  virtual ~MeshSignal(){};
+
+  operator int8_t() const { return 2; }
+
+  virtual hal_net_access_tech_t getAccessTechnology() const {
+    return NET_ACCESS_TECHNOLOGY_IEEE802154;
+  }
+
+  virtual float getStrength() const { return 0.0f; }"	claude-3-5-sonnet-20241022	The code defines a MeshSignal class that inherits from particle::Signal to handle mesh network signals with properties like RSSI and quality, specifically for IEEE802154 technology.	4	1	0.06329113924050632	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.0	0.08973075449466705
+dm-vdo-kvdo-8df6805/vdo/base/blockAllocator.c	Get the aggregated slab journal statistics for the slabs in this allocator.	2	"SlabJournalStatistics
+getSlabJournalStatistics(const BlockAllocator *allocator) {
+  const AtomicSlabJournalStatistics *atoms = &allocator->slabJournalStatistics;
+  return (SlabJournalStatistics){
+      .diskFullCount = atomicLoad64(&atoms->diskFullCount),
+      .flushCount = atomicLoad64(&atoms->flushCount),
+      .blockedCount = atomicLoad64(&atoms->blockedCount),
+      .blocksWritten = atomicLoad64(&atoms->blocksWritten),
+      .tailBusyCount = atomicLoad64(&atoms->tailBusyCount),
+  };
+}"	claude-3-5-sonnet-20241022	This function retrieves various statistical counters related to slab journal operations from a block allocator by atomically loading values from its internal statistics structure.	4	1	0.28181818181818186	0.019900763312868126	{'f': 0.23529411326989624, 'p': 0.36363636363636365, 'r': 0.17391304347826086}	{'f': 0.0588235250346024, 'p': 0.09090909090909091, 'r': 0.043478260869565216}	{'f': 0.17647058385813158, 'p': 0.2727272727272727, 'r': 0.13043478260869565}	0.85	0.7172101736068726
+opalenzuela-opendomo-1adadbd/src/odbase/src/script.c	Process a comments line and format the output in HTML or XML.	2	"script_process_comments(const char *buf) {
+  char tipname[50];
+  char *classname = NULL;
+  char *contents = NULL;
+
+  if (strlen(buf) < 3)
+    return;
+
+  if (gui == html) {
+    if ((buf[0] == '-') && (buf[1] == '-')) {
+      printf(""\t<hr/>\n"");
+    } else if (SPELL3(buf, 'E', 'R', 'R')) {
+      printf(""\t<p class='error'>%s</p>\n"", T(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R')) {
+      printf(""\t<p class='warning'>%s</p>\n"", T(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F')) {
+      printf(""\t<p class='info'>%s</p>\n"", T(buf += 5));
+    } else if (SPELL3(buf, 'T', 'I', 'P')) {
+      printf(""\t<p class='tooltip tip'>%s</p>\n"", T(buf += 4));
+    } else if (SPELL3(buf, 'L', 'O', 'A')) {
+
+      printf(""\t<p class='loading'>%s</p>\n"", T(buf += 8));
+
+      printf(""<script type='text/Javascript'>\n""
+             ""$(function($){\n""
+             ""	$('p.loading').hide() ;\n""
+             ""});\n""
+             ""</script>\n"");
+    } else if (SPELL3(buf, 'U', 'R', 'L')) {
+      printf(""\t<p class='link'>""
+             ""<a href='%s' target='_blank'>%s</a></p>\n"",
+             buf += 4, buf);
+    } else if (buf[0] == '>') {
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    } else {
+
+      if (buf[0] == ' ') {
+        printf(""\t<p class='comments'>%s</p>\n"", T(buf += 1));
+      } else {
+        classname = strtok(buf, "" "");
+        contents = strtok(NULL, ""\n"");
+
+        printf(""\t<p class='%s'>%s</p>\n"", classname, T(contents));
+      }
+    }
+  } else {
+    if (SPELL3(buf, 'E', 'R', 'R') || SPELL3(buf, 'e', 'r', 'r')) {
+      printf(""\t<error description='%s'/>\n"", CT(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R') || SPELL3(buf, 'w', 'a', 'r')) {
+      printf(""\t<warning description='%s'/>\n"", CT(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F') || SPELL3(buf, 'i', 'n', 'f'))
+      printf(""\t<info description='%s'/>\n"", CT(buf += 5));
+    else if (buf[0] == '>')
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    else
+      printf(""\t<message description='%s'/>\n"", CT(buf += 1));
+  }
+}"	claude-3-5-sonnet-20241022	This function processes different types of comments (like errors, warnings, info, tips) and formats them into either HTML or XML output based on the input buffer and GUI mode.	4	1	0.5023880328016581	0.03958755899435821	{'f': 0.3499999958, 'p': 0.5833333333333334, 'r': 0.25}	{'f': 0.10256409851413557, 'p': 0.18181818181818182, 'r': 0.07142857142857142}	{'f': 0.24999999580000004, 'p': 0.4166666666666667, 'r': 0.17857142857142858}	0.85	0.5815296769142151
+makestuff-neroJtag-b7f0313/LUFA-110528/LUFA/Drivers/USB/Class/Host/MassStorage.c	Retrieves the Mass Storage device's inquiry data for the specified LUN, indicating the device characteristics and properties.	0	"uint8_t MS_Host_GetInquiryData(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                               const uint8_t LUNIndex,
+                               SCSI_Inquiry_Response_t *const InquiryData) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  uint8_t ErrorCode;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .DataTransferLength = sizeof(SCSI_Inquiry_Response_t),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_INQUIRY, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Inquiry_Response_t), 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock,
+                                       InquiryData)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  if ((ErrorCode = MS_Host_GetReturnedStatus(
+           MSInterfaceInfo, &SCSICommandStatus)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  return PIPE_RWSTREAM_NoError;
+}"	claude-3-5-sonnet-20241022	This function sends a SCSI INQUIRY command to a USB Mass Storage device to retrieve information about a specific Logical Unit Number (LUN) and stores the response in the InquiryData structure.	4	1	0.31736446591519063	0.017448767890681335	{'f': 0.285714281122449, 'p': 0.4, 'r': 0.2222222222222222}	{'f': 0.04347825633270369, 'p': 0.0625, 'r': 0.03333333333333333}	{'f': 0.14285713826530627, 'p': 0.2, 'r': 0.1111111111111111}	0.95	0.7355916500091553
+seemk-TileSweep-627999b/tilesweep/third_party/h2o/lib/handler/mimemap.c	returns the default mime attributes given a mime type	2	"void h2o_mimemap_get_default_attributes(const char *_mime,
+                                        h2o_mime_attributes_t *attr) {
+  char *mime = alloca(strlen(_mime) + 1);
+  strcpy(mime, _mime);
+
+  const char *type_end_at;
+
+  if ((type_end_at = strchr(mime, ';')) == NULL)
+    type_end_at = mime + strlen(mime);
+
+  *attr = (h2o_mime_attributes_t){0};
+
+  if (h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/css"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/javascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/javascript""))) {
+    attr->is_compressible = 1;
+    attr->priority = H2O_MIME_ATTRIBUTE_PRIORITY_HIGHEST;
+  } else if (h2o_memis(mime, type_end_at - mime,
+                       H2O_STRLIT(""application/json"")) ||
+             strncmp(mime, ""text/"", 5) == 0 ||
+             h2o_strstr(mime, type_end_at - mime, H2O_STRLIT(""+xml"")) !=
+                 SIZE_MAX) {
+    attr->is_compressible = 1;
+  }
+}"	claude-3-5-sonnet-20241022	This function sets default MIME attributes for different content types, determining their compressibility and priority levels, particularly for text-based files like CSS, JavaScript, JSON, and XML.	4	1	0.1869158878504673	0.008640609739997756	{'f': 0.12499999625000012, 'p': 0.25, 'r': 0.08333333333333333}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.12499999625000012, 'p': 0.25, 'r': 0.08333333333333333}	0.7	0.5455443859100342
+openastroproject-openastro-ec7e71c/ext/ffmpeg/libavformat/utils.c	Add a new stream to a media file. When demuxing, it is called by the demuxer in read_header(). If the flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also be called in read_packet().	2	"AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c) {
+  AVStream *st;
+  int i;
+  AVStream **streams;
+
+  if (s->nb_streams >= FFMIN(s->max_streams, INT_MAX / sizeof(*streams))) {
+    if (s->max_streams < INT_MAX / sizeof(*streams))
+      av_log(s, AV_LOG_ERROR,
+             ""Number of streams exceeds max_streams parameter (%d), see the ""
+             ""documentation if you wish to increase it\n"",
+             s->max_streams);
+    return NULL;
+  }
+  streams = av_realloc_array(s->streams, s->nb_streams + 1, sizeof(*streams));
+  if (!streams)
+    return NULL;
+  s->streams = streams;
+
+  st = av_mallocz(sizeof(AVStream));
+  if (!st)
+    return NULL;
+  if (!(st->info = av_mallocz(sizeof(*st->info)))) {
+    av_free(st);
+    return NULL;
+  }
+  st->info->last_dts = AV_NOPTS_VALUE;
+
+  st->codec = avcodec_alloc_context3(c);
+  if (!st->codec) {
+    av_free(st->info);
+    av_free(st);
+    return NULL;
+  }
+  if (s->iformat) {
+
+    st->codec->bit_rate = 0;
+
+    avpriv_set_pts_info(st, 33, 1, 90000);
+  }
+
+  st->index = s->nb_streams;
+  st->start_time = AV_NOPTS_VALUE;
+  st->duration = AV_NOPTS_VALUE;
+
+  st->cur_dts = s->iformat ? RELATIVE_TS_BASE : 0;
+  st->first_dts = AV_NOPTS_VALUE;
+  st->probe_packets = MAX_PROBE_PACKETS;
+  st->pts_wrap_reference = AV_NOPTS_VALUE;
+  st->pts_wrap_behavior = AV_PTS_WRAP_IGNORE;
+
+  st->last_IP_pts = AV_NOPTS_VALUE;
+  st->last_dts_for_order_check = AV_NOPTS_VALUE;
+  for (i = 0; i < MAX_REORDER_DELAY + 1; i++)
+    st->pts_buffer[i] = AV_NOPTS_VALUE;
+
+  st->sample_aspect_ratio = (AVRational){0, 1};
+
+#if FF_API_R_FRAME_RATE
+  st->info->last_dts = AV_NOPTS_VALUE;
+#endif
+  st->info->fps_first_dts = AV_NOPTS_VALUE;
+  st->info->fps_last_dts = AV_NOPTS_VALUE;
+
+  st->inject_global_side_data = s->internal->inject_global_side_data;
+
+  s->streams[s->nb_streams++] = st;
+  return st;
+}"	claude-3-5-sonnet-20241022	The `avformat_new_stream` function creates and initializes a new media stream within an `AVFormatContext`, allocating necessary memory and setting default values for stream parameters.	5	1	0.0911854103343465	0.01291097349201502	{'f': 0.1666666617447918, 'p': 0.14814814814814814, 'r': 0.19047619047619047}	{'f': 0.036363631563637, 'p': 0.030303030303030304, 'r': 0.045454545454545456}	{'f': 0.12499999507812519, 'p': 0.1111111111111111, 'r': 0.14285714285714285}	0.55	0.5913960933685303
+dakami-autoclave-84ab84b/old_but_working_qemu/block/io.c	Add an active request to the tracked requests list	2	"static void tracked_request_begin(BdrvTrackedRequest *req, BlockDriverState *bs,
+                                  int64_t offset, unsigned int bytes,
+                                  enum BdrvTrackedRequestType type) {
+  *req = (BdrvTrackedRequest){
+      .bs = bs,
+      .offset = offset,
+      .bytes = bytes,
+      .type = type,
+      .co = qemu_coroutine_self(),
+      .serialising = false,
+      .overlap_offset = offset,
+      .overlap_bytes = bytes,
+  };
+
+  qemu_co_queue_init(&req->wait_queue);
+
+  QLIST_INSERT_HEAD(&bs->tracked_requests, req, list);
+}"	claude-3-5-sonnet-20241022	This function initializes a new block device I/O request tracking structure with given parameters and adds it to the tracked requests list of the block driver state.	5	1	0.5300453514739228	0.13597796343834895	{'f': 0.3529411725778547, 'p': 0.6666666666666666, 'r': 0.24}	{'f': 0.23529411404844294, 'p': 0.5, 'r': 0.15384615384615385}	{'f': 0.3529411725778547, 'p': 0.6666666666666666, 'r': 0.24}	0.85	0.3693839907646179
+gexpander-gex-client-c-9f870ec/gex/gex_settings.c	Write settings INI file via TinyFrame	2	"bool GEX_IniWrite(GexClient *gex, const char *buffer) {
+  uint8_t buf[8];
+  PayloadBuilder pb = pb_start(buf, 8, NULL);
+  pb_u32(&pb, (uint32_t)strlen(buffer));
+
+  GexBulk bw = (GexBulk){
+      .buffer = (uint8_t *)buffer,
+      .len = (uint32_t)strlen(buffer),
+      .req_cmd = MSG_INI_WRITE,
+      .req_data = buf,
+      .req_len = (uint32_t)pb_length(&pb),
+  };
+
+  return GEX_BulkWrite(GEX_SysUnit(gex), &bw);
+}"	claude-3-5-sonnet-20241022	This function writes configuration data to a GEX client by creating a bulk write request that includes the length and content of the provided buffer.	5	1	0.06329113924050632	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.35	0.274199515581131
+rexmac-pebble-chronocode-5a85c4a/src/chronocode.c	Initialize the app	2	"static void init(void) {
+
+  SettingsStoreObject stored_settings;
+
+  if (persist_exists(STORAGE_SETTINGS_KEY)) {
+    persist_read_data(STORAGE_SETTINGS_KEY, &stored_settings,
+                      sizeof(stored_settings));
+    settings = stored_settings.flags;
+    language_setting = stored_settings.language;
+  } else {
+    settings = 0;
+    language_setting = LANG_EN_US;
+  }
+
+  window = window_create();
+  window_set_background_color(
+      window, (settings & SETTING_INVERTED) > 0 ? GColorWhite : GColorBlack);
+  window_set_window_handlers(
+      window, (WindowHandlers){.load = window_load, .unload = window_unload});
+  window_stack_push(window, true);
+
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
+  update_time(t);
+
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+
+  Tuplet initial_settings[] = {
+      TupletInteger(SETTING_SYNC_KEY_ALL_CAPS, (settings & SETTING_ALL_CAPS)),
+      TupletInteger(SETTING_SYNC_KEY_INVERTED, (settings & SETTING_INVERTED)),
+      TupletInteger(SETTING_SYNC_KEY_LANGUAGE, language_setting),
+      TupletInteger(SETTING_SYNC_KEY_TWO_MIN_DOTS,
+                    (settings & SETTING_TWO_MIN_DOTS))};
+  app_sync_init(
+      &settings_sync, settings_sync_buffer, sizeof(settings_sync_buffer),
+      initial_settings, ARRAY_LENGTH(initial_settings),
+      settings_sync_tuple_changed_callback, settings_sync_error_callback, NULL);
+  app_message_open(64, 64);
+}"	claude-3-5-sonnet-20241022	This function initializes a Pebble watchface application by loading stored settings, creating a window, setting up time display, and configuring synchronization with the phone app.	5	1	0.2884615384615385	0.009009113474307318	{'f': 0.1481481461728395, 'p': 0.6666666666666666, 'r': 0.08333333333333333}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.1481481461728395, 'p': 0.6666666666666666, 'r': 0.08333333333333333}	0.85	0.43245410919189453
+freeciv-freeciv-e4ead30/client/gui-sdl2/spaceshipdlg.c	Popup (or raise) the spaceship dialog for the given player.	2	"void popup_spaceship_dialog(struct player *pPlayer) {
+  struct SMALL_DLG *pSpaceShp;
+
+  if (!(pSpaceShp = get_spaceship_dialog(pPlayer))) {
+    struct widget *pBuf, *pWindow;
+    utf8_str *pstr;
+    char cbuf[128];
+    SDL_Rect area;
+
+    pSpaceShp = fc_calloc(1, sizeof(struct SMALL_DLG));
+
+    fc_snprintf(cbuf, sizeof(cbuf), _(""The %s Spaceship""),
+                nation_adjective_for_player(pPlayer));
+    pstr = create_utf8_from_char(cbuf, adj_font(12));
+    pstr->style |= TTF_STYLE_BOLD;
+
+    pWindow = create_window_skeleton(NULL, pstr, 0);
+
+    pWindow->action = space_dialog_window_callback;
+    set_wstate(pWindow, FC_WS_NORMAL);
+    pWindow->data.player = pPlayer;
+    pWindow->private_data.small_dlg = pSpaceShp;
+    add_to_gui_list(ID_WINDOW, pWindow);
+    pSpaceShp->pEndWidgetList = pWindow;
+
+    area = pWindow->area;
+
+    pBuf = create_themeicon(current_theme->Small_CANCEL_Icon, pWindow->dst,
+                            WF_WIDGET_HAS_INFO_LABEL | WF_RESTORE_BACKGROUND);
+    pBuf->info_label =
+        create_utf8_from_char(_(""Close Dialog (Esc)""), adj_font(12));
+    pBuf->data.player = pPlayer;
+    pBuf->action = exit_space_dialog_callback;
+    set_wstate(pBuf, FC_WS_NORMAL);
+    pBuf->key = SDLK_ESCAPE;
+    area.w = MAX(area.w, (pBuf->size.w + adj_size(10)));
+
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pBuf = create_themeicon_button_from_chars(
+        current_theme->OK_Icon, pWindow->dst, _(""Launch""), adj_font(12), 0);
+
+    pBuf->action = launch_spaceship_callback;
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pstr = create_utf8_from_char(get_spaceship_descr(NULL), adj_font(12));
+    pstr->bgcol = (SDL_Color){0, 0, 0, 0};
+    pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_LABEL, pBuf);
+
+    pSpaceShp->pBeginWidgetList = pBuf;
+
+    area.w = MAX(area.w, adj_size(300) - (pWindow->size.w - pWindow->area.w));
+
+    resize_window(pWindow, NULL, NULL,
+                  (pWindow->size.w - pWindow->area.w) + area.w,
+                  (pWindow->size.h - pWindow->area.h) + area.h);
+
+    area = pWindow->area;
+
+    widget_set_position(pWindow, (main_window_width() - pWindow->size.w) / 2,
+                        (main_window_height() - pWindow->size.h) / 2);
+
+    pBuf = pWindow->prev;
+    pBuf->size.x = area.x + area.w - pBuf->size.w - 1;
+    pBuf->size.y = pWindow->size.y + adj_size(2);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + area.h - pBuf->size.h - adj_size(7);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + adj_size(7);
+
+    dialog_list_prepend(dialog_list, pSpaceShp);
+
+    refresh_spaceship_dialog(pPlayer);
+  } else {
+    if (select_window_group_dialog(pSpaceShp->pBeginWidgetList,
+                                   pSpaceShp->pEndWidgetList)) {
+      widget_flush(pSpaceShp->pEndWidgetList);
+    }
+  }
+}"	claude-3-5-sonnet-20241022	This function creates and displays a dialog window for managing a player's spaceship, including launch controls and ship description, or brings an existing spaceship dialog to the front if it already exists.	5	1	0.34949908925318757	0.015514392335273455	{'f': 0.270270266588751, 'p': 0.5555555555555556, 'r': 0.17857142857142858}	{'f': 0.04999999651250024, 'p': 0.1111111111111111, 'r': 0.03225806451612903}	{'f': 0.21621621253469692, 'p': 0.4444444444444444, 'r': 0.14285714285714285}	0.85	0.6440860033035278
+particle-iot-device-os-7fbf145/wiring/inc/spark_wiring_mesh.h	Determines if the given handler exists.	2	"#include ""scope_guard.h""
+#include <memory>
+
+#include ""spark_wiring_thread.h""
+
+namespace spark {
+
+class MeshSignal : public particle::Signal {
+public:
+  int rssi = 2;
+  int qual = 0;
+
+  MeshSignal() {}
+  virtual ~MeshSignal(){};
+
+  operator int8_t() const { return 2; }
+
+  virtual hal_net_access_tech_t getAccessTechnology() const {
+    return NET_ACCESS_TECHNOLOGY_IEEE802154;
+  }
+
+  virtual float getStrength() const { return 0.0f; }"	claude-3-5-sonnet-20241022	This code defines a `MeshSignal` class that represents signal properties in a mesh network, inheriting from `particle::Signal` and providing signal strength and quality information.	5	1	0.0	0.0	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	0.0	0.06069502606987953
+dm-vdo-kvdo-8df6805/vdo/base/blockAllocator.c	Get the aggregated slab journal statistics for the slabs in this allocator.	2	"SlabJournalStatistics
+getSlabJournalStatistics(const BlockAllocator *allocator) {
+  const AtomicSlabJournalStatistics *atoms = &allocator->slabJournalStatistics;
+  return (SlabJournalStatistics){
+      .diskFullCount = atomicLoad64(&atoms->diskFullCount),
+      .flushCount = atomicLoad64(&atoms->flushCount),
+      .blockedCount = atomicLoad64(&atoms->blockedCount),
+      .blocksWritten = atomicLoad64(&atoms->blocksWritten),
+      .tailBusyCount = atomicLoad64(&atoms->tailBusyCount),
+  };
+}"	claude-3-5-sonnet-20241022	This function retrieves various statistical counters from a block allocator's slab journal by atomically loading values from its atomic statistics structure and returning them in a non-atomic statistics structure.	5	1	0.31123276561232766	0.016275776313613193	{'f': 0.22222221797839511, 'p': 0.36363636363636365, 'r': 0.16}	{'f': 0.05263157483379533, 'p': 0.09090909090909091, 'r': 0.037037037037037035}	{'f': 0.22222221797839511, 'p': 0.36363636363636365, 'r': 0.16}	0.85	0.6696913242340088
+opalenzuela-opendomo-1adadbd/src/odbase/src/script.c	Process a comments line and format the output in HTML or XML.	2	"script_process_comments(const char *buf) {
+  char tipname[50];
+  char *classname = NULL;
+  char *contents = NULL;
+
+  if (strlen(buf) < 3)
+    return;
+
+  if (gui == html) {
+    if ((buf[0] == '-') && (buf[1] == '-')) {
+      printf(""\t<hr/>\n"");
+    } else if (SPELL3(buf, 'E', 'R', 'R')) {
+      printf(""\t<p class='error'>%s</p>\n"", T(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R')) {
+      printf(""\t<p class='warning'>%s</p>\n"", T(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F')) {
+      printf(""\t<p class='info'>%s</p>\n"", T(buf += 5));
+    } else if (SPELL3(buf, 'T', 'I', 'P')) {
+      printf(""\t<p class='tooltip tip'>%s</p>\n"", T(buf += 4));
+    } else if (SPELL3(buf, 'L', 'O', 'A')) {
+
+      printf(""\t<p class='loading'>%s</p>\n"", T(buf += 8));
+
+      printf(""<script type='text/Javascript'>\n""
+             ""$(function($){\n""
+             ""	$('p.loading').hide() ;\n""
+             ""});\n""
+             ""</script>\n"");
+    } else if (SPELL3(buf, 'U', 'R', 'L')) {
+      printf(""\t<p class='link'>""
+             ""<a href='%s' target='_blank'>%s</a></p>\n"",
+             buf += 4, buf);
+    } else if (buf[0] == '>') {
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    } else {
+
+      if (buf[0] == ' ') {
+        printf(""\t<p class='comments'>%s</p>\n"", T(buf += 1));
+      } else {
+        classname = strtok(buf, "" "");
+        contents = strtok(NULL, ""\n"");
+
+        printf(""\t<p class='%s'>%s</p>\n"", classname, T(contents));
+      }
+    }
+  } else {
+    if (SPELL3(buf, 'E', 'R', 'R') || SPELL3(buf, 'e', 'r', 'r')) {
+      printf(""\t<error description='%s'/>\n"", CT(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R') || SPELL3(buf, 'w', 'a', 'r')) {
+      printf(""\t<warning description='%s'/>\n"", CT(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F') || SPELL3(buf, 'i', 'n', 'f'))
+      printf(""\t<info description='%s'/>\n"", CT(buf += 5));
+    else if (buf[0] == '>')
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    else
+      printf(""\t<message description='%s'/>\n"", CT(buf += 1));
+  }
+}"	claude-3-5-sonnet-20241022	This function processes and formats different types of comments (like errors, warnings, tips) and outputs them in either HTML or XML format based on the input buffer content.	5	1	0.5470588235294117	0.04247869905261408	{'f': 0.41025640599605523, 'p': 0.6666666666666666, 'r': 0.2962962962962963}	{'f': 0.10526315378116359, 'p': 0.18181818181818182, 'r': 0.07407407407407407}	{'f': 0.3076923034319527, 'p': 0.5, 'r': 0.2222222222222222}	0.85	0.5846949815750122
+makestuff-neroJtag-b7f0313/LUFA-110528/LUFA/Drivers/USB/Class/Host/MassStorage.c	Retrieves the Mass Storage device's inquiry data for the specified LUN, indicating the device characteristics and properties.	0	"uint8_t MS_Host_GetInquiryData(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                               const uint8_t LUNIndex,
+                               SCSI_Inquiry_Response_t *const InquiryData) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  uint8_t ErrorCode;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .DataTransferLength = sizeof(SCSI_Inquiry_Response_t),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_INQUIRY, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Inquiry_Response_t), 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock,
+                                       InquiryData)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  if ((ErrorCode = MS_Host_GetReturnedStatus(
+           MSInterfaceInfo, &SCSICommandStatus)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  return PIPE_RWSTREAM_NoError;
+}"	claude-3-5-sonnet-20241022	This function sends a SCSI INQUIRY command to a specific Logical Unit Number (LUN) on a USB Mass Storage device and retrieves its inquiry data containing device information.	5	1	0.423572744014733	0.023103257620595934	{'f': 0.34999999531250003, 'p': 0.4666666666666667, 'r': 0.28}	{'f': 0.09302325114115761, 'p': 0.125, 'r': 0.07407407407407407}	{'f': 0.24999999531250006, 'p': 0.3333333333333333, 'r': 0.2}	0.95	0.7318089008331299
+seemk-TileSweep-627999b/tilesweep/third_party/h2o/lib/handler/mimemap.c	returns the default mime attributes given a mime type	2	"void h2o_mimemap_get_default_attributes(const char *_mime,
+                                        h2o_mime_attributes_t *attr) {
+  char *mime = alloca(strlen(_mime) + 1);
+  strcpy(mime, _mime);
+
+  const char *type_end_at;
+
+  if ((type_end_at = strchr(mime, ';')) == NULL)
+    type_end_at = mime + strlen(mime);
+
+  *attr = (h2o_mime_attributes_t){0};
+
+  if (h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/css"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/javascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/javascript""))) {
+    attr->is_compressible = 1;
+    attr->priority = H2O_MIME_ATTRIBUTE_PRIORITY_HIGHEST;
+  } else if (h2o_memis(mime, type_end_at - mime,
+                       H2O_STRLIT(""application/json"")) ||
+             strncmp(mime, ""text/"", 5) == 0 ||
+             h2o_strstr(mime, type_end_at - mime, H2O_STRLIT(""+xml"")) !=
+                 SIZE_MAX) {
+    attr->is_compressible = 1;
+  }
+}"	claude-3-5-sonnet-20241022	This function determines default MIME attributes for different content types, setting compression and priority flags based on the MIME type (like text/css, JavaScript, JSON, or XML).	5	1	0.5257009345794392	0.010275474580767148	{'f': 0.24242423875114788, 'p': 0.5, 'r': 0.16}	{'f': 0.0, 'p': 0.0, 'r': 0.0}	{'f': 0.1818181781450873, 'p': 0.375, 'r': 0.12}	0.85	0.5784966349601746

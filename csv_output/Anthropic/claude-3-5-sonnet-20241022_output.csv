@@ -1,0 +1,4875 @@
+filename,comment,preds,stripped_code,meteor_score,bleu_4,rouge_1,rouge_2,rouge_L
+BRAINSia-BRAINSTools-11a70b1/ARCHIVE/BRAINSSurfaceTools/BRAINSSurfaceCommon/itkMeshToMeshRegistrationMethod.h,Method invoked by the pipeline in order to trigger the computation of the registration.,2,"using Superclass::MakeOutput;
+
+virtual DataObjectPointer MakeOutput(size_t idx) override;
+
+unsigned long GetMTime() const override;
+
+protected:
+MeshToMeshRegistrationMethod();
+virtual ~MeshToMeshRegistrationMethod(){};
+void PrintSelf(std::ostream &os, Indent indent) const override;
+
+void GenerateData() override;
+
+private:
+MetricPointer m_Metric;
+OptimizerType::Pointer m_Optimizer;
+
+MovingMeshConstPointer m_MovingMesh;
+FixedMeshConstPointer m_FixedMesh;
+
+TransformPointer m_Transform;
+InterpolatorPointer m_Interpolator;
+
+ParametersType m_InitialTransformParameters;
+ParametersType m_LastTransformParameters;
+}
+;
+}",0.0,0.0,--,--,--
+PhilipZwanenburg-DPGSolver-b48e04b/src/testing/unit/test_unit_bases.c,Provides unit tests for the orthonormal simplex basis functions.,2,"static void
+test_unit_basis_simplex_orthonormal(struct Test_Info *const test_info) {
+  UNUSED(test_info);
+  bool pass = false;
+  double *tol = NULL;
+  bool *differences = NULL;
+
+  struct Basis_Data_SI_Ortho *b_data_a = constructor_Basis_Data_SI_Ortho('a'),
+                             *b_data_c = constructor_Basis_Data_SI_Ortho('c');
+
+  tol = (double[]){
+      10 * EPS,
+      20 * EPS,
+      10 * EPS,
+  };
+  differences = (bool[]){
+      diff_const_Matrix_d(b_data_a->phi22, b_data_c->phi22, tol[0]),
+      diff_const_Matrix_d(b_data_a->phi23, b_data_c->phi23, tol[1]),
+      diff_const_Matrix_d(b_data_a->phi32, b_data_c->phi32, tol[2]),
+  };
+  if (check_diff(3, differences, &pass)) {
+    if (differences[0])
+      print_diff_const_Matrix_d(b_data_a->phi22, b_data_c->phi22, tol[0]);
+    if (differences[1])
+      print_diff_const_Matrix_d(b_data_a->phi23, b_data_c->phi23, tol[1]);
+    if (differences[2])
+      print_diff_const_Matrix_d(b_data_a->phi32, b_data_c->phi32, tol[2]);
+  }
+  expect_condition(pass, ""basis"");
+
+  tol = (double[]){
+      2 * EPS,
+      EPS,
+  };
+  differences = (bool[]){
+      diff_const_Multiarray_Matrix_d(b_data_a->grad_phi22, b_data_c->grad_phi22,
+                                     tol[0]),
+      diff_const_Multiarray_Matrix_d(b_data_a->grad_phi31, b_data_c->grad_phi31,
+                                     tol[1]),
+  };
+  if (check_diff(2, differences, &pass)) {
+    if (differences[0])
+      print_diff_const_Multiarray_Matrix_d(b_data_a->grad_phi22,
+                                           b_data_c->grad_phi22, tol[0]);
+    if (differences[1])
+      print_diff_const_Multiarray_Matrix_d(b_data_a->grad_phi31,
+                                           b_data_c->grad_phi31, tol[1]);
+  }
+  expect_condition(pass, ""grad basis"");
+
+  tol = (double[]){
+      20 * EPS,
+      30 * EPS,
+  };
+  differences = (bool[]){
+      diff_const_Matrix_d(b_data_a->m_24, b_data_c->m_24, tol[0]),
+      diff_const_Matrix_d(b_data_a->m_34, b_data_c->m_34, tol[1]),
+  };
+  if (check_diff(2, differences, &pass)) {
+    if (differences[0])
+      print_diff_const_Matrix_d(b_data_a->m_24, b_data_c->m_24, tol[0]);
+    if (differences[1])
+      print_diff_const_Matrix_d(b_data_a->m_34, b_data_c->m_34, tol[1]);
+  }
+  expect_condition(pass, ""mass matrix"");
+
+  tol = (double[]){
+      9 * EPS,
+      8e4 * EPS,
+  };
+  differences = (bool[]){
+      diff_const_Multiarray_d(b_data_a->grad_coef_25, b_data_c->grad_coef_25,
+                              tol[0]),
+      diff_const_Multiarray_d(b_data_a->grad_coef_37, b_data_c->grad_coef_37,
+                              tol[1]),
+  };
+  if (check_diff(2, differences, &pass)) {
+    if (differences[0])
+      print_diff_const_Multiarray_d(b_data_a->grad_coef_25,
+                                    b_data_c->grad_coef_25, tol[0]);
+    if (differences[1])
+      print_diff_const_Multiarray_d(b_data_a->grad_coef_37,
+                                    b_data_c->grad_coef_37, tol[1]);
+  }
+  expect_condition(pass, ""gradient evaluation"");
+
+  destructor_Basis_Data_SI_Ortho(b_data_a);
+  destructor_Basis_Data_SI_Ortho(b_data_c);
+
+  assert_condition(pass);
+}",0.0,0.0,--,--,--
+MightyPork-avr-projects-1c993f8/projects/color-memory-game/main.c,Randomly place pairs of cards on the board,2,"void deal_cards() {
+
+  for (uint8_t i = 0; i < CARD_COUNT; ++i) {
+    board[i] = (tile_t){.color = 0, .state = GONE};
+  }
+
+  const uint8_t dealt_cards =
+      get_pin(FLAG_SMALL) ? CARD_COUNT : CARD_COUNT_SMALL;
+
+  for (uint8_t i = 0; i < (dealt_cards / 2); ++i) {
+
+    for (uint8_t j = 0; j < 2; j++) {
+
+      while (1) {
+        const uint8_t pos = rand() % dealt_cards;
+
+        if (board[pos].state == GONE) {
+          board[pos] = (tile_t){.color = i, .state = SECRET};
+          break;
+        }
+      }
+    }
+  }
+}",0.0,0.0,--,--,--
+StarLabMakerSpace-Nova4Mixly-bed4f4f/nova/hardware/nova/avr/bootloaders/Caterina-ORG/LUFA-111009/LUFA/Drivers/USB/Class/Host/MassStorage.c,"Retrieves the Mass Storage device's inquiry data for the specified LUN, indicating the device characteristics and properties.",0,"uint8_t MS_Host_GetInquiryData(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                               const uint8_t LUNIndex,
+                               SCSI_Inquiry_Response_t *const InquiryData) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  uint8_t ErrorCode;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .DataTransferLength = CPU_TO_LE32(sizeof(SCSI_Inquiry_Response_t)),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_INQUIRY, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Inquiry_Response_t), 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock,
+                                       InquiryData)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  if ((ErrorCode = MS_Host_GetReturnedStatus(
+           MSInterfaceInfo, &SCSICommandStatus)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  return PIPE_RWSTREAM_NoError;
+}",0.0,0.0,--,--,--
+multitheftauto-mtasa-blue-1f5e9f8/vendor/ehs/ehs.h,adds new data to psBuffer,2,"NetworkAbstraction *GetNetworkAbstraction();
+
+int TrySend(const char *ipMessage, size_t inLength, int inFlags = 0);
+}
+;
+
+class EHSServer;
+
+class EHS {
+
+protected:
+  EHSMap oEHSMap;
+
+  EHS *poParent;
+
+  std::string sRegisteredAs;
+
+  EHSServer *poEHSServer;
+
+  EHS *m_poSourceEHS;
+
+public:
+  EHS(EHS *ipoParent = NULL, std::string isRegisteredAs = """");
+
+  virtual ~EHS();
+
+  void SetCertificateFile(std::string &irsCertificateFile);
+
+  void SetCertificatePassphrase(std::string &irsCertificatePassphrase);
+
+  void SetPassphraseCallback(int (*m_ipfOverridePassphraseCallback)(char *, int,
+                                                                    int,
+                                                                    void *));
+
+  void SetParent(EHS *ipoParent, std::string isRegisteredAs);
+
+  enum RegisterEHSResult {
+    REGISTEREHSINTERFACE_INVALID = 0,
+    REGISTEREHSINTERFACE_ALREADYEXISTS,
+    REGISTEREHSINTERFACE_SUCCESS
+  };
+
+  RegisterEHSResult RegisterEHS(EHS *ipoEHS, const char *ipsRegisterPath);
+
+  enum UnregisterEHSResult {
+    UNREGISTEREHSINTERFACE_INVALID = 0,
+    UNREGISTEREHSINTERFACE_NOTREGISTERED,
+    UNREGISTEREHSINTERFACE_SUCCESS
+  };
+
+  UnregisterEHSResult UnregisterEHS(const char *ipsRegisterPath);
+
+  virtual HttpResponse *RouteRequest(HttpRequest *ipoHttpRequest);
+
+  virtual ResponseCode HandleRequest(HttpRequest *ipoHttpRequest,
+                                     HttpResponse *ipoHttpResponse);
+
+  virtual void HttpPulse(void){};
+
+  virtual bool ShouldAllowConnection(const char *szAddress) { return true; }",0.0,0.0,--,--,--
+ARM-software-scmi-tests-24dd373/protocols/power/power_exe.c,The function is called by the test engine before sending the power domain attributes command and testing the received values.,3,"void arm_scmi_custom_test_power_domain_attributes(
+    struct arm_scmi_protocol_execution_context *protocol_execution_context,
+    arm_scmi_test_case_t *test_case) {
+  uint32_t domain_id;
+  int error_code;
+  uint32_t attributes;
+  uint32_t protocol_mask = expected_flags_mask;
+  uint32_t rcv_u, exp_u;
+  char *domain_name;
+  char *rcv_s, *exp_s;
+  struct arm_scmi_protocol_execution_context *prot = protocol_execution_context;
+  enum test_status res;
+
+  test_case->parameter_count = 1;
+  test_case->parameters = (uint32_t[MAX_PARAMETERS_SIZE]){};
+  if (test_case->invalid_parameter ==
+      OFFSET_INVALID_PARAM(struct arm_scmi_power_domain_attributes,
+                           domain_id)) {
+
+    test_case->parameters[OFFSET_PARAM(struct arm_scmi_power_domain_attributes,
+                                       domain_id)] =
+        power_protocol_data.num_power_domains + 1;
+    error_code =
+        arm_scmi_execute_and_assert_test_case(prot, test_case, &received);
+  } else if (test_case->parameter_discovery_driven) {
+
+    for (domain_id = 0; domain_id < power_protocol_data.num_power_domains;
+         ++domain_id) {
+      test_case->parameters[OFFSET_PARAM(
+          struct arm_scmi_power_domain_attributes, domain_id)] = domain_id;
+      snprintf(description, NUM_ELEMS(description), ""\n\t\tPOWER DOMAIN ID %d"",
+               domain_id);
+      arm_scmi_log(&prot->test_stats, description);
+      error_code =
+          arm_scmi_execute_and_assert_test_case(prot, test_case, &received);
+      if (arm_scmi_skip_return_values(error_code, received.status))
+        break;
+      attributes = RETURN_VAL(received, struct arm_scmi_power_domain_attributes,
+                              attributes);
+
+      res = INFO;
+      rcv_u = arm_scmi_get_norm_bits(attributes,
+                                     POWER_DOMAIN_ATTR_STATE_NOTIFICATIONS_HIGH,
+                                     POWER_DOMAIN_ATTR_STATE_NOTIFICATIONS_LOW);
+      snprintf(name, NUM_ELEMS(name),
+               ""POWER STATE CHANGE NOTIFICATIONS SUPPORT"");
+      if ((power_expected->power_state_notification_support != NULL) &&
+          (protocol_mask & LEFT_SHIFT(POWER_STATE_NOTIFICATION_SUPPORT))) {
+        exp_u = power_expected->power_state_notification_support[domain_id];
+        res = (exp_u == rcv_u) ? PASSED : FAILED;
+        snprintf(description, NUM_ELEMS(description),
+                 ""Expected: %d, Received: %d"", exp_u, rcv_u);
+      }
+      if ((res == PASSED) || (res == INFO)) {
+        snprintf(description, NUM_ELEMS(description), ""%d"", rcv_u);
+      }
+      arm_scmi_log_test_result(&prot->test_stats, res, name, description);
+
+      res = INFO;
+      rcv_u = arm_scmi_get_norm_bits(attributes, POWER_DOMAIN_ATTR_ASYNC_HIGH,
+                                     POWER_DOMAIN_ATTR_ASYNC_LOW);
+      snprintf(name, NUM_ELEMS(name), ""POWER ASYNCHRONOUS SUPPORT"");
+      if ((power_expected->power_asynchronous_support != NULL) &&
+          (protocol_mask & LEFT_SHIFT(POWER_ASYNCHRONOUS_SUPPORT))) {
+        exp_u = power_expected->power_asynchronous_support[domain_id];
+        res = (exp_u == rcv_u) ? PASSED : FAILED;
+        snprintf(description, NUM_ELEMS(description),
+                 ""Expected: %d, Received: %d"", exp_u, rcv_u);
+      }
+      if ((res == PASSED) || (res == INFO)) {
+        snprintf(description, NUM_ELEMS(description), ""%d"", rcv_u);
+      }
+      arm_scmi_log_test_result(&prot->test_stats, res, name, description);
+
+      res = INFO;
+      rcv_u = arm_scmi_get_norm_bits(attributes, POWER_DOMAIN_ATTR_SYNC_HIGH,
+                                     POWER_DOMAIN_ATTR_SYNC_LOW);
+      snprintf(name, NUM_ELEMS(name), ""POWER SYNCHRONOUS SUPPORT"");
+      if ((power_expected->power_synchronous_support != NULL) &&
+          (protocol_mask & LEFT_SHIFT(POWER_SYNCHRONOUS_SUPPORT))) {
+        exp_u = power_expected->power_synchronous_support[domain_id];
+        res = (exp_u == rcv_u) ? PASSED : FAILED;
+        snprintf(description, NUM_ELEMS(description),
+                 ""Expected: %d, Received: %d"", exp_u, rcv_u);
+      }
+      if ((res == PASSED) || (res == INFO)) {
+        snprintf(description, NUM_ELEMS(description), ""%d"", rcv_u);
+      }
+      arm_scmi_log_test_result(&prot->test_stats, res, name, description);
+
+      arm_scmi_check_and_report_dec(
+          &prot->test_stats, ALL_BITS_SET, CHECK, RESERVED,
+          arm_scmi_get_norm_bits(attributes, POWER_DOMAIN_ATTR_RESERVED_HIGH,
+                                 POWER_DOMAIN_ATTR_RESERVED_LOW),
+          ""RESERVED"");
+
+      power_protocol_data.attributes[domain_id] = attributes;
+
+      res = INFO;
+      domain_name =
+          RETURN_STR(received, struct arm_scmi_power_domain_attributes, name);
+      rcv_s = domain_name;
+      snprintf(name, NUM_ELEMS(name), ""DOMAIN NAME"");
+      if ((power_expected->power_domain_names != NULL) &&
+          (protocol_mask & LEFT_SHIFT(POWER_DOMAIN_NAMES))) {
+        exp_s = power_expected->power_domain_names[domain_id];
+        res = (strcmp(rcv_s, exp_s) == 0) ? PASSED : FAILED;
+        snprintf(description, NUM_ELEMS(description),
+                 ""Expected: %s, Received: %s"", exp_s, rcv_s);
+      }
+      if ((res == PASSED) || (res == INFO)) {
+        snprintf(description, NUM_ELEMS(description), ""'%s'"", rcv_s);
+      }
+      arm_scmi_log_test_result(&prot->test_stats, INFO, name, description);
+    }
+  }
+}",0.0,0.0,--,--,--
+makestuff-neroJtag-b7f0313/LUFA-110528/LUFA/Drivers/USB/Class/Host/Printer.c,"Soft-resets the attached printer, readying it for new commands.",2,"uint8_t
+PRNT_Host_SoftReset(USB_ClassInfo_PRNT_Host_t *const PRNTInterfaceInfo) {
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType = (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE),
+      .bRequest = PRNT_REQ_SoftReset,
+      .wValue = 0,
+      .wIndex = PRNTInterfaceInfo->State.InterfaceNumber,
+      .wLength = 0,
+  };
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+  return USB_Host_SendControlRequest(NULL);
+}",0.0,0.0,--,--,--
+ARM-software-scmi-tests-24dd373/protocols/clock/clock_exe.c,The function is called by the test engine before sending the clock describe rates command and testing the received values.,3,"void arm_scmi_custom_tester_clock_describe_rates(
+    struct arm_scmi_protocol_execution_context *protocol_execution_context,
+    arm_scmi_test_case_t *test_case) {
+  uint8_t clock_id;
+  uint32_t num_rates_flags;
+  uint8_t num_rates = 0;
+  uint32_t rcv_u, exp_u;
+  uint32_t rate_index = 0;
+  uint32_t remaining_rates;
+  struct arm_scmi_clock_rate *rcv_rates, *rates;
+  size_t nr;
+  struct arm_scmi_protocol_test_stats *test_stats =
+      &protocol_execution_context->test_stats;
+  uint64_t op1, step_size;
+  struct arm_scmi_clock_rate **discrete;
+  int error_code;
+
+  test_case->parameters = (uint32_t[MAX_PARAMETERS_SIZE]){};
+  test_case->parameter_count = 2;
+  if (test_case->invalid_parameter ==
+      OFFSET_INVALID_PARAM(struct arm_scmi_clock_describe_rates, clock_id)) {
+
+    test_case->parameters[OFFSET_PARAM(struct arm_scmi_clock_describe_rates,
+                                       clock_id)] =
+        clock_protocol_data.num_clocks;
+    test_case->parameters[OFFSET_PARAM(struct arm_scmi_clock_describe_rates,
+                                       rate_index)] = 0;
+    arm_scmi_execute_and_assert_test_case(protocol_execution_context, test_case,
+                                          &received);
+  } else {
+
+    for (clock_id = 0; clock_id < clock_protocol_data.num_clocks; ++clock_id) {
+      snprintf(description, NUM_ELEMS(description), ""\n\t\tCLOCK ID %d"",
+               clock_id);
+      arm_scmi_log(test_stats, description);
+      test_case->parameters[OFFSET_PARAM(struct arm_scmi_clock_describe_rates,
+                                         clock_id)] = clock_id;
+      rate_index = 0;
+
+      rates = clock_protocol_data.clocks[clock_id].rates;
+      do {
+
+        test_case->parameters[OFFSET_PARAM(struct arm_scmi_clock_describe_rates,
+                                           rate_index)] = rate_index;
+        error_code = arm_scmi_execute_and_assert_test_case(
+            protocol_execution_context, test_case, &received);
+        if (arm_scmi_skip_return_values(error_code, received.status))
+          break;
+
+        num_rates_flags = RETURN_VAL(
+            received, struct arm_scmi_clock_describe_rates, num_rates_flags);
+
+        remaining_rates = arm_scmi_get_norm_bits(
+            num_rates_flags, CLK_DESCRATE_NUM_RATES_REMAINING_HIGH,
+            CLK_DESCRATE_NUM_RATES_REMAINING_LOW);
+        arm_scmi_check_and_report_dec(test_stats, ALL_BITS_SET, PRINT, 0,
+                                      remaining_rates,
+                                      ""NUMBER OF REMAINING RATES"");
+
+        rcv_u =
+            arm_scmi_get_norm_bits(num_rates_flags, CLK_DESCRATE_RESERVED_HIGH,
+                                   CLK_DESCRATE_RESERVED_LOW);
+        arm_scmi_check_and_report_dec(test_stats, ALL_BITS_SET, CHECK, RESERVED,
+                                      rcv_u, ""RESERVED"");
+
+        uint32_t format = arm_scmi_get_norm_bits(
+            num_rates_flags, CLK_DESCRATE_RETURN_FORMAT_HIGH,
+            CLK_DESCRATE_RETURN_FORMAT_LOW);
+        clock_protocol_data.format = format;
+        if (clock_expected->rate_format_supported) {
+          arm_scmi_check_and_report_dec(
+              test_stats, expected_flags_mask,
+              LEFT_SHIFT(RATE_FORMAT_SUPPORTED),
+              clock_expected->rate_format_supported[clock_id], format,
+              ""FORMAT"");
+        } else {
+          arm_scmi_check_and_report_dec(test_stats, expected_flags_mask,
+                                        LEFT_SHIFT(RATE_FORMAT_SUPPORTED), 0,
+                                        format, ""FORMAT"");
+        }
+
+        num_rates = arm_scmi_get_norm_bits(num_rates_flags,
+                                           CLK_DESCRATE_NUM_RATES_RETURNED_HIGH,
+                                           CLK_DESCRATE_NUM_RATES_RETURNED_LOW);
+        exp_u = clock_expected->num_rates == NULL
+                    ? 0
+                    : clock_expected->num_rates[clock_id];
+        arm_scmi_check_and_report_dec(test_stats, expected_flags_mask,
+                                      LEFT_SHIFT(CLOCK_NUM_RATES), exp_u,
+                                      num_rates, ""NUMBER OF RATES"");
+
+        rcv_rates = (struct arm_scmi_clock_rate *)&received.payload[OFFSET_RET(
+            struct arm_scmi_clock_describe_rates, rates)];
+        if (format == THREE_TUPLE_RATE_FORMAT) {
+
+          exp_u = clock_expected->low_clock_rate == NULL
+                      ? 0
+                      : clock_expected->low_clock_rate[clock_id].lower;
+          arm_scmi_check_and_report_dec(test_stats, expected_flags_mask,
+                                        LEFT_SHIFT(THREE_TUPLE_CLOCK_RATES),
+                                        exp_u, rcv_rates[LOWEST_RATE].lower,
+                                        ""LOWEST RATE {LOWER}"");
+          exp_u = clock_expected->low_clock_rate == NULL
+                      ? 0
+                      : clock_expected->low_clock_rate[clock_id].upper;
+          arm_scmi_check_and_report_dec(test_stats, expected_flags_mask,
+                                        LEFT_SHIFT(THREE_TUPLE_CLOCK_RATES),
+                                        exp_u, rcv_rates[LOWEST_RATE].upper,
+                                        ""LOWEST RATE {UPPER}"");
+
+          exp_u = clock_expected->high_clock_rate == NULL
+                      ? 0
+                      : clock_expected->high_clock_rate[clock_id].lower;
+          arm_scmi_check_and_report_dec(test_stats, expected_flags_mask,
+                                        LEFT_SHIFT(THREE_TUPLE_CLOCK_RATES),
+                                        exp_u, rcv_rates[HIGHEST_RATE].lower,
+                                        ""HIGHEST RATE {LOWER}"");
+          exp_u = clock_expected->high_clock_rate == NULL
+                      ? 0
+                      : clock_expected->high_clock_rate[clock_id].upper;
+          arm_scmi_check_and_report_dec(test_stats, expected_flags_mask,
+                                        LEFT_SHIFT(THREE_TUPLE_CLOCK_RATES),
+                                        exp_u, rcv_rates[HIGHEST_RATE].upper,
+                                        ""HIGHEST RATE {UPPER}"");
+
+          exp_u = clock_expected->step_clock_rate == NULL
+                      ? 0
+                      : clock_expected->step_clock_rate[clock_id].lower;
+          arm_scmi_check_and_report_dec(test_stats, expected_flags_mask,
+                                        LEFT_SHIFT(THREE_TUPLE_CLOCK_RATES),
+                                        exp_u, rcv_rates[STEP_SIZE].lower,
+                                        ""STEP SIZE {LOWER}"");
+          exp_u = clock_expected->step_clock_rate == NULL
+                      ? 0
+                      : clock_expected->step_clock_rate[clock_id].upper;
+          arm_scmi_check_and_report_dec(test_stats, expected_flags_mask,
+                                        LEFT_SHIFT(THREE_TUPLE_CLOCK_RATES),
+                                        exp_u, rcv_rates[STEP_SIZE].upper,
+                                        ""STEP SIZE {UPPER}"");
+
+          rates[MIN_CLOCK] = rcv_rates[LOWEST_RATE];
+          op1 = (((uint64_t)rcv_rates[LOWEST_RATE].upper) << 32) |
+                rcv_rates[LOWEST_RATE].lower;
+          step_size = (((uint64_t)rcv_rates[STEP_SIZE].upper) << 32) |
+                      rcv_rates[STEP_SIZE].lower;
+          op1 += step_size;
+          rates[MIN_CLOCK + 1] = (struct arm_scmi_clock_rate){
+              (uint32_t)op1, (uint32_t)(op1 >> 32)};
+          op1 = (((uint64_t)rcv_rates[HIGHEST_RATE].upper) << 32) |
+                rcv_rates[HIGHEST_RATE].lower;
+          op1 -= step_size;
+          rates[MAX_CLOCK - 1] = (struct arm_scmi_clock_rate){
+              (uint32_t)op1, (uint32_t)(op1 >> 32)};
+          rates[MAX_CLOCK] = rcv_rates[HIGHEST_RATE];
+
+        } else {
+
+          discrete = clock_expected->discrete_clock_rates;
+          for (nr = 0; nr < num_rates; ++nr) {
+            exp_u = clock_expected->discrete_clock_rates == NULL
+                        ? 0
+                        : discrete[clock_id][nr + rate_index].lower;
+            arm_scmi_check_and_report_dec(test_stats, expected_flags_mask,
+                                          LEFT_SHIFT(DISCRETE_CLOCK_RATES),
+                                          exp_u, rcv_rates->lower,
+                                          ""LOWER WORD"");
+            exp_u = clock_expected->discrete_clock_rates == NULL
+                        ? 0
+                        : discrete[clock_id][nr + rate_index].upper;
+            arm_scmi_check_and_report_dec(test_stats, expected_flags_mask,
+                                          LEFT_SHIFT(DISCRETE_CLOCK_RATES),
+                                          exp_u, rcv_rates->upper,
+                                          ""UPPER WORD"");
+
+            if ((rate_index + nr) == 0) {
+              rates[MIN_CLOCK] = rates[MIN_CLOCK + 1] = rates[MAX_CLOCK - 1] =
+                  rates[MAX_CLOCK] = *rcv_rates;
+            } else if ((rate_index + nr) == 1) {
+              rates[MIN_CLOCK + 1] = rates[MAX_CLOCK - 1] = rates[MAX_CLOCK] =
+                  *rcv_rates;
+            }
+            rates[MAX_CLOCK - 1] = rates[MAX_CLOCK];
+            rates[MAX_CLOCK] = *rcv_rates;
+            rcv_rates += 1;
+          }
+        }
+        rate_index += num_rates;
+      } while (remaining_rates > 0);
+    }
+  }
+}",0.0,0.0,--,--,--
+SL-RU-MakiseGUI-971c7c7/MakiseGUI/makise.c,set new border. This region must be smaller then previous. It will be cropped. Borders need for drawing GUI. For gui elements do not leave their & their parent's borders. After setting border & drawing it you need to call makise_rem_border.,2,"MakiseBufferBorderData makise_add_border(MakiseBuffer *buffer,
+                                         MakiseBufferBorder b) {
+  if (buffer == 0)
+    return (MakiseBufferBorderData){0};
+
+  if (b.x < buffer->border.x)
+    b.x = buffer->border.x;
+  if (b.y < buffer->border.y)
+    b.y = buffer->border.y;
+  if (b.w > buffer->border.w + buffer->border.x - b.x)
+    b.w = buffer->border.w + buffer->border.x - b.x;
+  if (b.h > buffer->border.h + buffer->border.y - b.y)
+    b.h = buffer->border.h + buffer->border.y - b.y;
+
+  b.ex = b.x + b.w;
+  b.ey = b.y + b.h;
+
+  MakiseBufferBorder l = buffer->border;
+
+  buffer->border = b;
+
+  return (MakiseBufferBorderData){b, l};
+}",0.0,0.0,--,--,--
+openastroproject-openastro-ec7e71c/ext/ffmpeg/libavformat/utils.c,"Add a new stream to a media file. When demuxing, it is called by the demuxer in read_header(). If the flag AVFMTCTX_NOHEADER is set in s.ctx_flags, then it may also be called in read_packet().",2,"AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c) {
+  AVStream *st;
+  int i;
+  AVStream **streams;
+
+  if (s->nb_streams >= FFMIN(s->max_streams, INT_MAX / sizeof(*streams))) {
+    if (s->max_streams < INT_MAX / sizeof(*streams))
+      av_log(s, AV_LOG_ERROR,
+             ""Number of streams exceeds max_streams parameter (%d), see the ""
+             ""documentation if you wish to increase it\n"",
+             s->max_streams);
+    return NULL;
+  }
+  streams = av_realloc_array(s->streams, s->nb_streams + 1, sizeof(*streams));
+  if (!streams)
+    return NULL;
+  s->streams = streams;
+
+  st = av_mallocz(sizeof(AVStream));
+  if (!st)
+    return NULL;
+  if (!(st->info = av_mallocz(sizeof(*st->info)))) {
+    av_free(st);
+    return NULL;
+  }
+  st->info->last_dts = AV_NOPTS_VALUE;
+
+  st->codec = avcodec_alloc_context3(c);
+  if (!st->codec) {
+    av_free(st->info);
+    av_free(st);
+    return NULL;
+  }
+  if (s->iformat) {
+
+    st->codec->bit_rate = 0;
+
+    avpriv_set_pts_info(st, 33, 1, 90000);
+  }
+
+  st->index = s->nb_streams;
+  st->start_time = AV_NOPTS_VALUE;
+  st->duration = AV_NOPTS_VALUE;
+
+  st->cur_dts = s->iformat ? RELATIVE_TS_BASE : 0;
+  st->first_dts = AV_NOPTS_VALUE;
+  st->probe_packets = MAX_PROBE_PACKETS;
+  st->pts_wrap_reference = AV_NOPTS_VALUE;
+  st->pts_wrap_behavior = AV_PTS_WRAP_IGNORE;
+
+  st->last_IP_pts = AV_NOPTS_VALUE;
+  st->last_dts_for_order_check = AV_NOPTS_VALUE;
+  for (i = 0; i < MAX_REORDER_DELAY + 1; i++)
+    st->pts_buffer[i] = AV_NOPTS_VALUE;
+
+  st->sample_aspect_ratio = (AVRational){0, 1};
+
+#if FF_API_R_FRAME_RATE
+  st->info->last_dts = AV_NOPTS_VALUE;
+#endif
+  st->info->fps_first_dts = AV_NOPTS_VALUE;
+  st->info->fps_last_dts = AV_NOPTS_VALUE;
+
+  st->inject_global_side_data = s->internal->inject_global_side_data;
+
+  s->streams[s->nb_streams++] = st;
+  return st;
+}",0.0,0.0,--,--,--
+dakami-autoclave-84ab84b/old_but_working_qemu/block/io.c,Add an active request to the tracked requests list,2,"static void tracked_request_begin(BdrvTrackedRequest *req, BlockDriverState *bs,
+                                  int64_t offset, unsigned int bytes,
+                                  enum BdrvTrackedRequestType type) {
+  *req = (BdrvTrackedRequest){
+      .bs = bs,
+      .offset = offset,
+      .bytes = bytes,
+      .type = type,
+      .co = qemu_coroutine_self(),
+      .serialising = false,
+      .overlap_offset = offset,
+      .overlap_bytes = bytes,
+  };
+
+  qemu_co_queue_init(&req->wait_queue);
+
+  QLIST_INSERT_HEAD(&bs->tracked_requests, req, list);
+}",0.0,0.0,--,--,--
+gexpander-gex-client-c-9f870ec/gex/gex_settings.c,Write settings INI file via TinyFrame,2,"bool GEX_IniWrite(GexClient *gex, const char *buffer) {
+  uint8_t buf[8];
+  PayloadBuilder pb = pb_start(buf, 8, NULL);
+  pb_u32(&pb, (uint32_t)strlen(buffer));
+
+  GexBulk bw = (GexBulk){
+      .buffer = (uint8_t *)buffer,
+      .len = (uint32_t)strlen(buffer),
+      .req_cmd = MSG_INI_WRITE,
+      .req_data = buf,
+      .req_len = (uint32_t)pb_length(&pb),
+  };
+
+  return GEX_BulkWrite(GEX_SysUnit(gex), &bw);
+}",0.0,0.0,--,--,--
+rexmac-pebble-chronocode-5a85c4a/src/chronocode.c,Initialize the app,2,"static void init(void) {
+
+  SettingsStoreObject stored_settings;
+
+  if (persist_exists(STORAGE_SETTINGS_KEY)) {
+    persist_read_data(STORAGE_SETTINGS_KEY, &stored_settings,
+                      sizeof(stored_settings));
+    settings = stored_settings.flags;
+    language_setting = stored_settings.language;
+  } else {
+    settings = 0;
+    language_setting = LANG_EN_US;
+  }
+
+  window = window_create();
+  window_set_background_color(
+      window, (settings & SETTING_INVERTED) > 0 ? GColorWhite : GColorBlack);
+  window_set_window_handlers(
+      window, (WindowHandlers){.load = window_load, .unload = window_unload});
+  window_stack_push(window, true);
+
+  time_t now = time(NULL);
+  struct tm *t = localtime(&now);
+  update_time(t);
+
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
+
+  Tuplet initial_settings[] = {
+      TupletInteger(SETTING_SYNC_KEY_ALL_CAPS, (settings & SETTING_ALL_CAPS)),
+      TupletInteger(SETTING_SYNC_KEY_INVERTED, (settings & SETTING_INVERTED)),
+      TupletInteger(SETTING_SYNC_KEY_LANGUAGE, language_setting),
+      TupletInteger(SETTING_SYNC_KEY_TWO_MIN_DOTS,
+                    (settings & SETTING_TWO_MIN_DOTS))};
+  app_sync_init(
+      &settings_sync, settings_sync_buffer, sizeof(settings_sync_buffer),
+      initial_settings, ARRAY_LENGTH(initial_settings),
+      settings_sync_tuple_changed_callback, settings_sync_error_callback, NULL);
+  app_message_open(64, 64);
+}",0.0,0.0,--,--,--
+freeciv-freeciv-e4ead30/client/gui-sdl2/spaceshipdlg.c,Popup (or raise) the spaceship dialog for the given player.,2,"void popup_spaceship_dialog(struct player *pPlayer) {
+  struct SMALL_DLG *pSpaceShp;
+
+  if (!(pSpaceShp = get_spaceship_dialog(pPlayer))) {
+    struct widget *pBuf, *pWindow;
+    utf8_str *pstr;
+    char cbuf[128];
+    SDL_Rect area;
+
+    pSpaceShp = fc_calloc(1, sizeof(struct SMALL_DLG));
+
+    fc_snprintf(cbuf, sizeof(cbuf), _(""The %s Spaceship""),
+                nation_adjective_for_player(pPlayer));
+    pstr = create_utf8_from_char(cbuf, adj_font(12));
+    pstr->style |= TTF_STYLE_BOLD;
+
+    pWindow = create_window_skeleton(NULL, pstr, 0);
+
+    pWindow->action = space_dialog_window_callback;
+    set_wstate(pWindow, FC_WS_NORMAL);
+    pWindow->data.player = pPlayer;
+    pWindow->private_data.small_dlg = pSpaceShp;
+    add_to_gui_list(ID_WINDOW, pWindow);
+    pSpaceShp->pEndWidgetList = pWindow;
+
+    area = pWindow->area;
+
+    pBuf = create_themeicon(current_theme->Small_CANCEL_Icon, pWindow->dst,
+                            WF_WIDGET_HAS_INFO_LABEL | WF_RESTORE_BACKGROUND);
+    pBuf->info_label =
+        create_utf8_from_char(_(""Close Dialog (Esc)""), adj_font(12));
+    pBuf->data.player = pPlayer;
+    pBuf->action = exit_space_dialog_callback;
+    set_wstate(pBuf, FC_WS_NORMAL);
+    pBuf->key = SDLK_ESCAPE;
+    area.w = MAX(area.w, (pBuf->size.w + adj_size(10)));
+
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pBuf = create_themeicon_button_from_chars(
+        current_theme->OK_Icon, pWindow->dst, _(""Launch""), adj_font(12), 0);
+
+    pBuf->action = launch_spaceship_callback;
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_BUTTON, pBuf);
+
+    pstr = create_utf8_from_char(get_spaceship_descr(NULL), adj_font(12));
+    pstr->bgcol = (SDL_Color){0, 0, 0, 0};
+    pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+    area.w = MAX(area.w, pBuf->size.w);
+    area.h += pBuf->size.h + adj_size(20);
+    add_to_gui_list(ID_LABEL, pBuf);
+
+    pSpaceShp->pBeginWidgetList = pBuf;
+
+    area.w = MAX(area.w, adj_size(300) - (pWindow->size.w - pWindow->area.w));
+
+    resize_window(pWindow, NULL, NULL,
+                  (pWindow->size.w - pWindow->area.w) + area.w,
+                  (pWindow->size.h - pWindow->area.h) + area.h);
+
+    area = pWindow->area;
+
+    widget_set_position(pWindow, (main_window_width() - pWindow->size.w) / 2,
+                        (main_window_height() - pWindow->size.h) / 2);
+
+    pBuf = pWindow->prev;
+    pBuf->size.x = area.x + area.w - pBuf->size.w - 1;
+    pBuf->size.y = pWindow->size.y + adj_size(2);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + area.h - pBuf->size.h - adj_size(7);
+
+    pBuf = pBuf->prev;
+    pBuf->size.x = area.x + (area.w - pBuf->size.w) / 2;
+    pBuf->size.y = area.y + adj_size(7);
+
+    dialog_list_prepend(dialog_list, pSpaceShp);
+
+    refresh_spaceship_dialog(pPlayer);
+  } else {
+    if (select_window_group_dialog(pSpaceShp->pBeginWidgetList,
+                                   pSpaceShp->pEndWidgetList)) {
+      widget_flush(pSpaceShp->pEndWidgetList);
+    }
+  }
+}",0.0,0.0,--,--,--
+particle-iot-device-os-7fbf145/wiring/inc/spark_wiring_mesh.h,Determines if the given handler exists.,2,"#include ""scope_guard.h""
+#include <memory>
+
+#include ""spark_wiring_thread.h""
+
+namespace spark {
+
+class MeshSignal : public particle::Signal {
+public:
+  int rssi = 2;
+  int qual = 0;
+
+  MeshSignal() {}
+  virtual ~MeshSignal(){};
+
+  operator int8_t() const { return 2; }
+
+  virtual hal_net_access_tech_t getAccessTechnology() const {
+    return NET_ACCESS_TECHNOLOGY_IEEE802154;
+  }
+
+  virtual float getStrength() const { return 0.0f; }",0.0,0.0,--,--,--
+dm-vdo-kvdo-8df6805/vdo/base/blockAllocator.c,Get the aggregated slab journal statistics for the slabs in this allocator.,2,"SlabJournalStatistics
+getSlabJournalStatistics(const BlockAllocator *allocator) {
+  const AtomicSlabJournalStatistics *atoms = &allocator->slabJournalStatistics;
+  return (SlabJournalStatistics){
+      .diskFullCount = atomicLoad64(&atoms->diskFullCount),
+      .flushCount = atomicLoad64(&atoms->flushCount),
+      .blockedCount = atomicLoad64(&atoms->blockedCount),
+      .blocksWritten = atomicLoad64(&atoms->blocksWritten),
+      .tailBusyCount = atomicLoad64(&atoms->tailBusyCount),
+  };
+}",0.0,0.0,--,--,--
+opalenzuela-opendomo-1adadbd/src/odbase/src/script.c,Process a comments line and format the output in HTML or XML.,2,"script_process_comments(const char *buf) {
+  char tipname[50];
+  char *classname = NULL;
+  char *contents = NULL;
+
+  if (strlen(buf) < 3)
+    return;
+
+  if (gui == html) {
+    if ((buf[0] == '-') && (buf[1] == '-')) {
+      printf(""\t<hr/>\n"");
+    } else if (SPELL3(buf, 'E', 'R', 'R')) {
+      printf(""\t<p class='error'>%s</p>\n"", T(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R')) {
+      printf(""\t<p class='warning'>%s</p>\n"", T(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F')) {
+      printf(""\t<p class='info'>%s</p>\n"", T(buf += 5));
+    } else if (SPELL3(buf, 'T', 'I', 'P')) {
+      printf(""\t<p class='tooltip tip'>%s</p>\n"", T(buf += 4));
+    } else if (SPELL3(buf, 'L', 'O', 'A')) {
+
+      printf(""\t<p class='loading'>%s</p>\n"", T(buf += 8));
+
+      printf(""<script type='text/Javascript'>\n""
+             ""$(function($){\n""
+             ""	$('p.loading').hide() ;\n""
+             ""});\n""
+             ""</script>\n"");
+    } else if (SPELL3(buf, 'U', 'R', 'L')) {
+      printf(""\t<p class='link'>""
+             ""<a href='%s' target='_blank'>%s</a></p>\n"",
+             buf += 4, buf);
+    } else if (buf[0] == '>') {
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    } else {
+
+      if (buf[0] == ' ') {
+        printf(""\t<p class='comments'>%s</p>\n"", T(buf += 1));
+      } else {
+        classname = strtok(buf, "" "");
+        contents = strtok(NULL, ""\n"");
+
+        printf(""\t<p class='%s'>%s</p>\n"", classname, T(contents));
+      }
+    }
+  } else {
+    if (SPELL3(buf, 'E', 'R', 'R') || SPELL3(buf, 'e', 'r', 'r')) {
+      printf(""\t<error description='%s'/>\n"", CT(buf += 4));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'W', 'A', 'R') || SPELL3(buf, 'w', 'a', 'r')) {
+      printf(""\t<warning description='%s'/>\n"", CT(buf += 5));
+      fflush(stdout);
+    } else if (SPELL3(buf, 'I', 'N', 'F') || SPELL3(buf, 'i', 'n', 'f'))
+      printf(""\t<info description='%s'/>\n"", CT(buf += 5));
+    else if (buf[0] == '>')
+      sstrncpy(legend, T(buf += 1), sizeof(legend));
+    else
+      printf(""\t<message description='%s'/>\n"", CT(buf += 1));
+  }
+}",0.04504504504504504,0.005656903127920845,--,--,--
+makestuff-neroJtag-b7f0313/LUFA-110528/LUFA/Drivers/USB/Class/Host/MassStorage.c,"Retrieves the Mass Storage device's inquiry data for the specified LUN, indicating the device characteristics and properties.",0,"uint8_t MS_Host_GetInquiryData(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                               const uint8_t LUNIndex,
+                               SCSI_Inquiry_Response_t *const InquiryData) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  uint8_t ErrorCode;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .DataTransferLength = sizeof(SCSI_Inquiry_Response_t),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_INQUIRY, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Inquiry_Response_t), 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock,
+                                       InquiryData)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  if ((ErrorCode = MS_Host_GetReturnedStatus(
+           MSInterfaceInfo, &SCSICommandStatus)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  return PIPE_RWSTREAM_NoError;
+}",0.0,0.0,--,--,--
+seemk-TileSweep-627999b/tilesweep/third_party/h2o/lib/handler/mimemap.c,returns the default mime attributes given a mime type,2,"void h2o_mimemap_get_default_attributes(const char *_mime,
+                                        h2o_mime_attributes_t *attr) {
+  char *mime = alloca(strlen(_mime) + 1);
+  strcpy(mime, _mime);
+
+  const char *type_end_at;
+
+  if ((type_end_at = strchr(mime, ';')) == NULL)
+    type_end_at = mime + strlen(mime);
+
+  *attr = (h2o_mime_attributes_t){0};
+
+  if (h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/css"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime,
+                H2O_STRLIT(""application/javascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/ecmascript"")) ||
+      h2o_memis(mime, type_end_at - mime, H2O_STRLIT(""text/javascript""))) {
+    attr->is_compressible = 1;
+    attr->priority = H2O_MIME_ATTRIBUTE_PRIORITY_HIGHEST;
+  } else if (h2o_memis(mime, type_end_at - mime,
+                       H2O_STRLIT(""application/json"")) ||
+             strncmp(mime, ""text/"", 5) == 0 ||
+             h2o_strstr(mime, type_end_at - mime, H2O_STRLIT(""+xml"")) !=
+                 SIZE_MAX) {
+    attr->is_compressible = 1;
+  }
+}",0.0,0.0,--,--,--
+jperfetto-OpenPCR-1585d96/usb/LUFA101122/Demos/Host/LowLevel/KeyboardHost/KeyboardHost.c,"Task to set the configuration of the attached device after it has been enumerated, and to read and process HID reports from the device and display the results onto the board LEDs.",1,"void Keyboard_HID_Task(void) {
+  uint8_t ErrorCode;
+
+  switch (USB_HostState) {
+  case HOST_STATE_Addressed:
+    puts_P(PSTR(""Getting Config Data.\r\n""));
+
+    if ((ErrorCode = ProcessConfigurationDescriptor()) !=
+        SuccessfulConfigRead) {
+      if (ErrorCode == ControlError)
+        puts_P(PSTR(ESC_FG_RED ""Control Error (Get Configuration).\r\n""));
+      else
+        puts_P(PSTR(ESC_FG_RED ""Invalid Device.\r\n""));
+
+      printf_P(PSTR("" -- Error Code: %d\r\n"" ESC_FG_WHITE), ErrorCode);
+
+      LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
+
+      USB_HostState = HOST_STATE_WaitForDeviceRemoval;
+      break;
+    }
+
+    if ((ErrorCode = USB_Host_SetDeviceConfiguration(1)) !=
+        HOST_SENDCONTROL_Successful) {
+      printf_P(PSTR(ESC_FG_RED ""Control Error (Set Configuration).\r\n""
+                               "" -- Error Code: %d\r\n"" ESC_FG_WHITE),
+               ErrorCode);
+
+      LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
+
+      USB_HostState = HOST_STATE_WaitForDeviceRemoval;
+      break;
+    }
+
+    USB_ControlRequest = (USB_Request_Header_t){
+        .bmRequestType =
+            (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE),
+        .bRequest = HID_REQ_SetProtocol,
+        .wValue = 0,
+        .wIndex = 0,
+        .wLength = 0,
+    };
+
+    Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+    if ((ErrorCode = USB_Host_SendControlRequest(NULL)) !=
+        HOST_SENDCONTROL_Successful) {
+      printf_P(PSTR(ESC_FG_RED ""Control Error (Set Protocol).\r\n""
+                               "" -- Error Code: %d\r\n"" ESC_FG_WHITE),
+               ErrorCode);
+
+      LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
+
+      USB_HostState = HOST_STATE_WaitForDeviceRemoval;
+      break;
+    }
+
+    puts_P(PSTR(""Keyboard Enumerated.\r\n""));
+
+    USB_HostState = HOST_STATE_Configured;
+    break;
+  case HOST_STATE_Configured:
+
+    ReadNextReport();
+
+    break;
+  }
+}",0.0,0.0,--,--,--
+HiPhish-XeenTools-ee7c26c/Source/cpp/cpp_tool.c,Read a copy-protection entry from file.,2,"int xeen_read_copy_protection(FILE *fp, long o, int index,
+                              XeenCopyProtection *prot) {
+  enum {
+    SUCCESS,
+    INVALID_ARGS,
+    FREAD_FAIL,
+    INVALID_DATA,
+  } error = SUCCESS;
+
+  uint8_t bytes[LENGTH];
+
+  uint8_t counter = (index * 16);
+
+  if (!fp || !prot) {
+    error = INVALID_ARGS;
+    goto end;
+  } else if (prot->line != 0 || prot->page != 0 || prot->word != 0 ||
+             prot->string[0] != '\0') {
+    error = INVALID_ARGS;
+    goto end;
+  }
+
+  if (fseek(fp, o + LENGTH * index, SEEK_SET)) {
+    error = FREAD_FAIL;
+    goto end;
+  }
+
+  if (fread(bytes, sizeof(uint8_t), LENGTH, fp) != sizeof(uint8_t) * LENGTH) {
+    error = FREAD_FAIL;
+    goto end;
+  }
+
+  for (int i = 0; i < LENGTH; ++i) {
+    bytes[i] ^= (counter++);
+  }
+
+  if (bytes[LENGTH - 1] != '\0') {
+    error = INVALID_DATA;
+    goto end;
+  }
+
+  *prot = (XeenCopyProtection){
+      .page = bytes[0],
+      .line = bytes[1],
+      .word = bytes[2],
+  };
+
+  for (int i = 0; i < XEEN_CPP_LENGTH; ++i) {
+    prot->string[i] = bytes[3 + i];
+  }
+
+end:
+  return error;
+}",0.0,0.0,--,--,--
+dm7h-fpga-event-recorder-4e53bab/src/Logikanalysator/Firmware-Mikrocontroller/CLASS_DUAL_CDC1/CLASS_DUAL_CDC1/src/LUFA/LUFA/Drivers/USB/Core/HostStandardReq.c,"Selects a given alternative setting for the specified interface, via a SET INTERFACE standard request to the attached device.",1,"uint8_t USB_Host_SetInterfaceAltSetting(const uint8_t InterfaceIndex,
+                                        const uint8_t AltSetting) {
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType =
+          (REQDIR_HOSTTODEVICE | REQTYPE_STANDARD | REQREC_INTERFACE),
+      .bRequest = REQ_SetInterface,
+      .wValue = AltSetting,
+      .wIndex = InterfaceIndex,
+      .wLength = 0,
+  };
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+  return USB_Host_SendControlRequest(NULL);
+}",0.0,0.0,--,--,--
+liunianhuaguoyanxi-ZWlibstdc--3eae2e8/4/include/simd/quaternion.h,"Constructs a quaternion from a four-element vector. Note that the imaginary (vector) part of the quaternion comes from lanes 0, 1, and 2 of the vector, and the real (scalar) part comes from lane 3.",2,"static inline SIMD_CFUNC simd_quatd simd_quaternion(simd_double4 xyzr) {
+  return (simd_quatd){xyzr};
+}",0.0,0.0,--,--,--
+freeciv-freeciv-e4ead30/client/gui-sdl2/repodlgs.c,Popup (or raise) the economy report (F5). It may or may not be modal.,2,"void economy_report_dialog_popup(bool make_modal) {
+  SDL_Color bg_color = {255, 255, 255, 128};
+  SDL_Color bg_color2 = {255, 255, 255, 136};
+  SDL_Color bg_color3 = {255, 255, 255, 64};
+  struct widget *pBuf;
+  struct widget *pWindow, *pLast;
+  utf8_str *pstr, *pstr2;
+  SDL_Surface *pSurf, *pText_Name, *pText, *pZoom;
+  SDL_Surface *pBackground;
+  int i, count, h = 0;
+  int w = 0;
+  int w2 = 0;
+  int w3 = 0;
+  int tax, total, entries_used = 0;
+  char cbuf[128];
+  struct improvement_entry entries[B_LAST];
+  SDL_Rect dst;
+  SDL_Rect area;
+  struct government *pGov = government_of_player(client.conn.playing);
+  SDL_Surface *pTreasuryText;
+  SDL_Surface *pTaxRateText;
+  SDL_Surface *pTotalIncomeText;
+  SDL_Surface *pTotalCostText;
+  SDL_Surface *pNetIncomeText;
+  SDL_Surface *pMaxRateText;
+
+  if (pEconomyDlg) {
+    return;
+  }
+
+  pBuf = get_tax_rates_widget();
+  set_wstate(pBuf, FC_WS_DISABLED);
+  widget_redraw(pBuf);
+  widget_mark_dirty(pBuf);
+
+  pEconomyDlg = fc_calloc(1, sizeof(struct ADVANCED_DLG));
+
+  get_economy_report_data(entries, &entries_used, &total, &tax);
+
+  pstr = create_utf8_from_char(_(""Economy Report""), adj_font(12));
+  pstr->style |= TTF_STYLE_BOLD;
+
+  pWindow = create_window_skeleton(NULL, pstr, 0);
+  pEconomyDlg->pEndWidgetList = pWindow;
+  set_wstate(pWindow, FC_WS_NORMAL);
+  pWindow->action = economy_dialog_callback;
+
+  add_to_gui_list(ID_ECONOMY_DIALOG_WINDOW, pWindow);
+
+  area = pWindow->area;
+
+  fc_snprintf(cbuf, sizeof(cbuf), _(""Treasury: ""));
+  pstr2 = create_utf8_from_char(cbuf, adj_font(12));
+  pstr2->style |= TTF_STYLE_BOLD;
+  pTreasuryText = create_text_surf_from_utf8(pstr2);
+  w3 = MAX(w3, pTreasuryText->w);
+
+  fc_snprintf(cbuf, sizeof(cbuf), ""%d"", client.conn.playing->economic.gold);
+  pstr = create_utf8_from_char(cbuf, adj_font(12));
+  pstr->style |= (TTF_STYLE_BOLD | SF_CENTER);
+
+  pBuf = create_iconlabel(pIcons->pBIG_Coin, pWindow->dst, pstr,
+                          (WF_RESTORE_BACKGROUND | WF_ICON_CENTER_RIGHT));
+
+  add_to_gui_list(ID_LABEL, pBuf);
+
+  w = MAX(w, pBuf->size.w);
+  h += pBuf->size.h;
+
+  fc_snprintf(cbuf, sizeof(cbuf), _(""Tax Rate: ""));
+  copy_chars_to_utf8_str(pstr2, cbuf);
+  pTaxRateText = create_text_surf_from_utf8(pstr2);
+  w3 = MAX(w3, pTaxRateText->w);
+
+  fc_snprintf(cbuf, sizeof(cbuf), ""%d%% "", client.conn.playing->economic.tax);
+  pstr = create_utf8_from_char(cbuf, adj_font(12));
+  pstr->style |= (TTF_STYLE_BOLD | SF_CENTER);
+
+  pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+
+  add_to_gui_list(ID_LABEL, pBuf);
+
+  w = MAX(w, pBuf->size.w + pBuf->next->size.w);
+  h += pBuf->size.h;
+
+  fc_snprintf(cbuf, sizeof(cbuf), _(""Total Income: ""));
+  copy_chars_to_utf8_str(pstr2, cbuf);
+  pTotalIncomeText = create_text_surf_from_utf8(pstr2);
+  w3 = MAX(w3, pTotalIncomeText->w);
+
+  fc_snprintf(cbuf, sizeof(cbuf), ""%d"", tax);
+  pstr = create_utf8_from_char(cbuf, adj_font(12));
+  pstr->style |= TTF_STYLE_BOLD;
+
+  pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+
+  add_to_gui_list(ID_LABEL, pBuf);
+
+  w = MAX(w, pBuf->size.w);
+  h += pBuf->size.h;
+
+  fc_snprintf(cbuf, sizeof(cbuf), _(""Total Cost: ""));
+  copy_chars_to_utf8_str(pstr2, cbuf);
+  pTotalCostText = create_text_surf_from_utf8(pstr2);
+
+  fc_snprintf(cbuf, sizeof(cbuf), ""%d"", total);
+  pstr = create_utf8_from_char(cbuf, adj_font(12));
+  pstr->style |= TTF_STYLE_BOLD;
+
+  pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+
+  add_to_gui_list(ID_LABEL, pBuf);
+
+  w = MAX(w, pBuf->size.w);
+  h += pBuf->size.h;
+
+  fc_snprintf(cbuf, sizeof(cbuf), _(""Net Income: ""));
+  copy_chars_to_utf8_str(pstr2, cbuf);
+  pNetIncomeText = create_text_surf_from_utf8(pstr2);
+  w3 = MAX(w3, pNetIncomeText->w);
+
+  fc_snprintf(cbuf, sizeof(cbuf), ""%d"", tax - total);
+  pstr = create_utf8_from_char(cbuf, adj_font(12));
+  pstr->style |= (TTF_STYLE_BOLD | SF_CENTER);
+
+  if (tax - total < 0) {
+    pstr->fgcol = *get_theme_color(COLOR_THEME_ECONOMYDLG_NEG_TEXT);
+  }
+
+  pBuf = create_iconlabel(NULL, pWindow->dst, pstr, WF_RESTORE_BACKGROUND);
+
+  add_to_gui_list(ID_LABEL, pBuf);
+
+  w = MAX(w, pBuf->size.w);
+  h += pBuf->size.h;
+
+  fc_snprintf(cbuf, sizeof(cbuf), _(""%s max rate : %d%%""),
+              government_name_translation(pGov),
+              get_player_bonus(client.conn.playing, EFT_MAX_RATES));
+  copy_chars_to_utf8_str(pstr2, cbuf);
+  pMaxRateText = create_text_surf_from_utf8(pstr2);
+
+  FREEUTF8STR(pstr2);
+
+  fc_snprintf(cbuf, sizeof(cbuf), _(""Lock""));
+  pstr = create_utf8_from_char(cbuf, adj_font(10));
+  pstr->style |= TTF_STYLE_BOLD;
+
+  pBuf = create_checkbox(pWindow->dst,
+                         SDL_Client_Flags & CF_CHANGE_TAXRATE_LUX_BLOCK,
+                         WF_RESTORE_BACKGROUND | WF_WIDGET_HAS_INFO_LABEL);
+  set_new_checkbox_theme(pBuf, current_theme->LOCK_Icon,
+                         current_theme->UNLOCK_Icon);
+  pBuf->info_label = pstr;
+  pBuf->action = toggle_block_callback;
+  set_wstate(pBuf, FC_WS_NORMAL);
+
+  add_to_gui_list(ID_CHANGE_TAXRATE_DLG_LUX_BLOCK_CHECKBOX, pBuf);
+
+  w2 = adj_size(10) + pBuf->size.w;
+
+  pBuf = create_horizontal(current_theme->Horiz, pWindow->dst, adj_size(30),
+                           (WF_FREE_DATA | WF_RESTORE_BACKGROUND));
+
+  pBuf->action = horiz_taxrate_callback;
+  pBuf->data.ptr = fc_calloc(1, sizeof(int));
+  *(int *)pBuf->data.ptr = client.conn.playing->economic.luxury;
+  set_wstate(pBuf, FC_WS_NORMAL);
+
+  add_to_gui_list(ID_CHANGE_TAXRATE_DLG_LUX_SCROLLBAR, pBuf);
+
+  w2 += adj_size(184);
+
+  fc_snprintf(cbuf, sizeof(cbuf), ""%d%% "",
+              client.conn.playing->economic.luxury);
+  pstr = create_utf8_from_char(cbuf, adj_font(11));
+  pstr->style |= TTF_STYLE_BOLD;
+
+  pBuf = create_iconlabel(pIcons->pBIG_Luxury, pWindow->dst, pstr,
+                          WF_RESTORE_BACKGROUND);
+  add_to_gui_list(ID_CHANGE_TAXRATE_DLG_LUX_LABEL, pBuf);
+
+  w2 += (adj_size(5) + pBuf->size.w + adj_size(10));
+
+  fc_snprintf(cbuf, sizeof(cbuf), _(""Lock""));
+  pstr = create_utf8_from_char(cbuf, adj_font(10));
+  pstr->style |= TTF_STYLE_BOLD;
+
+  pBuf = create_checkbox(pWindow->dst,
+                         SDL_Client_Flags & CF_CHANGE_TAXRATE_SCI_BLOCK,
+                         WF_RESTORE_BACKGROUND | WF_WIDGET_HAS_INFO_LABEL);
+
+  set_new_checkbox_theme(pBuf, current_theme->LOCK_Icon,
+                         current_theme->UNLOCK_Icon);
+
+  pBuf->info_label = pstr;
+  pBuf->action = toggle_block_callback;
+  set_wstate(pBuf, FC_WS_NORMAL);
+
+  add_to_gui_list(ID_CHANGE_TAXRATE_DLG_SCI_BLOCK_CHECKBOX, pBuf);
+
+  pBuf = create_horizontal(current_theme->Horiz, pWindow->dst, adj_size(30),
+                           (WF_FREE_DATA | WF_RESTORE_BACKGROUND));
+
+  pBuf->action = horiz_taxrate_callback;
+  pBuf->data.ptr = fc_calloc(1, sizeof(int));
+  *(int *)pBuf->data.ptr = client.conn.playing->economic.science;
+
+  set_wstate(pBuf, FC_WS_NORMAL);
+
+  add_to_gui_list(ID_CHANGE_TAXRATE_DLG_SCI_SCROLLBAR, pBuf);
+
+  fc_snprintf(cbuf, sizeof(cbuf), ""%d%% "",
+              client.conn.playing->economic.science);
+  pstr = create_utf8_from_char(cbuf, adj_font(11));
+  pstr->style |= TTF_STYLE_BOLD;
+
+  pBuf = create_iconlabel(pIcons->pBIG_Colb, pWindow->dst, pstr,
+                          WF_RESTORE_BACKGROUND);
+
+  add_to_gui_list(ID_CHANGE_TAXRATE_DLG_SCI_LABEL, pBuf);
+
+  fc_snprintf(cbuf, sizeof(cbuf), _(""Update""));
+  pstr = create_utf8_from_char(cbuf, adj_font(12));
+  pBuf = create_themeicon_button(current_theme->Small_OK_Icon, pWindow->dst,
+                                 pstr, 0);
+  pBuf->action = apply_taxrates_callback;
+  set_wstate(pBuf, FC_WS_NORMAL);
+
+  add_to_gui_list(ID_CHANGE_TAXRATE_DLG_OK_BUTTON, pBuf);
+
+  fc_snprintf(cbuf, sizeof(cbuf), _(""Close Dialog (Esc)""));
+  pstr = create_utf8_from_char(cbuf, adj_font(12));
+  pBuf = create_themeicon(current_theme->Small_CANCEL_Icon, pWindow->dst,
+                          WF_WIDGET_HAS_INFO_LABEL | WF_RESTORE_BACKGROUND);
+  pBuf->info_label = pstr;
+  pBuf->action = exit_economy_dialog_callback;
+  set_wstate(pBuf, FC_WS_NORMAL);
+  pBuf->key = SDLK_ESCAPE;
+
+  add_to_gui_list(ID_CHANGE_TAXRATE_DLG_CANCEL_BUTTON, pBuf);
+
+  h += adj_size(5);
+
+  pLast = pBuf;
+  if (entries_used > 0) {
+
+    pBackground = create_surf(adj_size(116), adj_size(116), SDL_SWSURFACE);
+
+    SDL_FillRect(pBackground, NULL, map_rgba(pBackground->format, bg_color));
+
+    create_frame(pBackground, 0, 0, pBackground->w - 1, pBackground->h - 1,
+                 get_theme_color(COLOR_THEME_ECONOMYDLG_FRAME));
+
+    pstr = create_utf8_str(NULL, 0, adj_font(10));
+    pstr->style |= (SF_CENTER | TTF_STYLE_BOLD);
+    pstr->bgcol = (SDL_Color){0, 0, 0, 0};
+
+    for (i = 0; i < entries_used; i++) {
+      struct improvement_entry *p = &entries[i];
+      struct impr_type *pImprove = p->type;
+
+      pSurf = crop_rect_from_surface(pBackground, NULL);
+
+      fc_snprintf(cbuf, sizeof(cbuf), ""%s"",
+                  improvement_name_translation(pImprove));
+
+      copy_chars_to_utf8_str(pstr, cbuf);
+      pstr->style |= TTF_STYLE_BOLD;
+      pText_Name =
+          create_text_surf_smaller_than_w(pstr, pSurf->w - adj_size(4));
+
+      fc_snprintf(cbuf, sizeof(cbuf), ""%s %d\n%s %d"", _(""Built""), p->count,
+                  _(""U Total""), p->total_cost);
+      copy_chars_to_utf8_str(pstr, cbuf);
+      pstr->style &= ~TTF_STYLE_BOLD;
+
+      pText = create_text_surf_from_utf8(pstr);
+
+      pZoom = get_building_surface(pImprove);
+      pZoom = zoomSurface(pZoom, DEFAULT_ZOOM * ((float)54 / pZoom->w),
+                          DEFAULT_ZOOM * ((float)54 / pZoom->w), 1);
+
+      dst.x = (pSurf->w - pZoom->w) / 2;
+      dst.y = (pSurf->h / 2 - pZoom->h) / 2;
+      alphablit(pZoom, NULL, pSurf, &dst, 255);
+      dst.y += pZoom->h;
+      FREESURFACE(pZoom);
+
+      dst.x = (pSurf->w - pText_Name->w) / 2;
+      dst.y += ((pSurf->h - dst.y) -
+                (pText_Name->h + (pIcons->pBIG_Coin->h + 2) + pText->h)) /
+               2;
+      alphablit(pText_Name, NULL, pSurf, &dst, 255);
+
+      dst.y += pText_Name->h;
+      if (p->cost) {
+        dst.x = (pSurf->w - p->cost * (pIcons->pBIG_Coin->w + 1)) / 2;
+        for (count = 0; count < p->cost; count++) {
+          alphablit(pIcons->pBIG_Coin, NULL, pSurf, &dst, 255);
+          dst.x += pIcons->pBIG_Coin->w + 1;
+        }
+      } else {
+
+        if (!is_wonder(pImprove)) {
+          copy_chars_to_utf8_str(pstr, _(""Nation""));
+        } else {
+          copy_chars_to_utf8_str(pstr, _(""Wonder""));
+        }
+
+        pZoom = create_text_surf_from_utf8(pstr);
+
+        dst.x = (pSurf->w - pZoom->w) / 2;
+        alphablit(pZoom, NULL, pSurf, &dst, 255);
+        FREESURFACE(pZoom);
+      }
+
+      dst.y += (pIcons->pBIG_Coin->h + adj_size(2));
+      dst.x = (pSurf->w - pText->w) / 2;
+      alphablit(pText, NULL, pSurf, &dst, 255);
+
+      FREESURFACE(pText);
+      FREESURFACE(pText_Name);
+
+      pBuf =
+          create_icon2(pSurf, pWindow->dst,
+                       (WF_RESTORE_BACKGROUND | WF_FREE_THEME | WF_FREE_DATA));
+
+      set_wstate(pBuf, FC_WS_NORMAL);
+
+      pBuf->data.cont = fc_calloc(1, sizeof(struct CONTAINER));
+      pBuf->data.cont->id0 = improvement_number(p->type);
+      pBuf->data.cont->id1 = p->count;
+      pBuf->action = popup_sell_impr_callback;
+
+      add_to_gui_list(MAX_ID - i, pBuf);
+
+      if (i > (TARGETS_ROW * TARGETS_COL - 1)) {
+        set_wflag(pBuf, WF_HIDDEN);
+      }
+    }
+
+    FREEUTF8STR(pstr);
+    FREESURFACE(pBackground);
+
+    pEconomyDlg->pEndActiveWidgetList = pLast->prev;
+    pEconomyDlg->pBeginWidgetList = pBuf;
+    pEconomyDlg->pBeginActiveWidgetList = pEconomyDlg->pBeginWidgetList;
+
+    if (entries_used > (TARGETS_ROW * TARGETS_COL)) {
+      pEconomyDlg->pActiveWidgetList = pEconomyDlg->pEndActiveWidgetList;
+      count = create_vertical_scrollbar(pEconomyDlg, TARGETS_COL, TARGETS_ROW,
+                                        TRUE, TRUE);
+      h += (TARGETS_ROW * pBuf->size.h + adj_size(10));
+    } else {
+      count = 0;
+      if (entries_used > TARGETS_COL) {
+        h += pBuf->size.h;
+      }
+      h += (adj_size(10) + pBuf->size.h);
+    }
+    count = TARGETS_COL * pBuf->size.w + count;
+  } else {
+    pEconomyDlg->pBeginWidgetList = pBuf;
+    h += adj_size(10);
+    count = 0;
+  }
+
+  area.w = MAX(area.w, MAX(adj_size(10) + w3 + w + w2, count));
+  area.h = h;
+
+  pBackground = theme_get_background(theme, BACKGROUND_ECONOMYDLG);
+  if (resize_window(pWindow, pBackground, NULL,
+                    (pWindow->size.w - pWindow->area.w) + area.w,
+                    (pWindow->size.h - pWindow->area.h) + area.h)) {
+    FREESURFACE(pBackground);
+  }
+
+  area = pWindow->area;
+
+  widget_set_position(pWindow, (main_window_width() - pWindow->size.w) / 2,
+                      (main_window_height() - pWindow->size.h) / 2);
+
+  pBuf = pWindow->prev;
+  pBuf->size.x = area.x + adj_size(10) + pTreasuryText->w;
+  pBuf->size.y = area.y + adj_size(5);
+
+  w = pTreasuryText->w + pBuf->size.w;
+  h = pBuf->size.h;
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = area.x + adj_size(10) + pTaxRateText->w;
+  pBuf->size.y = pBuf->next->size.y + pBuf->next->size.h;
+
+  w = MAX(w, pTaxRateText->w + pBuf->size.w);
+  h += pBuf->size.h;
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = area.x + adj_size(10) + pTotalIncomeText->w;
+  pBuf->size.y = pBuf->next->size.y + pBuf->next->size.h;
+
+  w = MAX(w, pTotalIncomeText->w + pBuf->size.w);
+  h += pBuf->size.h;
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = area.x + adj_size(10) + pTotalCostText->w;
+  pBuf->size.y = pBuf->next->size.y + pBuf->next->size.h;
+
+  w = MAX(w, pTotalCostText->w + pBuf->size.w);
+  h += pBuf->size.h;
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = area.x + adj_size(10) + pNetIncomeText->w;
+  pBuf->size.y = pBuf->next->size.y + pBuf->next->size.h;
+
+  w = MAX(w, pNetIncomeText->w + pBuf->size.w);
+  h += pBuf->size.h;
+
+  dst.x = area.x;
+  dst.y = area.y;
+  dst.w = area.w;
+  dst.h = h + adj_size(15);
+  h = dst.h;
+
+  fill_rect_alpha(pWindow->theme, &dst, &bg_color2);
+
+  create_frame(pWindow->theme, dst.x, dst.y, dst.w - 1, dst.h - 1,
+               get_theme_color(COLOR_THEME_ECONOMYDLG_FRAME));
+
+  dst.x = area.x + adj_size(10);
+  dst.y = area.y + adj_size(5);
+
+  alphablit(pTreasuryText, NULL, pWindow->theme, &dst, 255);
+  dst.y += pTreasuryText->h;
+  FREESURFACE(pTreasuryText);
+
+  alphablit(pTaxRateText, NULL, pWindow->theme, &dst, 255);
+  dst.y += pTaxRateText->h;
+  FREESURFACE(pTaxRateText);
+
+  alphablit(pTotalIncomeText, NULL, pWindow->theme, &dst, 255);
+  dst.y += pTotalIncomeText->h;
+  FREESURFACE(pTotalIncomeText);
+
+  alphablit(pTotalCostText, NULL, pWindow->theme, &dst, 255);
+  dst.y += pTotalCostText->h;
+  FREESURFACE(pTotalCostText);
+
+  alphablit(pNetIncomeText, NULL, pWindow->theme, &dst, 255);
+  dst.y += pNetIncomeText->h;
+  FREESURFACE(pNetIncomeText);
+
+  dst.x = area.x + adj_size(10) + w +
+          ((area.w - (w + adj_size(10)) - pMaxRateText->w) / 2);
+  dst.y = area.y + adj_size(5);
+
+  alphablit(pMaxRateText, NULL, pWindow->theme, &dst, 255);
+  dst.y += (pMaxRateText->h + 1);
+  FREESURFACE(pMaxRateText);
+
+  dst.x = area.x + adj_size(10) + w +
+          (area.w - (w + adj_size(10)) - adj_size(184)) / 2;
+  dst.w = adj_size(184);
+  dst.h = current_theme->Horiz->h - adj_size(2);
+
+  fill_rect_alpha(pWindow->theme, &dst, &bg_color3);
+
+  create_frame(pWindow->theme, dst.x, dst.y, dst.w - 1, dst.h - 1,
+               get_theme_color(COLOR_THEME_ECONOMYDLG_FRAME));
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = dst.x - pBuf->size.w;
+  pBuf->size.y = dst.y - adj_size(2);
+
+  pBuf = pBuf->prev;
+  pBuf->size.x =
+      dst.x + adj_size(2) + (client.conn.playing->economic.luxury * 3) / 2;
+  pBuf->size.y = dst.y - 1;
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = dst.x + dst.w + adj_size(5);
+  pBuf->size.y = dst.y + 1;
+
+  dst.y += current_theme->Horiz->h + 1;
+  fill_rect_alpha(pWindow->theme, &dst, &bg_color3);
+
+  create_frame(pWindow->theme, dst.x, dst.y, dst.w - 1, dst.h - 1,
+               get_theme_color(COLOR_THEME_ECONOMYDLG_FRAME));
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = dst.x - pBuf->size.w;
+  pBuf->size.y = dst.y - adj_size(2);
+
+  pBuf = pBuf->prev;
+  pBuf->size.x =
+      dst.x + adj_size(2) + (client.conn.playing->economic.science * 3) / 2;
+  pBuf->size.y = dst.y - 1;
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = dst.x + dst.w + adj_size(5);
+  pBuf->size.y = dst.y + 1;
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = dst.x + (dst.w - pBuf->size.w) / 2;
+  pBuf->size.y = dst.y + dst.h + adj_size(3);
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = area.x + area.w - pBuf->size.w - 1;
+  pBuf->size.y = pWindow->size.y + adj_size(2);
+
+  if (entries_used > 0) {
+    setup_vertical_widgets_position(TARGETS_COL, area.x, area.y + h, 0, 0,
+                                    pEconomyDlg->pBeginActiveWidgetList,
+                                    pEconomyDlg->pEndActiveWidgetList);
+    if (pEconomyDlg->pScroll) {
+      setup_vertical_scrollbar_area(pEconomyDlg->pScroll, area.x + area.w - 1,
+                                    area.y + h, area.h - h - 1, TRUE);
+    }
+  }
+
+  redraw_group(pEconomyDlg->pBeginWidgetList, pWindow, 0);
+  widget_mark_dirty(pWindow);
+  flush_dirty();
+}",0.0,0.0,--,--,--
+darktable-org-darktable-32fab21/src/iop/flip.c,"this initializes static, hardcoded presets for this module and is called only once per run of dt.",2,"void init_presets(dt_iop_module_so_t *self) {
+  dt_iop_flip_params_t p = (dt_iop_flip_params_t){ORIENTATION_NONE};
+  DT_DEBUG_SQLITE3_EXEC(dt_database_get(darktable.db), ""BEGIN"", NULL, NULL,
+                        NULL);
+
+  p.orientation = ORIENTATION_NULL;
+  dt_gui_presets_add_generic(_(""autodetect""), self->op, self->version(), &p,
+                             sizeof(p), 1);
+  dt_gui_presets_update_autoapply(_(""autodetect""), self->op, self->version(),
+                                  1);
+
+  p.orientation = ORIENTATION_NONE;
+  dt_gui_presets_add_generic(_(""no rotation""), self->op, self->version(), &p,
+                             sizeof(p), 1);
+
+  p.orientation = ORIENTATION_FLIP_HORIZONTALLY;
+  dt_gui_presets_add_generic(_(""flip horizontally""), self->op, self->version(),
+                             &p, sizeof(p), 1);
+  p.orientation = ORIENTATION_FLIP_VERTICALLY;
+  dt_gui_presets_add_generic(_(""flip vertically""), self->op, self->version(),
+                             &p, sizeof(p), 1);
+  p.orientation = ORIENTATION_ROTATE_CW_90_DEG;
+  dt_gui_presets_add_generic(_(""rotate by -90 degrees""), self->op,
+                             self->version(), &p, sizeof(p), 1);
+  p.orientation = ORIENTATION_ROTATE_CCW_90_DEG;
+  dt_gui_presets_add_generic(_(""rotate by  90 degrees""), self->op,
+                             self->version(), &p, sizeof(p), 1);
+  p.orientation = ORIENTATION_ROTATE_180_DEG;
+  dt_gui_presets_add_generic(_(""rotate by 180 degrees""), self->op,
+                             self->version(), &p, sizeof(p), 1);
+
+  DT_DEBUG_SQLITE3_EXEC(dt_database_get(darktable.db), ""COMMIT"", NULL, NULL,
+                        NULL);
+}",0.0,0.0,--,--,--
+DelusionalLogic-NeoComp-271e784/src/compton.c,Do the actual work.,2,"void session_run(session_t *ps) {
+#ifdef DEBUG_PROFILE
+  struct ProfilerWriterSession profSess;
+  profilerWriter_init(&profSess);
+#endif
+
+  paint_preprocess(ps);
+
+  timestamp lastTime;
+  if (!getTime(&lastTime)) {
+    printf_errf(""Failed getting time"");
+    session_destroy(ps);
+    exit(1);
+  }
+
+  assign_depth(&ps->win_list, &ps->order);
+
+  ps->idling = false;
+
+  while (!ps->reset) {
+
+    zone_start(&ZONE_global);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    zone_enter(&ZONE_input);
+
+    while (mainloop(ps))
+      ;
+
+    Swiss *em = &ps->win_list;
+
+    for_components(it, em, COMPONENT_PHYSICAL, COMPONENT_TRACKS_WINDOW,
+                   COMPONENT_SHAPE_DAMAGED, CQ_END) {
+      struct TracksWindowComponent *window =
+          swiss_getComponent(em, COMPONENT_TRACKS_WINDOW, it.id);
+      struct ShapeDamagedEvent *shapeDamaged =
+          swiss_getComponent(em, COMPONENT_SHAPE_DAMAGED, it.id);
+
+      XWindowAttributes attribs;
+      if (!XGetWindowAttributes(ps->xcontext.display, window->id, &attribs)) {
+        printf_errf(""Failed getting window attributes while mapping"");
+        swiss_removeComponent(em, COMPONENT_SHAPE_DAMAGED, it.id);
+        continue;
+      }
+
+      Vector2 extents = {{attribs.width + attribs.border_width * 2,
+                          attribs.height + attribs.border_width * 2}};
+
+      Vector2 offset = {{-attribs.border_width, -attribs.border_width}};
+
+      XserverRegion window_region = XFixesCreateRegionFromWindow(
+          ps->xcontext.display, window->id, ShapeBounding);
+
+      XRectangle default_clip = {.x = offset.x,
+                                 .y = offset.y,
+                                 .width = extents.x,
+                                 .height = extents.y};
+      XserverRegion default_clip_region =
+          XFixesCreateRegion(ps->xcontext.display, &default_clip, 1);
+      XFixesIntersectRegion(ps->xcontext.display, window_region, window_region,
+                            default_clip_region);
+
+      int rect_count;
+      XRectangle *rects =
+          XFixesFetchRegion(ps->xcontext.display, window_region, &rect_count);
+
+      XFixesDestroyRegion(ps->xcontext.display, window_region);
+
+      vector_init(&shapeDamaged->rects, sizeof(struct Rect), rect_count);
+
+      convert_xrects_to_relative_rect(rects, rect_count, &extents, &offset,
+                                      &shapeDamaged->rects);
+    }
+
+    zone_leave(&ZONE_input);
+
+    timestamp currentTime;
+    if (!getTime(&currentTime)) {
+      printf_errf(""Failed getting time"");
+      exit(1);
+    }
+
+    double dt = timeDiff(&lastTime, &currentTime);
+
+    ps->skip_poll = false;
+
+    if (ps->o.benchmark) {
+      if (ps->o.benchmark_wid) {
+        win *w = find_win(ps, ps->o.benchmark_wid);
+        if (!w) {
+          printf_errf(""(): Couldn't find specified benchmark window."");
+          session_destroy(ps);
+          exit(1);
+        }
+      }
+    }
+
+    ps->idling = true;
+
+    zone_enter(&ZONE_preprocess);
+
+    paint_preprocess(ps);
+
+    zone_leave(&ZONE_preprocess);
+
+    zone_enter(&ZONE_update);
+
+    zone_enter(&ZONE_update_z);
+    assign_depth(&ps->win_list, &ps->order);
+    zone_leave(&ZONE_update_z);
+
+    zone_enter(&ZONE_update_wintype);
+
+    for_components(it, em, COMPONENT_MAP, CQ_END) {
+      swiss_addComponent(em, COMPONENT_WINTYPE_CHANGE, it.id);
+    }
+
+    fill_wintype_changes(&ps->win_list, ps);
+
+    for_components(it, em, COMPONENT_WINTYPE_CHANGE, CQ_END) {
+      swiss_ensureComponent(em, COMPONENT_FOCUS_CHANGE, it.id);
+    }
+
+    for_components(it, em, COMPONENT_WINTYPE_CHANGE, CQ_END) {
+      struct WintypeChangedComponent *wintypeChanged =
+          swiss_getComponent(em, COMPONENT_WINTYPE_CHANGE, it.id);
+      struct _win *w = swiss_getComponent(em, COMPONENT_MUD, it.id);
+
+      w->window_type = wintypeChanged->newType;
+    }
+    zone_leave(&ZONE_update_wintype);
+
+    if (ps->o.shadow_blacklist) {
+      zone_enter(&ZONE_update_shadow_blacklist);
+      for_components(it, em, COMPONENT_MUD, CQ_END) {
+        struct _win *w = swiss_getComponent(em, COMPONENT_MUD, it.id);
+        if (win_mapped(em, it.id)) {
+          w->shadow = (ps->o.wintype_shadow[w->window_type] &&
+                       !win_match(ps, w, ps->o.shadow_blacklist) &&
+                       !(ps->o.respect_prop_shadow));
+        }
+      }
+      zone_leave(&ZONE_update_shadow_blacklist);
+    }
+
+    if (ps->o.fade_blacklist) {
+      zone_enter(&ZONE_update_fade_blacklist);
+      for_components(it, em, COMPONENT_MUD, CQ_END) {
+        struct _win *w = swiss_getComponent(em, COMPONENT_MUD, it.id);
+
+        if (win_mapped(em, it.id)) {
+
+          if (win_match(ps, w, ps->o.fade_blacklist)) {
+            w->fade = false;
+          } else {
+            w->fade = ps->o.wintype_fade[w->window_type];
+          }
+        }
+      }
+      zone_leave(&ZONE_update_fade_blacklist);
+    }
+
+    if (ps->o.blur_background_blacklist) {
+      zone_enter(&ZONE_update_blur_blacklist);
+      for_components(it, em, COMPONENT_MUD, CQ_END) {
+        struct _win *w = swiss_getComponent(em, COMPONENT_MUD, it.id);
+        if (win_mapped(em, it.id)) {
+          bool blur_background_new =
+              ps->o.blur_background &&
+              !win_match(ps, w, ps->o.blur_background_blacklist);
+
+          win_set_blur_background(ps, w, blur_background_new);
+        }
+      }
+      zone_leave(&ZONE_update_blur_blacklist);
+    }
+
+    if (ps->o.paint_blacklist) {
+      zone_enter(&ZONE_update_paint_blacklist);
+      for_components(it, em, COMPONENT_MUD, CQ_END) {
+        struct _win *w = swiss_getComponent(em, COMPONENT_MUD, it.id);
+        if (win_mapped(em, it.id)) {
+          w->paint_excluded = win_match(ps, w, ps->o.paint_blacklist);
+        }
+      }
+      zone_leave(&ZONE_update_paint_blacklist);
+    }
+
+    zone_enter(&ZONE_input_react);
+    commit_destroy(&ps->win_list);
+    commit_map(&ps->win_list, &ps->atoms, &ps->xcontext);
+    commit_unmap(&ps->win_list, &ps->xcontext);
+    commit_opacity_change(&ps->win_list, ps->o.opacity_fade_time,
+                          ps->o.bg_opacity_fade_time);
+    commit_move(&ps->win_list, &ps->order);
+    commit_resize(&ps->win_list, &ps->order);
+    commit_reshape(&ps->win_list, &ps->xcontext);
+    zone_leave(&ZONE_input_react);
+
+    zone_enter(&ZONE_make_cutout);
+    {
+      XserverRegion newShape = XFixesCreateRegion(ps->dpy, NULL, 0);
+      for_components(it, em, COMPONENT_MUD, COMPONENT_TRACKS_WINDOW,
+                     COMPONENT_PHYSICAL, CQ_NOT, COMPONENT_REDIRECTED, CQ_END) {
+        struct TracksWindowComponent *tracksWindow =
+            swiss_getComponent(em, COMPONENT_TRACKS_WINDOW, it.id);
+        struct PhysicalComponent *physical =
+            swiss_getComponent(em, COMPONENT_PHYSICAL, it.id);
+
+        if (win_mapped(em, it.id)) {
+          XserverRegion windowRegion = XFixesCreateRegionFromWindow(
+              ps->xcontext.display, tracksWindow->id, ShapeBounding);
+          XFixesTranslateRegion(ps->dpy, windowRegion, physical->position.x + 1,
+                                physical->position.y + 1);
+          XFixesUnionRegion(ps->xcontext.display, newShape, newShape,
+                            windowRegion);
+          XFixesDestroyRegion(ps->xcontext.display, windowRegion);
+        }
+      }
+      XFixesInvertRegion(ps->dpy, newShape,
+                         &(XRectangle){0, 0, ps->root_size.x, ps->root_size.y},
+                         newShape);
+      XFixesSetWindowShapeRegion(ps->dpy, ps->overlay, ShapeBounding, 0, 0,
+                                 newShape);
+      XFixesDestroyRegion(ps->xcontext.display, newShape);
+    }
+    zone_leave(&ZONE_make_cutout);
+
+    zone_enter(&ZONE_prop_blur_damage);
+    damage_blur_over_damaged(&ps->win_list, &ps->order);
+    zone_leave(&ZONE_prop_blur_damage);
+
+    zone_enter(&ZONE_update_textures);
+    update_window_textures(&ps->win_list, &ps->xcontext,
+                           &ps->psglx->shared_fbo);
+    zone_leave(&ZONE_update_textures);
+
+    update_focused_state(&ps->win_list, ps);
+    calculate_window_opacity(ps, &ps->win_list);
+    start_focus_fade(&ps->win_list, ps->o.opacity_fade_time,
+                     ps->o.bg_opacity_fade_time, ps->o.dim_fade_time);
+
+    zone_enter(&ZONE_update_fade);
+
+    damage_blur_over_fade(&ps->win_list);
+    syncronize_fade_opacity(&ps->win_list);
+    if (do_win_fade(&ps->curve, dt, &ps->win_list)) {
+      ps->skip_poll = true;
+    }
+
+    for_components(it, em, COMPONENT_TRANSITIONING, CQ_END) {
+      struct TransitioningComponent *t =
+          swiss_getComponent(em, COMPONENT_TRANSITIONING, it.id);
+      t->time += dt;
+    }
+
+    for_components(it, em, COMPONENT_TRANSITIONING, CQ_END) {
+      struct TransitioningComponent *t =
+          swiss_getComponent(em, COMPONENT_TRANSITIONING, it.id);
+      if (t->time >= t->duration)
+        swiss_removeComponent(em, COMPONENT_TRANSITIONING, it.id);
+    }
+
+    zone_leave(&ZONE_update_fade);
+
+    transition_faded_entities(&ps->win_list);
+    remove_texture_invis_windows(&ps->win_list);
+    finish_destroyed_windows(&ps->win_list, ps);
+    zone_leave(&ZONE_update);
+
+    Vector opaque;
+    vector_init(&opaque, sizeof(win_id), ps->order.size);
+    for_components(it, &ps->win_list, COMPONENT_MUD, COMPONENT_TEXTURED, CQ_NOT,
+                   COMPONENT_BGOPACITY, COMPONENT_PHYSICAL, CQ_END) {
+      vector_putBack(&opaque, &it.id);
+    }
+    vector_qsort(&opaque, window_zcmp, &ps->win_list);
+    Vector transparent;
+    vector_init(&transparent, sizeof(win_id), ps->order.size);
+
+    for_components(it, &ps->win_list, COMPONENT_MUD, COMPONENT_TEXTURED,
+                   COMPONENT_PHYSICAL, CQ_END) {
+      vector_putBack(&transparent, &it.id);
+    }
+    vector_qsort(&transparent, window_zcmp, &ps->win_list);
+
+    Vector opaque_shadow;
+    vector_init(&opaque_shadow, sizeof(win_id), ps->order.size);
+    fetchSortedWindowsWith(&ps->win_list, &opaque_shadow, COMPONENT_MUD,
+                           COMPONENT_Z, COMPONENT_PHYSICAL, CQ_NOT,
+                           COMPONENT_OPACITY, COMPONENT_SHADOW, CQ_END);
+
+    zone_enter(&ZONE_effect_textures);
+
+    zone_enter(&ZONE_update_shadow);
+    windowlist_updateShadow(ps, &transparent);
+    zone_leave(&ZONE_update_shadow);
+
+    if (ps->o.blur_background)
+      windowlist_updateBlur(ps);
+
+    zone_leave(&ZONE_effect_textures);
+
+    {
+      static int paint = 0;
+
+      zone_enter(&ZONE_paint);
+
+      glDepthMask(GL_TRUE);
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
+      static const GLenum DRAWBUFS[2] = {GL_BACK_LEFT};
+      glDrawBuffers(1, DRAWBUFS);
+      glViewport(0, 0, ps->root_size.x, ps->root_size.y);
+
+      glClearDepth(1.0);
+      glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+      glDepthFunc(GL_LESS);
+
+      windowlist_drawBackground(ps, &opaque);
+      windowlist_drawTint(ps);
+      windowlist_draw(ps, &opaque);
+
+      paint_root(ps);
+
+      windowlist_drawTransparent(ps, &transparent);
+
+#ifdef DEBUG_WINDOWS
+
+      draw_component_debug(&ps->win_list, &ps->root_size);
+#endif
+
+      vector_kill(&opaque_shadow);
+      vector_kill(&transparent);
+      vector_kill(&opaque);
+
+      zone_leave(&ZONE_paint);
+
+      paint++;
+      if (ps->o.benchmark && paint >= ps->o.benchmark) {
+#ifdef DEBUG_PROFILE
+        profilerWriter_kill(&profSess);
+#endif
+        session_destroy(ps);
+        exit(0);
+      }
+    }
+
+    zone_enter(&ZONE_remove_input);
+
+    swiss_resetComponent(&ps->win_list, COMPONENT_MAP);
+    swiss_resetComponent(&ps->win_list, COMPONENT_UNMAP);
+    swiss_resetComponent(&ps->win_list, COMPONENT_MOVE);
+    swiss_removeComponentWhere(
+        &ps->win_list, COMPONENT_RESIZE,
+        (enum ComponentType[]){COMPONENT_PHYSICAL, CQ_END});
+
+    swiss_resetComponent(em, COMPONENT_WINTYPE_CHANGE);
+
+    swiss_resetComponent(&ps->win_list, COMPONENT_FOCUS_CHANGE);
+
+    for_components(it, em, COMPONENT_SHAPE_DAMAGED, CQ_END) {
+      struct ShapeDamagedEvent *shapeDamaged =
+          swiss_getComponent(em, COMPONENT_SHAPE_DAMAGED, it.id);
+      if (shapeDamaged->rects.elementSize != 0) {
+        vector_kill(&shapeDamaged->rects);
+      }
+    }
+    swiss_resetComponent(&ps->win_list, COMPONENT_SHAPE_DAMAGED);
+
+    zone_leave(&ZONE_remove_input);
+
+    swiss_resetComponent(&ps->win_list, COMPONENT_CONTENTS_DAMAGED);
+
+#ifdef FRAMERATE_DISPLAY
+    update_debug_graph(&ps->debug_graph, currentTime);
+    draw_debug_graph(&ps->debug_graph, &(Vector2){{10, ps->root_size.y - 10}});
+#endif
+
+    struct ZoneEventStream *event_stream = zone_package(&ZONE_global);
+#ifdef DEBUG_PROFILE
+
+    profilerWriter_emitFrame(&profSess, event_stream);
+#endif
+
+    glXSwapBuffers(ps->dpy, get_tgt_window(ps));
+    glFinish();
+
+    lastTime = currentTime;
+  }
+
+#ifdef DEBUG_PROFILE
+  profilerWriter_kill(&profSess);
+#endif
+}",0.0,0.0,--,--,--
+3drobotics-ardupilot-solo-rebase-e5f2337/Tools/ArduPPM/ATMega32U2/LUFA/Drivers/USB/Class/Device/CDC.c,"Sends a Serial Control Line State Change notification to the host. This should be called when the virtual serial control lines (DCD, DSR, etc.) have changed states, or to give BREAK notifications to the host. Line states persist until they are cleared via a second notification. This should be called each time the CDC class driver's ControlLineStates.DeviceToHost value is updated to push the new states to the USB host.",2,"void CDC_Device_SendControlLineStateChange(
+    USB_ClassInfo_CDC_Device_t *const CDCInterfaceInfo) {
+  if ((USB_DeviceState != DEVICE_STATE_Configured) ||
+      !(CDCInterfaceInfo->State.LineEncoding.BaudRateBPS))
+    return;
+
+  Endpoint_SelectEndpoint(CDCInterfaceInfo->Config.NotificationEndpointNumber);
+
+  USB_Request_Header_t Notification = (USB_Request_Header_t){
+      .bmRequestType = (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE),
+      .bRequest = NOTIF_SerialState,
+      .wValue = 0,
+      .wIndex = 0,
+      .wLength = sizeof(CDCInterfaceInfo->State.ControlLineStates.DeviceToHost),
+  };
+
+  Endpoint_Write_Stream_LE(&Notification, sizeof(USB_Request_Header_t),
+                           NO_STREAM_CALLBACK);
+  Endpoint_Write_Stream_LE(
+      &CDCInterfaceInfo->State.ControlLineStates.DeviceToHost,
+      sizeof(CDCInterfaceInfo->State.ControlLineStates.DeviceToHost),
+      NO_STREAM_CALLBACK);
+  Endpoint_ClearIN();
+}",0.0,0.0,--,--,--
+StarLabMakerSpace-Nova4Mixly-bed4f4f/nova/hardware/nova/avr/bootloaders/Caterina-ORG/LUFA-111009/Demos/Host/LowLevel/MassStorageHost/Lib/MassStoreCommands.c,"Issues a SCSI Inquiry command to the attached device, to determine the device's information. This gives information on the device's capabilities.",1,"uint8_t MassStore_Inquiry(const uint8_t LUNIndex,
+                          SCSI_Inquiry_Response_t *const InquiryPtr) {
+  uint8_t ErrorCode = PIPE_RWSTREAM_NoError;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .Signature = MS_CBW_SIGNATURE,
+      .DataTransferLength = sizeof(SCSI_Inquiry_Response_t),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_INQUIRY, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Inquiry_Response_t), 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MassStore_SendCommand(&SCSICommandBlock, InquiryPtr)) !=
+      PIPE_RWSTREAM_NoError) {
+    Pipe_Freeze();
+    return ErrorCode;
+  }
+
+  if ((ErrorCode = MassStore_GetReturnedStatus(&SCSICommandStatus)) !=
+      PIPE_RWSTREAM_NoError) {
+    Pipe_Freeze();
+    return ErrorCode;
+  }
+
+  return ErrorCode;
+}",0.0,0.0,--,--,--
+boazsegev-iodine-b6bdf50/ext/iodine/fio.c,Publishes the message to the current process and frees the strings.,2,"static void fio_publish2process(fio_msg_internal_s *m) {
+  fio_msg_internal_finalize(m);
+  channel_s *ch;
+  if (m->filter) {
+    ch = fio_filter_find_dup(m->filter);
+    if (!ch) {
+      goto finish;
+    }
+  } else {
+    ch = fio_channel_find_dup(m->channel);
+  }
+
+  if (ch) {
+    fio_defer_push_urgent(fio_publish2channel_task, ch,
+                          fio_msg_internal_dup(m));
+  }
+  if (m->filter == 0) {
+
+    fio_lock(&fio_postoffice.patterns.lock);
+    FIO_SET_FOR_LOOP(&fio_postoffice.patterns.channels, p) {
+      if (!p->hash) {
+        continue;
+      }
+
+      if (p->obj->match(
+              (fio_str_info_s){.data = p->obj->name, .len = p->obj->name_len},
+              m->channel)) {
+        fio_channel_dup(p->obj);
+        fio_defer_push_urgent(fio_publish2channel_task, p->obj,
+                              fio_msg_internal_dup(m));
+      }
+    }
+    fio_unlock(&fio_postoffice.patterns.lock);
+  }
+finish:
+  fio_msg_internal_free(m);
+}",0.0,0.0,--,--,--
+AltSysrq-avalanche-a3f4bfd/bootstrap-runtime/src/runtime/macsub.c,Returns a macro substitution result wrapping a silent error as produced by ava_macsub_silent_error().,2,"ava_macro_subst_result
+ava_macsub_silent_error_result(const ava_compile_location *location) {
+  return (ava_macro_subst_result){.status = ava_mss_done,
+                                  .v.node = ava_macsub_silent_error(location)};
+}",0.0,0.0,--,--,--
+opticron-libuweave-2e5e385/src/ble_transport.c,Initializes a BLE transport service to handle BLE input and registers it in the runloop.,0,"bool uw_ble_transport_init(UwBleTransport *transport, UwDevice *device) {
+  assert(transport != NULL && device != NULL);
+
+  memset(transport, 0, sizeof(UwBleTransport));
+  transport->device = device;
+
+  uw_buffer_init(&transport->read_buffer, transport->read_data,
+                 sizeof(transport->read_data));
+
+  uw_buffer_init(&transport->write_buffer, transport->write_data,
+                 sizeof(transport->write_data));
+
+  uw_session_init_(&transport->session, device);
+
+  uw_device_channel_init_(
+      &transport->device_channel,
+      (UwDeviceChannelHandshakeConfig){.handler = handshake_exchange_handler_,
+                                       .data = (void *)transport},
+      (UwDeviceChannelConnectionResetConfig){
+          .handler = connection_reset_handler_, .data = (void *)transport},
+      &transport->read_buffer, &transport->write_buffer, UW_BLE_PACKET_SIZE);
+
+  uw_service_init_(&transport->service, service_start_handler_,
+                   service_event_handler_, service_stop_handler_, transport);
+
+  uw_device_register_service_(transport->device, &transport->service);
+
+  UwSettings *settings = uw_device_get_settings(transport->device);
+  settings->supports_ble_40 = true;
+
+  return true;
+}",0.0,0.0,--,--,--
+dm7h-fpga-event-recorder-4e53bab/src/Logikanalysator/USB-TPLE/Microcontroller_Firmware/LUFA_Based/DualSerial/LUFA_100219/LUFA/Drivers/USB/Class/Host/MassStorage.c,"Sends a MASS STORAGE RESET control request to the attached device, resetting the Mass Storage Interface and readying it for the next Mass Storage command. This should be called after a failed SCSI request to ensure the attached Mass Storage device is ready to receive the next command.",1,"uint8_t
+MS_Host_ResetMSInterface(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo) {
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType = (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE),
+      .bRequest = REQ_MassStorageReset,
+      .wValue = 0,
+      .wIndex = MSInterfaceInfo->State.InterfaceNumber,
+      .wLength = 0,
+  };
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+  return USB_Host_SendControlRequest(NULL);
+}",0.0,0.0,--,--,--
+graphitemaster-redroid-9cdd940/string.c,Constructs an empty managed string object.,2,"string_t *string_construct(void) {
+  string_t *string =
+      memcpy(malloc(sizeof(string_t)),
+             &(string_t){.buffer = malloc(8), .allocated = 8, .length = 0},
+             sizeof(string_t));
+  *string->buffer = '\0';
+  return string;
+}",0.0,0.0,--,--,--
+dm7h-fpga-event-recorder-4e53bab/src/Logikanalysator/USB-TPLE/Microcontroller_Firmware/LUFA_Based/estick_firmware/LUFA090605/Demos/Host/MassStorageHost/MassStorageHost.c,"Task to set the configuration of the attached device after it has been enumerated, and to read in blocks from the device and print them to the serial port.",1,"TASK(USB_MassStore_Host) {
+  uint8_t ErrorCode;
+
+  switch (USB_HostState) {
+  case HOST_STATE_Addressed:
+
+    USB_ControlRequest = (USB_Request_Header_t){
+        .bmRequestType =
+            (REQDIR_HOSTTODEVICE | REQTYPE_STANDARD | REQREC_DEVICE),
+        .bRequest = REQ_SetConfiguration,
+        .wValue = 1,
+        .wIndex = 0,
+        .wLength = 0,
+    };
+
+    Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+    if ((ErrorCode = USB_Host_SendControlRequest(NULL)) !=
+        HOST_SENDCONTROL_Successful) {
+      puts_P(PSTR(""Control Error (Set Configuration).\r\n""));
+      printf_P(PSTR("" -- Error Code: %d\r\n""), ErrorCode);
+
+      UpdateStatus(Status_EnumerationError);
+
+      while (USB_IsConnected)
+        ;
+      break;
+    }
+
+    USB_HostState = HOST_STATE_Configured;
+    break;
+  case HOST_STATE_Configured:
+    puts_P(PSTR(""Getting Config Data.\r\n""));
+
+    if ((ErrorCode = ProcessConfigurationDescriptor()) !=
+        SuccessfulConfigRead) {
+      if (ErrorCode == ControlError)
+        puts_P(PSTR(""Control Error (Get Configuration).\r\n""));
+      else
+        puts_P(PSTR(""Invalid Device.\r\n""));
+
+      printf_P(PSTR("" -- Error Code: %d\r\n""), ErrorCode);
+
+      UpdateStatus(Status_EnumerationError);
+
+      while (USB_IsConnected)
+        ;
+      break;
+    }
+
+    puts_P(PSTR(""Mass Storage Disk Enumerated.\r\n""));
+
+    USB_HostState = HOST_STATE_Ready;
+    break;
+  case HOST_STATE_Ready:
+
+    UpdateStatus(Status_Busy);
+
+    if ((ErrorCode = MassStore_GetMaxLUN(&MassStore_MaxLUNIndex)) !=
+        HOST_SENDCONTROL_Successful) {
+      ShowDiskReadError(PSTR(""Get Max LUN""), false, ErrorCode);
+      break;
+    }
+
+    printf_P(PSTR(""Total LUNs: %d.\r\n""), (MassStore_MaxLUNIndex + 1));
+
+    if ((ErrorCode = MassStore_MassStorageReset()) !=
+        HOST_SENDCONTROL_Successful) {
+      ShowDiskReadError(PSTR(""Mass Storage Reset""), false, ErrorCode);
+      break;
+    }
+
+    SCSI_Request_Sense_Response_t SenseData;
+    if (((ErrorCode = MassStore_RequestSense(0, &SenseData)) != 0) ||
+        (SCSICommandStatus.Status != Command_Pass)) {
+      ShowDiskReadError(PSTR(""Request Sense""),
+                        (SCSICommandStatus.Status != Command_Pass), ErrorCode);
+      break;
+    }
+
+    if (((ErrorCode = MassStore_PreventAllowMediumRemoval(0, true)) != 0) ||
+        (SCSICommandStatus.Status != Command_Pass)) {
+      ShowDiskReadError(PSTR(""Prevent/Allow Medium Removal""),
+                        (SCSICommandStatus.Status != Command_Pass), ErrorCode);
+      break;
+    }
+
+    puts_P(PSTR(""Waiting until ready..""));
+
+    do {
+      Serial_TxByte('.');
+
+      if ((ErrorCode = MassStore_TestUnitReady(0)) != 0) {
+        ShowDiskReadError(PSTR(""Test Unit Ready""), false, ErrorCode);
+        break;
+      }
+    } while ((SCSICommandStatus.Status != Command_Pass) && USB_IsConnected);
+
+    if (!(USB_IsConnected))
+      break;
+
+    puts_P(PSTR(""\r\nRetrieving Capacity... ""));
+
+    SCSI_Capacity_t DiskCapacity;
+
+    if (((ErrorCode = MassStore_ReadCapacity(0, &DiskCapacity)) != 0) ||
+        (SCSICommandStatus.Status != Command_Pass)) {
+      ShowDiskReadError(PSTR(""Read Capacity""),
+                        (SCSICommandStatus.Status != Command_Pass), ErrorCode);
+      break;
+    }
+
+    printf_P(PSTR(""%lu blocks of %lu bytes.\r\n""), DiskCapacity.Blocks,
+             DiskCapacity.BlockSize);
+
+    uint8_t BlockBuffer[DiskCapacity.BlockSize];
+
+    if (((ErrorCode = MassStore_ReadDeviceBlock(
+              0, 0x00000000, 1, DiskCapacity.BlockSize, BlockBuffer)) != 0) ||
+        (SCSICommandStatus.Status != Command_Pass)) {
+      ShowDiskReadError(PSTR(""Read Device Block""),
+                        (SCSICommandStatus.Status != Command_Pass), ErrorCode);
+      break;
+    }
+
+    puts_P(PSTR(""\r\nContents of first block:\r\n""));
+
+    for (uint16_t Chunk = 0; Chunk < (DiskCapacity.BlockSize >> 4); Chunk++) {
+
+      uint8_t *ChunkPtr = &BlockBuffer[Chunk << 4];
+
+      for (uint8_t ByteOffset = 0; ByteOffset < (1 << 4); ByteOffset++) {
+        char CurrByte = *(ChunkPtr + ByteOffset);
+
+        printf_P(PSTR(""%.2X ""), CurrByte);
+      }
+
+      puts_P(PSTR(""    ""));
+
+      for (uint8_t ByteOffset = 0; ByteOffset < (1 << 4); ByteOffset++) {
+        char CurrByte = *(ChunkPtr + ByteOffset);
+
+        putchar(isprint(CurrByte) ? CurrByte : '.');
+      }
+
+      puts_P(PSTR(""\r\n""));
+    }
+
+    puts_P(PSTR(""\r\n\r\nPress board button to read entire ASCII contents of ""
+                ""disk...\r\n\r\n""));
+
+    while (!(Buttons_GetStatus() & BUTTONS_BUTTON1)) {
+
+      if (!(USB_IsConnected))
+        break;
+    }
+
+    for (uint32_t CurrBlock = 0; CurrBlock < DiskCapacity.Blocks; CurrBlock++) {
+
+      if (((ErrorCode = MassStore_ReadDeviceBlock(
+                0, CurrBlock, 1, DiskCapacity.BlockSize, BlockBuffer)) != 0) ||
+          (SCSICommandStatus.Status != Command_Pass)) {
+        ShowDiskReadError(PSTR(""Read Device Block""),
+                          (SCSICommandStatus.Status != Command_Pass),
+                          ErrorCode);
+        break;
+      }
+
+      for (uint16_t Byte = 0; Byte < DiskCapacity.BlockSize; Byte++) {
+        char CurrByte = BlockBuffer[Byte];
+
+        putchar(isprint(CurrByte) ? CurrByte : '.');
+      }
+
+      if (!(USB_IsConnected))
+        break;
+    }
+
+    UpdateStatus(Status_USBReady);
+
+    while (USB_IsConnected)
+      ;
+
+    break;
+  }
+}",0.0,0.0,--,--,--
+JohnCoatesOSS-Limitless-7246efd/External/oclint/lib/clang/5.0.0/include/avxintrin.h,This intrinsic is a utility function and does not correspond to a specific instruction.,4,"_mm256_setr_ps(float __a, float __b, float __c, float __d, float __e, float __f,
+               float __g, float __h) {
+  return (__m256){__a, __b, __c, __d, __e, __f, __g, __h};
+}",0.0,0.0,--,--,--
+pgrawehr-golgotha-5d70da4/string/string.h,Attempts to convert the string to a number.,2,"i4_str *read_string();
+
+w32 read_ascii(char *buffer, w32 buffer_size);
+
+sw32 read_number(i4_bool throwexception = i4_F);
+
+double read_float(i4_bool throwexception = i4_F);
+}
+;
+
+virtual ~i4_const_str(){};
+
+const iterator end() const { return ptr + len; }
+iterator end() { return ptr + len; }
+
+const iterator begin() const { return ptr; }
+iterator begin() { return ptr; }
+
+w32 length() const { return len; }",0.0,0.0,--,--,--
+parapluu-encore-3d5e973/src/runtime/stream/stream.c,Close a stream,2,"void stream_close(pony_ctx_t **ctx, stream_t *s) {
+  struct scons *scons = scons_mk(*ctx, NULL);
+  scons->eos = true;
+  future_fulfil(ctx, (future_t *)s, (encore_arg_t){.p = scons});
+}",0.0,0.0,--,--,--
+HarveyHunt-howm-81b1d82/src/monitor.c,Create a single monitor for use with default X11.,2,"static void scan_x11_monitor(void) {
+  monitor_t *m =
+      create_monitor((xcb_rectangle_t){0, 0, screen_width, screen_height});
+
+  add_ws(m);
+}",0.0,0.0,--,--,--
+dm7h-fpga-event-recorder-4e53bab/src/Logikanalysator/Firmware-Mikrocontroller/CLASS_DUAL_CDC1/CLASS_DUAL_CDC1/src/LUFA/LUFA/Drivers/USB/Class/Host/MassStorageClassHost.c,Reads blocks of data from the attached Mass Storage device's medium.,1,"uint8_t MS_Host_ReadDeviceBlocks(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                                 const uint8_t LUNIndex,
+                                 const uint32_t BlockAddress,
+                                 const uint8_t Blocks, const uint16_t BlockSize,
+                                 void *BlockBuffer) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .DataTransferLength = cpu_to_le32((uint32_t)Blocks * BlockSize),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 10,
+      .SCSICommandData = {SCSI_CMD_READ_10, 0x00, (BlockAddress >> 24),
+                          (BlockAddress >> 16), (BlockAddress >> 8),
+                          (BlockAddress & 0xFF), 0x00, 0x00, Blocks, 0x00}};
+
+  return MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock, BlockBuffer);
+}",0.0,0.0,--,--,--
+makestuff-neroJtag-b7f0313/LUFA-110528/LUFA/Drivers/USB/Class/Host/CDC.c,Sends a Send Break request to the device. This is generally used to separate data data or to indicate a special condition to the receiving device.,2,"uint8_t CDC_Host_SendBreak(USB_ClassInfo_CDC_Host_t *const CDCInterfaceInfo,
+                           const uint8_t Duration) {
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType = (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE),
+      .bRequest = CDC_REQ_SendBreak,
+      .wValue = Duration,
+      .wIndex = CDCInterfaceInfo->State.ControlInterfaceNumber,
+      .wLength = 0,
+  };
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+  return USB_Host_SendControlRequest(NULL);
+}",0.0,0.0,--,--,--
+ikeydoherty-ui-tests-41140ce/src/popover.c,Work out the geometry for the relative_to widget in absolute coordinates on the screen.,2,"static void budgie_popover_compute_widget_geometry(GtkWidget *parent_widget,
+                                                   GdkRectangle *target) {
+  GtkAllocation alloc = {0};
+  GtkWidget *toplevel = NULL;
+  GdkWindow *toplevel_window = NULL;
+  gint rx, ry = 0;
+  gint x, y = 0;
+
+  if (!parent_widget) {
+    g_warning(""compute_widget_geometry(): missing relative_widget"");
+    return;
+  }
+
+  toplevel = gtk_widget_get_toplevel(parent_widget);
+  toplevel_window = gtk_widget_get_window(toplevel);
+  gdk_window_get_position(toplevel_window, &x, &y);
+  gtk_widget_translate_coordinates(parent_widget, toplevel, x, y, &rx, &ry);
+  gtk_widget_get_allocation(parent_widget, &alloc);
+
+  *target = (GdkRectangle){
+      .x = rx, .y = ry, .width = alloc.width, .height = alloc.height};
+}",0.0,0.0,--,--,--
+AltSysrq-avalanche-a3f4bfd/bootstrap-runtime/src/runtime/hash-map-impl.c,Builds a new hash table for the given hash map. A call to ava_hash_map_vacuum() is implied.,2,"static size_t ava_hash_map_rehash(ava_hash_map *restrict map,
+                                  size_t num_elements, ava_bool permit_ascii9) {
+  size_t i, orig_num_elements;
+  size_t new_size AVA_UNUSED;
+  ava_list_value keys;
+  ava_hash_map_hash_function preferred_hash_function;
+  ava_bool vacuumed;
+  const ava_hash_map_index *restrict old_index = map->index;
+
+  orig_num_elements = num_elements;
+  num_elements = ava_hash_map_vacuum(map, num_elements);
+  vacuumed = orig_num_elements != num_elements;
+
+  keys = (ava_list_value){ava_value_with_ulong(map->keys, num_elements)};
+
+  if (NULL != map->index || num_elements > ASCII9_SIZE_THRESH) {
+    preferred_hash_function = map->index->hash_function;
+  } else {
+    preferred_hash_function = ava_hmhf_ascii9;
+    for (i = 0; i < num_elements && preferred_hash_function != ava_hmhf_value;
+         ++i) {
+      if (!is_ascii9_string(map->esba_trait->index(keys, i))) {
+        preferred_hash_function = ava_hmhf_value;
+      }
+    }
+  }
+
+  map->index = ava_hash_map_index_new(desired_capacity(num_elements));
+  map->index->num_elements = 0;
+  map->index->hash_function =
+      permit_ascii9 ? preferred_hash_function : ava_hmhf_value;
+  memset(map->index->indices, -1, sizeof(TYPE) * (map->index->mask + 1));
+
+  if (old_index && !vacuumed &&
+      map->index->hash_function == old_index->hash_function) {
+
+    for (i = 0; i < num_elements; ++i) {
+      map->index->hash_cache[i] = old_index->hash_cache[i];
+      ava_hash_map_put_direct(map, i, old_index->hash_cache[i]);
+    }
+    map->index->num_elements = num_elements;
+  } else {
+    for (i = 0; i < num_elements; ++i) {
+      new_size = ava_hash_map_put(map, i, map->esba_trait->index(keys, i));
+      assert(i + 1 == new_size);
+      ++map->index->num_elements;
+    }
+  }
+
+  return num_elements;
+}",0.0,0.0,--,--,--
+StarLabMakerSpace-Nova4Mixly-bed4f4f/nova/hardware/nova/avr/bootloaders/Caterina-ORG/LUFA-111009/Demos/Host/LowLevel/MassStorageHost/Lib/MassStoreCommands.c,"Issues a SCSI Device Block Read command to the attached device, to read in one or more data blocks from the storage medium into a buffer.",0,"uint8_t MassStore_ReadDeviceBlock(const uint8_t LUNIndex,
+                                  const uint32_t BlockAddress,
+                                  const uint8_t Blocks,
+                                  const uint16_t BlockSize, void *BufferPtr) {
+  uint8_t ErrorCode = PIPE_RWSTREAM_NoError;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .Signature = MS_CBW_SIGNATURE,
+      .DataTransferLength = ((uint32_t)Blocks * BlockSize),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 10,
+      .SCSICommandData = {SCSI_CMD_READ_10, 0x00, (BlockAddress >> 24),
+                          (BlockAddress >> 16), (BlockAddress >> 8),
+                          (BlockAddress & 0xFF), 0x00, 0x00, Blocks, 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MassStore_SendCommand(&SCSICommandBlock, BufferPtr)) !=
+      PIPE_RWSTREAM_NoError) {
+    Pipe_Freeze();
+    return ErrorCode;
+  }
+
+  if ((ErrorCode = MassStore_GetReturnedStatus(&SCSICommandStatus)) !=
+      PIPE_RWSTREAM_NoError) {
+    Pipe_Freeze();
+    return ErrorCode;
+  }
+
+  return ErrorCode;
+}",0.0,0.0,--,--,--
+ARM-software-scmi-tests-24dd373/protocols/clock/clock_exe.c,The function is called by the test engine before sending the clock rate set command and testing the received values.,3,"void arm_scmi_custom_tester_clock_rate_get(
+    struct arm_scmi_protocol_execution_context *protocol_execution_context,
+    arm_scmi_test_case_t *test_case) {
+  uint32_t clock_id;
+  uint32_t *clock_rate;
+  struct arm_scmi_protocol_test_stats *test_stats =
+      &protocol_execution_context->test_stats;
+  int error_code;
+  int check_or_print;
+
+  test_case->parameters = (uint32_t[MAX_PARAMETERS_SIZE]){};
+  test_case->parameter_count = 1;
+  if (test_case->invalid_parameter ==
+      OFFSET_INVALID_PARAM(struct arm_scmi_clock_rate_get, clock_id)) {
+
+    test_case
+        ->parameters[OFFSET_PARAM(struct arm_scmi_clock_rate_get, clock_id)] =
+        clock_protocol_data.num_clocks;
+    arm_scmi_execute_and_assert_test_case(protocol_execution_context, test_case,
+                                          &received);
+  } else {
+
+    if ((test_case->precondition_indicator == PRECOND_USE) &&
+        ((protocol_execution_context->precondition_data.result != CONFORMANT) ||
+         (protocol_execution_context->precondition_data.status !=
+          SCMI_STATUS_SUCCESS))) {
+      arm_scmi_log_test_result(&protocol_execution_context->test_stats, SKIP,
+                               ""PRECONDITION STATUS"",
+                               ""PRECONDITION NON-CONFORMANT"");
+      return;
+    }
+
+    check_or_print =
+        (test_case->precondition_indicator == PRECOND_USE) ? CHECK : PRINT;
+
+    for (clock_id = 0; clock_id < clock_protocol_data.num_clocks; ++clock_id) {
+      snprintf(description, NUM_ELEMS(description), ""\n\t\tCLOCK ID %d"",
+               clock_id);
+      arm_scmi_log(test_stats, description);
+      test_case
+          ->parameters[OFFSET_PARAM(struct arm_scmi_clock_rate_get, clock_id)] =
+          clock_id;
+      arm_scmi_execute_and_assert_test_case(protocol_execution_context,
+                                            test_case, &received);
+      error_code = arm_scmi_execute_and_assert_test_case(
+          protocol_execution_context, test_case, &received);
+      if (arm_scmi_skip_return_values(error_code, received.status))
+        continue;
+
+      clock_rate =
+          &(received.payload[OFFSET_RET(struct arm_scmi_clock_rate_get, rate)]);
+      arm_scmi_check_and_report_hex(
+          &protocol_execution_context->test_stats, ALL_BITS_SET, check_or_print,
+          clock_protocol_data.clocks[clock_id].current_rate.lower,
+          clock_rate[0], ""CLOCK RATE LOWER"");
+      arm_scmi_check_and_report_hex(
+          &protocol_execution_context->test_stats, ALL_BITS_SET, check_or_print,
+          clock_protocol_data.clocks[clock_id].current_rate.upper,
+          clock_rate[1], ""CLOCK RATE UPPER"");
+    }
+  }
+}",0.0,0.0,--,--,--
+Samsung-RT-OCF-fd41fc4/security/tools/json2cbor_src/src/maps.c,Create a new definite map,2,"cbor_item_t *cbor_new_definite_map(size_t size) {
+  cbor_item_t *item = _CBOR_MALLOC(sizeof(cbor_item_t));
+  if (item == NULL) {
+    return NULL;
+  }
+  *item = (cbor_item_t){
+      .refcount = 1,
+      .type = CBOR_TYPE_MAP,
+      .metadata = {.map_metadata = {.allocated = size,
+                                    .type = _CBOR_METADATA_DEFINITE,
+                                    .end_ptr = 0}},
+      .data = _cbor_alloc_multiple(sizeof(struct cbor_pair), size)};
+  if (item->data == NULL) {
+    _CBOR_FREE(item);
+    return NULL;
+  }
+  return item;
+}",0.0,0.0,--,--,--
+PJK-libcbor-87f977e/src/cbor/arrays.c,Create new indefinite array,2,"cbor_item_t *cbor_new_indefinite_array() {
+  cbor_item_t *item = _CBOR_MALLOC(sizeof(cbor_item_t));
+  _CBOR_NOTNULL(item);
+
+  *item = (cbor_item_t){
+      .refcount = 1,
+      .type = CBOR_TYPE_ARRAY,
+      .metadata = {.array_metadata = {.type = _CBOR_METADATA_INDEFINITE,
+                                      .allocated = 0,
+                                      .end_ptr = 0}},
+      .data = NULL};
+  return item;
+}",0.0,0.0,--,--,--
+freeciv-freeciv-e4ead30/client/gui-sdl2/plrdlg.c,Popup (or raise) the player list dialog.,2,"void popup_players_dialog(bool raise) {
+  struct widget *pWindow = NULL, *pBuf = NULL;
+  SDL_Surface *pLogo = NULL, *pZoomed = NULL;
+  utf8_str *pstr;
+  SDL_Rect dst;
+  int i, n, h;
+  double a, b, r;
+  SDL_Rect area;
+
+  if (pPlayers_Dlg) {
+    return;
+  }
+
+  n = 0;
+  players_iterate(pPlayer) {
+    if (is_barbarian(pPlayer)) {
+      continue;
+    }
+    n++;
+  }
+  players_iterate_end;
+
+  if (n < 2) {
+    return;
+  }
+
+  pPlayers_Dlg = fc_calloc(1, sizeof(struct SMALL_DLG));
+
+  pstr = create_utf8_from_char(Q_(""?header:Players""), adj_font(12));
+  pstr->style |= TTF_STYLE_BOLD;
+
+  pWindow = create_window_skeleton(NULL, pstr, 0);
+
+  pWindow->action = players_window_dlg_callback;
+  set_wstate(pWindow, FC_WS_NORMAL);
+
+  add_to_gui_list(ID_WINDOW, pWindow);
+  pPlayers_Dlg->pEndWidgetList = pWindow;
+
+  pBuf = create_themeicon(current_theme->Small_CANCEL_Icon, pWindow->dst,
+                          WF_WIDGET_HAS_INFO_LABEL | WF_RESTORE_BACKGROUND);
+  pBuf->info_label =
+      create_utf8_from_char(_(""Close Dialog (Esc)""), adj_font(12));
+  pBuf->action = exit_players_dlg_callback;
+  set_wstate(pBuf, FC_WS_NORMAL);
+  pBuf->key = SDLK_ESCAPE;
+
+  add_to_gui_list(ID_BUTTON, pBuf);
+
+  for (i = 0; i < DS_LAST; i++) {
+    switch (i) {
+    case DS_ARMISTICE:
+      pBuf = create_checkbox(
+          pWindow->dst, (SDL_Client_Flags & CF_DRAW_PLAYERS_NEUTRAL_STATUS),
+          WF_RESTORE_BACKGROUND);
+      pBuf->action = toggle_draw_neutral_status_callback;
+      pBuf->key = SDLK_n;
+      break;
+    case DS_WAR:
+      pBuf = create_checkbox(pWindow->dst,
+                             (SDL_Client_Flags & CF_DRAW_PLAYERS_WAR_STATUS),
+                             WF_RESTORE_BACKGROUND);
+      pBuf->action = toggle_draw_war_status_callback;
+      pBuf->key = SDLK_w;
+      break;
+    case DS_CEASEFIRE:
+      pBuf = create_checkbox(
+          pWindow->dst, (SDL_Client_Flags & CF_DRAW_PLAYERS_CEASEFIRE_STATUS),
+          WF_RESTORE_BACKGROUND);
+      pBuf->action = toggle_draw_ceasefire_status_callback;
+      pBuf->key = SDLK_c;
+      break;
+    case DS_PEACE:
+      pBuf = create_checkbox(pWindow->dst,
+                             (SDL_Client_Flags & CF_DRAW_PLAYERS_PEACE_STATUS),
+                             WF_RESTORE_BACKGROUND);
+      pBuf->action = toggle_draw_peace_status_callback;
+      pBuf->key = SDLK_p;
+      break;
+    case DS_ALLIANCE:
+      pBuf = create_checkbox(
+          pWindow->dst, (SDL_Client_Flags & CF_DRAW_PLAYERS_ALLIANCE_STATUS),
+          WF_RESTORE_BACKGROUND);
+      pBuf->action = toggle_draw_alliance_status_callback;
+      pBuf->key = SDLK_a;
+      break;
+    default:
+
+      continue;
+      break;
+    }
+    set_wstate(pBuf, FC_WS_NORMAL);
+    add_to_gui_list(ID_CHECKBOX, pBuf);
+  }
+
+  players_iterate(pPlayer) {
+    if (is_barbarian(pPlayer)) {
+      continue;
+    }
+
+    pstr = create_utf8_str(NULL, 0, adj_font(10));
+    pstr->style |= (TTF_STYLE_BOLD | SF_CENTER);
+
+    pLogo = get_nation_flag_surface(nation_of_player(pPlayer));
+    {
+
+      double zoom = DEFAULT_ZOOM * (60.0 - n) / pLogo->h;
+
+      pZoomed = zoomSurface(pLogo, zoom, zoom, 1);
+    }
+
+    pBuf = create_icon2(pZoomed, pWindow->dst,
+                        WF_RESTORE_BACKGROUND | WF_WIDGET_HAS_INFO_LABEL |
+                            WF_FREE_THEME);
+    pBuf->info_label = pstr;
+
+    if (!pPlayer->is_alive) {
+      pstr = create_utf8_from_char(_(""R.I.P.""), adj_font(10));
+      pstr->style |= TTF_STYLE_BOLD;
+      pstr->fgcol = *get_theme_color(COLOR_THEME_PLRDLG_TEXT);
+      pLogo = create_text_surf_from_utf8(pstr);
+      FREEUTF8STR(pstr);
+
+      dst.x = (pZoomed->w - pLogo->w) / 2;
+      dst.y = (pZoomed->h - pLogo->h) / 2;
+      alphablit(pLogo, NULL, pZoomed, &dst, 255);
+      FREESURFACE(pLogo);
+    }
+
+    if (pPlayer->is_alive) {
+      set_wstate(pBuf, FC_WS_NORMAL);
+    }
+
+    pBuf->data.player = pPlayer;
+
+    pBuf->action = player_callback;
+
+    add_to_gui_list(ID_LABEL, pBuf);
+  }
+  players_iterate_end;
+
+  pPlayers_Dlg->pBeginWidgetList = pBuf;
+
+  resize_window(pWindow, NULL, NULL, adj_size(500), adj_size(400));
+
+  area = pWindow->area;
+
+  r = MIN(area.w, area.h);
+  r -= ((MAX(pBuf->size.w, pBuf->size.h) * 2));
+  r /= 2;
+  a = (2.0 * M_PI) / n;
+
+  widget_set_position(pWindow, (main_window_width() - pWindow->size.w) / 2,
+                      (main_window_height() - pWindow->size.h) / 2);
+
+  pBuf = pWindow->prev;
+
+  pBuf->size.x = area.x + area.w - pBuf->size.w - 1;
+  pBuf->size.y = pWindow->size.y + adj_size(2);
+
+  n = area.y;
+  pstr = create_utf8_str(NULL, 0, adj_font(10));
+  pstr->style |= TTF_STYLE_BOLD;
+  pstr->bgcol = (SDL_Color){0, 0, 0, 0};
+
+  for (i = 0; i < DS_LAST; i++) {
+    switch (i) {
+    case DS_ARMISTICE:
+      pstr->fgcol = *get_theme_color(COLOR_THEME_PLRDLG_ARMISTICE);
+      break;
+    case DS_WAR:
+      pstr->fgcol = *get_theme_color(COLOR_THEME_PLRDLG_WAR);
+      break;
+    case DS_CEASEFIRE:
+      pstr->fgcol = *get_theme_color(COLOR_THEME_PLRDLG_CEASEFIRE);
+      break;
+    case DS_PEACE:
+      pstr->fgcol = *get_theme_color(COLOR_THEME_PLRDLG_PEACE);
+      break;
+    case DS_ALLIANCE:
+      pstr->fgcol = *get_theme_color(COLOR_THEME_PLRDLG_ALLIANCE);
+      break;
+    default:
+
+      continue;
+      break;
+    }
+
+    copy_chars_to_utf8_str(pstr, diplstate_type_translated_name(i));
+    pLogo = create_text_surf_from_utf8(pstr);
+
+    pBuf = pBuf->prev;
+    h = MAX(pBuf->size.h, pLogo->h);
+    pBuf->size.x = area.x + adj_size(5);
+    pBuf->size.y = n + (h - pBuf->size.h) / 2;
+
+    dst.x = adj_size(5) + pBuf->size.w + adj_size(6);
+    dst.y = n + (h - pLogo->h) / 2;
+    alphablit(pLogo, NULL, pWindow->theme, &dst, 255);
+    n += h;
+    FREESURFACE(pLogo);
+  }
+  FREEUTF8STR(pstr);
+
+  pBuf = pBuf->prev;
+  pBuf->size.x = area.x + area.w / 2 - pBuf->size.w / 2;
+  pBuf->size.y = area.y + area.h / 2 - r - pBuf->size.h / 2;
+
+  n = 1;
+  if (pBuf != pPlayers_Dlg->pBeginWidgetList) {
+    do {
+      pBuf = pBuf->prev;
+      b = M_PI_2 + n * a;
+      pBuf->size.x = area.x + area.w / 2 - r * cos(b) - pBuf->size.w / 2;
+      pBuf->size.y = area.y + area.h / 2 - r * sin(b) - pBuf->size.h / 2;
+      n++;
+    } while (pBuf != pPlayers_Dlg->pBeginWidgetList);
+  }
+
+  players_dialog_update();
+}",0.0,0.0,--,--,--
+darktable-org-darktable-32fab21/src/iop/borders.c,"this is the chance to update default parameters, after the full raw is loaded.",2,"void reload_defaults(dt_iop_module_t *self) {
+  dt_iop_borders_params_t tmp =
+      (dt_iop_borders_params_t){{1.0f, 1.0f, 1.0f},
+                                DT_IOP_BORDERS_ASPECT_CONSTANT_VALUE,
+                                ""constant border"",
+                                0,
+                                0.1f,
+                                0.5f,
+                                ""1/2"",
+                                0.5f,
+                                ""1/2"",
+                                0.0f,
+                                0.5f,
+                                {0.0f, 0.0f, 0.0f},
+                                TRUE};
+  memcpy(self->params, &tmp, sizeof(dt_iop_borders_params_t));
+  memcpy(self->default_params, &tmp, sizeof(dt_iop_borders_params_t));
+  self->default_enabled = 0;
+}",0.0,0.0,--,--,--
+xipengwang-FLAG-cd1815e/april2/src/vx/vxo_sphere.c,"In this implementation, the only data passed to the shader are the texture coordinates. These texture coordinates can be trivially converted into latitude and longitude, but are adjusted so that the triangles render textures properly across the longitude=PI boundary. The shader computes lat/lon from the shader coordinates, then computes xyz.",2,"vx_object_t *vxo_sphere_textured(vx_resource_t *texture_resource) {
+  static vx_resource_t *program_resource = NULL;
+  static vx_resource_t *sts_resource = NULL;
+  static vx_resource_t *tris_resource = NULL;
+  static int nvertices = 0, napositions = 0;
+
+  vx_lock();
+
+  if (program_resource == NULL) {
+
+    zarray_t *vertex_datas = zarray_create(sizeof(struct vertex_data));
+    zarray_t *tris = zarray_create(sizeof(uint16_t[3]));
+
+    const double v = sqrt(3) / 3;
+    double *xyza = (double[]){v, v, v};
+    double *xyzb = (double[]){-v, -v, v};
+    double *xyzc = (double[]){-v, v, -v};
+    double *xyzd = (double[]){v, -v, -v};
+
+    int depth = 4;
+
+    recurse(vertex_datas, tris, xyza, xyzc, xyzb, depth);
+    recurse(vertex_datas, tris, xyza, xyzb, xyzd, depth);
+    recurse(vertex_datas, tris, xyza, xyzd, xyzc, depth);
+    recurse(vertex_datas, tris, xyzb, xyzc, xyzd, depth);
+
+    zarray_t *sts = zarray_create(sizeof(float[2]));
+
+    for (int i = 0; i < zarray_size(vertex_datas); i++) {
+      struct vertex_data *vd;
+      zarray_get_volatile(vertex_datas, i, &vd);
+
+      float *st = (float[]){vd->st[0], vd->st[1]};
+
+      zarray_add(sts, st);
+    }
+
+    nvertices = zarray_size(tris) * 3;
+
+    char vertex_shader_src[] =
+        ""#define PI 3.14159265358979323846264338\n""
+        ""attribute vec2 st; \n""
+        ""varying vec2 vtexcoord; \n""
+        ""uniform mat4 VX_P;\n""
+        ""uniform mat4 VX_V;\n""
+        ""uniform mat4 VX_M;\n""
+        ""void main(void) {\n""
+        ""  float lat = (PI / 2.0) - PI * st.y; \n ""
+        ""  float lon = 2.0 * PI * st.x; \n ""
+        ""  vtexcoord = st.xy; \n""
+        ""  float r = cos(lat); \n ""
+        ""  vec3 xyz = vec3(r*cos(lon), r*sin(lon), sin(lat)); \n ""
+        ""  gl_Position = VX_P * VX_V * VX_M * vec4(xyz, 1.0);\n""
+        ""}"";
+
+    char fragment_shader_src[] = ""precision mediump float; \n""
+                                 ""varying vec2 vtexcoord; \n""
+                                 ""uniform sampler2D texture; \n""
+                                 ""void main(void) {\n""
+                                 ""  vec4 c = texture2D(texture, vtexcoord);\n""
+                                 ""  gl_FragColor = vec4(c.r, c.g, c.b, 1);\n""
+                                 ""}\n"";
+
+    program_resource =
+        vx_resource_make_program(vertex_shader_src, fragment_shader_src);
+    program_resource->incref(program_resource);
+
+    sts_resource = vx_resource_make_attr_f32_copy((float *)sts->data,
+                                                  zarray_size(sts) * 2, 2);
+    sts_resource->incref(sts_resource);
+
+    tris_resource =
+        vx_resource_make_idx_u16_copy((uint16_t *)tris->data, nvertices);
+    tris_resource->incref(tris_resource);
+  }
+
+  vx_unlock();
+
+  return vxo_generic_create(
+      program_resource, (struct vxo_generic_uniformf[]){{.name = NULL}},
+      (struct vxo_generic_attribute[]){{.name = ""st"", .resource = sts_resource},
+                                       {.name = NULL}},
+      (struct vxo_generic_texture[]){
+          {.name = ""texture"", .resource = texture_resource}, {.name = NULL}},
+      (struct vxo_generic_draw[]){
+          {.command = VX_GL_TRIANGLES,
+           .first = 0,
+           .count = nvertices,
+           .indices_resource = tris_resource},
+          {.count = 0},
+      });
+}",0.0,0.0,--,--,--
+AsydSolutions-monit-9e43388/src/monit.c,Handle program options - Options set from the commandline takes precedence over those found in the control file,2,"static void handle_options(int argc, char **argv) {
+  int opt;
+  int deferred_opt = 0;
+  opterr = 0;
+  Run.mygroup = NULL;
+  const char *shortopts = ""c:d:g:l:p:s:HIirtvVh"";
+#ifdef HAVE_GETOPT_LONG
+  struct option longopts[] = {{""conf"", required_argument, NULL, 'c'},
+                              {""daemon"", required_argument, NULL, 'd'},
+                              {""group"", required_argument, NULL, 'g'},
+                              {""logfile"", required_argument, NULL, 'l'},
+                              {""pidfile"", required_argument, NULL, 'p'},
+                              {""statefile"", required_argument, NULL, 's'},
+                              {""hash"", optional_argument, NULL, 'H'},
+                              {""interactive"", no_argument, NULL, 'I'},
+                              {""id"", no_argument, NULL, 'i'},
+                              {""resetid"", no_argument, NULL, 'r'},
+                              {""test"", no_argument, NULL, 't'},
+                              {""verbose"", no_argument, NULL, 'v'},
+                              {""version"", no_argument, NULL, 'V'},
+                              {""help"", no_argument, NULL, 'h'},
+                              {0}};
+  while ((opt = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1)
+#else
+  while ((opt = getopt(argc, argv, shortopts)) != -1)
+#endif
+  {
+    switch (opt) {
+    case 'c': {
+      char *f = optarg;
+      if (f[0] != SEPARATOR_CHAR)
+        f = File_getRealPath(optarg, (char[PATH_MAX]){});
+      if (!f)
+        THROW(AssertException, ""The control file '%s' does not exist at %s"",
+              Str_trunc(optarg, 80), Dir_cwd((char[STRLEN]){}, STRLEN));
+      if (!File_isFile(f))
+        THROW(AssertException, ""The control file '%s' is not a file"",
+              Str_trunc(f, 80));
+      if (!File_isReadable(f))
+        THROW(AssertException, ""The control file '%s' is not readable"",
+              Str_trunc(f, 80));
+      Run.controlfile = Str_dup(f);
+      break;
+    }
+    case 'd': {
+      Run.isdaemon = true;
+      sscanf(optarg, ""%d"", &Run.polltime);
+      if (Run.polltime < 1) {
+        LogError(""Option -%c requires a natural number\n"", opt);
+        exit(1);
+      }
+      break;
+    }
+    case 'g': {
+      Run.mygroup = Str_dup(optarg);
+      break;
+    }
+    case 'l': {
+      Run.logfile = Str_dup(optarg);
+      if (IS(Run.logfile, ""syslog""))
+        Run.use_syslog = true;
+      Run.dolog = true;
+      break;
+    }
+    case 'p': {
+      Run.pidfile = Str_dup(optarg);
+      break;
+    }
+    case 's': {
+      Run.statefile = Str_dup(optarg);
+      break;
+    }
+    case 'I': {
+      Run.init = true;
+      break;
+    }
+    case 'i': {
+      deferred_opt = 'i';
+      break;
+    }
+    case 'r': {
+      deferred_opt = 'r';
+      break;
+    }
+    case 't': {
+      deferred_opt = 't';
+      break;
+    }
+    case 'v': {
+      Run.debug++;
+      break;
+    }
+    case 'H': {
+      if (argc > optind)
+        Util_printHash(argv[optind]);
+      else
+        Util_printHash(NULL);
+      exit(0);
+      break;
+    }
+    case 'V': {
+      version();
+      exit(0);
+      break;
+    }
+    case 'h': {
+      help();
+      exit(0);
+      break;
+    }
+    case '?': {
+      switch (optopt) {
+      case 'c':
+      case 'd':
+      case 'g':
+      case 'l':
+      case 'p':
+      case 's': {
+        LogError(""Option -- %c requires an argument\n"", optopt);
+        break;
+      }
+      default: {
+        LogError(""Invalid option -- %c  (-h will show valid options)\n"",
+                 optopt);
+      }
+      }
+      exit(1);
+    }
+    }
+  }
+
+  switch (deferred_opt) {
+  case 't': {
+    do_init();
+    printf(""Control file syntax OK\n"");
+    exit(0);
+    break;
+  }
+  case 'r': {
+    do_init();
+    assert(Run.id);
+    printf(""Reset Monit Id? [y/n]> "");
+    if (getchar() == 'y') {
+      File_delete(Run.idfile);
+      Util_monitId(Run.idfile);
+      kill_daemon(SIGHUP);
+    }
+    exit(0);
+    break;
+  }
+  case 'i': {
+    do_init();
+    assert(Run.id);
+    printf(""Monit ID: %s\n"", Run.id);
+    exit(0);
+    break;
+  }
+  }
+}",0.0,0.0,--,--,--
+braice-MuMuDVB-745259a/src/sap.c,Initialize sap variables,2,"void init_sap_v(sap_p_t *sap_p) {
+  *sap_p = (sap_p_t){
+      .sap_messages4 = NULL,
+      .sap_messages6 = NULL,
+      .sap = OPTION_UNDEFINED,
+      .sap_interval = SAP_DEFAULT_INTERVAL,
+      .sap_sending_ip4 = ""0.0.0.0"",
+      .sap_sending_ip6 = ""::"",
+      .sap_default_group = """",
+      .sap_organisation = ""MuMuDVB"",
+      .sap_uri = ""\0"",
+      .sap_ttl = SAP_DEFAULT_TTL,
+  };
+}",0.0,0.0,--,--,--
+RfidResearchGroup-proxmark3-1650889/client/cmdhf15.c,parses common HF 15 CMD parameters and prepares some data structures Parameters: **cmd command line,2,"int prepareHF15Cmd(char **cmd, UsbCommand *c, uint8_t iso15cmd) {
+  int temp;
+  uint8_t *req = c->d.asBytes;
+  uint8_t uid[8] = {0x00};
+  uint32_t reqlen = 0;
+
+  while (**cmd == ' ' || **cmd == '\t')
+    (*cmd)++;
+
+  if (strstr(*cmd, ""-2"") == *cmd) {
+    c->arg[1] = 0;
+    (*cmd) += 2;
+  }
+
+  while (**cmd == ' ' || **cmd == '\t')
+    (*cmd)++;
+
+  if (strstr(*cmd, ""-o"") == *cmd) {
+    req[reqlen] = ISO15_REQ_OPTION;
+    (*cmd) += 2;
+  }
+
+  while (**cmd == ' ' || **cmd == '\t')
+    (*cmd)++;
+
+  switch (**cmd) {
+  case 0:
+    PrintAndLogEx(WARNING, ""missing addr"");
+    return 0;
+    break;
+  case 'u':
+  case 'U':
+
+    req[reqlen++] |= ISO15_REQ_SUBCARRIER_SINGLE | ISO15_REQ_DATARATE_HIGH |
+                     ISO15_REQ_NONINVENTORY;
+    req[reqlen++] = iso15cmd;
+    break;
+  case '*':
+
+    req[reqlen++] |= ISO15_REQ_SUBCARRIER_SINGLE | ISO15_REQ_DATARATE_HIGH |
+                     ISO15_REQ_NONINVENTORY | ISO15_REQ_ADDRESS;
+    req[reqlen++] = iso15cmd;
+
+    if (!getUID(uid)) {
+      PrintAndLogEx(WARNING, ""No tag found"");
+      return 0;
+    }
+    memcpy(&req[reqlen], uid, sizeof(uid));
+    PrintAndLogEx(NORMAL, ""Detected UID %s"", sprintUID(NULL, uid));
+    reqlen += sizeof(uid);
+    break;
+  default:
+    req[reqlen++] |= ISO15_REQ_SUBCARRIER_SINGLE | ISO15_REQ_DATARATE_HIGH |
+                     ISO15_REQ_NONINVENTORY | ISO15_REQ_ADDRESS;
+    req[reqlen++] = iso15cmd;
+
+    for (int i = 0; i < 8 && (*cmd)[i * 2] && (*cmd)[i * 2 + 1]; i++) {
+      sscanf((char[]){(*cmd)[i * 2], (*cmd)[i * 2 + 1], 0}, ""%X"", &temp);
+      uid[7 - i] = temp & 0xff;
+    }
+
+    PrintAndLogEx(NORMAL, ""Using UID %s"", sprintUID(NULL, uid));
+    memcpy(&req[reqlen], uid, sizeof(uid));
+    reqlen += sizeof(uid);
+    break;
+  }
+
+  while (**cmd != ' ' && **cmd != '\t')
+    (*cmd)++;
+
+  while (**cmd == ' ' || **cmd == '\t')
+    (*cmd)++;
+
+  c->arg[0] = reqlen;
+  return 1;
+}",0.0,0.0,--,--,--
+makestuff-neroJtag-b7f0313/LUFA-110528/LUFA/Drivers/USB/Core/AVR8/Host_AVR8.c,"Clears a stall condition on the given pipe, via a CLEAR FEATURE standard request to the attached device.",1,"uint8_t USB_Host_ClearPipeStall(const uint8_t EndpointNum) {
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType =
+          (REQDIR_HOSTTODEVICE | REQTYPE_STANDARD | REQREC_ENDPOINT),
+      .bRequest = REQ_ClearFeature,
+      .wValue = FEATURE_SEL_EndpointHalt,
+      .wIndex = EndpointNum,
+      .wLength = 0,
+  };
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+  return USB_Host_SendControlRequest(NULL);
+}",0.0,0.0,--,--,--
+vyos-legacy-vyatta-strongswan-92dd80c/src/pki/commands/pub.c,Register the command.,2,"static void __attribute__((constructor)) reg() {
+  command_register(
+      (command_t){pub,
+                  'p',
+                  ""pub"",
+                  ""extract the public key from a private key/certificate"",
+                  {""[--in file|--keyid hex] [--type rsa|ecdsa|pkcs10|x509]"",
+                   ""[--outform der|pem|pgp]""},
+                  {
+                      {""help"", 'h', 0, ""show usage information""},
+                      {""in"", 'i', 1, ""input file, default: stdin""},
+                      {""keyid"", 'x', 1, ""keyid on smartcard of private key""},
+                      {""type"", 't', 1, ""type of credential, default: rsa""},
+                      {""outform"", 'f', 1, ""encoding of extracted public key""},
+                  }});
+}",0.0,0.0,--,--,--
+Meulengracht-MollenOS-e48f4ab/librt/include/avxintrin.h,Constructs a 256-bit floating-point vector of [4 x double] with all vector elements initialized to zero.,2,"_mm256_setzero_pd(void) { return __extension__(__m256d){0, 0, 0, 0}; }",0.0,0.0,--,--,--
+vm6502q-qrack-df6132d/include/qinterface.hpp,"Quantum analog of classical ""XOR"" gate. Takes one qubit input and one classical bit input. Measures the outputBit, then overwrites it with result.",2,"}
+
+virtual ~QInterface(){};
+
+int GetQubitCount() { return qubitCount; }",0.0,0.0,--,--,--
+dm7h-fpga-event-recorder-4e53bab/src/Logikanalysator/Firmware-Mikrocontroller/CLASS_DUAL_CDC1/CLASS_DUAL_CDC1/src/LUFA/LUFA/Drivers/USB/Class/Host/MassStorageClassHost.c,"Retrieves the device sense data, indicating the current device state and error codes for the previously issued command.",0,"uint8_t MS_Host_RequestSense(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                             const uint8_t LUNIndex,
+                             SCSI_Request_Sense_Response_t *const SenseData) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .DataTransferLength = CPU_TO_LE32(sizeof(SCSI_Request_Sense_Response_t)),
+      .Flags = MS_COMMAND_DIR_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_REQUEST_SENSE, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Request_Sense_Response_t), 0x00}};
+
+  return MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock, SenseData);
+}",0.0,0.0,--,--,--
+psyc-libpsyc-d16deca/include/psyc/parse.h,Sets a new buffer in the list parser state struct with data to be parsed.,2,"psyc_parse_list_buffer_set(PsycParseListState *state, const char *buffer,
+                           size_t length) {
+  state->buffer = (PsycString){length, (char *)buffer};
+  state->cursor = 0;
+}",0.0,0.0,--,--,--
+psyc-libpsyc-d16deca/include/psyc/parse.h,Sets a new buffer in the update modifier parser state struct with data to be parsed.,2,"psyc_parse_update_buffer_set(PsycParseUpdateState *state, const char *buffer,
+                             size_t length) {
+  state->buffer = (PsycString){length, (char *)buffer};
+  state->cursor = 0;
+}",0.0,0.0,--,--,--
+PhilipZwanenburg-DPGSolver-b48e04b/src/simulation/geometry/geometry_T.c,Construct the metric terms (and optionally the jacobian determinant) terms at the nodes of input type for the volume under consideration.,2,"static void
+constructor_volume_metric_terms_T(const char node_type,
+                                  struct Solver_Volume_T *const s_vol) {
+
+  struct Volume *vol = (struct Volume *)s_vol;
+  const struct Geometry_Element *g_e =
+      &((struct Solver_Element *)vol->element)->g_e;
+
+  const int p = s_vol->p_ref;
+  const bool curved = vol->curved;
+  const int p_g = (curved ? p : 1);
+
+  struct Container {
+    struct Multiarray_Operator *cv1_vg_vX;
+    const struct Operator *vv0_vm_vX;
+    struct Multiarray_T *metrics_vX;
+    struct Multiarray_T *jacobian_det_vX;
+  } con;
+  struct Multiarray_Operator cv1_vg_vm =
+      set_MO_from_MO(g_e->cv1_vg_vm[curved], 1, (ptrdiff_t[]){0, 0, p_g, p_g});
+  struct Multiarray_Operator cv1_vg_vc =
+      set_MO_from_MO(g_e->cv1_vg_vc[curved], 1, (ptrdiff_t[]){0, 0, p, p_g});
+  struct Multiarray_Operator cv1_vg_vs =
+      set_MO_from_MO(g_e->cv1_vg_vs[curved], 1, (ptrdiff_t[]){0, 0, p, p_g});
+
+  switch (node_type) {
+  case 'm':
+    con.cv1_vg_vX = &cv1_vg_vm;
+    con.vv0_vm_vX = NULL;
+    con.metrics_vX = (struct Multiarray_T *)s_vol->metrics_vm;
+    con.jacobian_det_vX = NULL;
+    break;
+  case 'c':
+    con.cv1_vg_vX = &cv1_vg_vc;
+    con.vv0_vm_vX = get_Multiarray_Operator(g_e->vv0_vm_vc[curved],
+                                            (ptrdiff_t[]){0, 0, p, p_g});
+    con.metrics_vX = (struct Multiarray_T *)s_vol->metrics_vc;
+    con.jacobian_det_vX = (struct Multiarray_T *)s_vol->jacobian_det_vc;
+    break;
+  case 's':
+    con.cv1_vg_vX = &cv1_vg_vs;
+    con.vv0_vm_vX = get_Multiarray_Operator(g_e->vv0_vm_vs[curved],
+                                            (ptrdiff_t[]){0, 0, p, p_g});
+    con.metrics_vX = (struct Multiarray_T *)s_vol->metrics_vs;
+    con.jacobian_det_vX = (struct Multiarray_T *)s_vol->jacobian_det_vs;
+    break;
+  default:
+    EXIT_ERROR(""Unsupported: %c\n"", node_type);
+    break;
+  }
+  const ptrdiff_t n_vX = con.cv1_vg_vX->data[0]->op_std->ext_0;
+  struct Multiarray_T *const jacobian_vX =
+      constructor_empty_Multiarray_T('C', 3, (ptrdiff_t[]){n_vX, DIM, DIM});
+
+  const char op_format = get_set_op_format(0);
+  const struct const_Multiarray_T *const geom_coef = s_vol->geom_coef;
+  for (ptrdiff_t row = 0; row < DIM; ++row)
+    mm_NN1C_Operator_Multiarray_T(con.cv1_vg_vX->data[row], geom_coef,
+                                  jacobian_vX, op_format, 2, NULL, &row);
+
+  if (node_type == 'm') {
+    compute_cofactors_T((struct const_Multiarray_T *)jacobian_vX,
+                        con.metrics_vX);
+  } else {
+    assert(compute_size(s_vol->metrics_vm->order, s_vol->metrics_vm->extents) >
+           0);
+    const struct const_Multiarray_T *const met_vm = s_vol->metrics_vm;
+    resize_Multiarray_T(con.metrics_vX, 3, (ptrdiff_t[]){n_vX, DIM, DIM});
+    mm_NN1C_Operator_Multiarray_T(con.vv0_vm_vX, met_vm, con.metrics_vX,
+                                  op_format, met_vm->order, NULL, NULL);
+  }
+
+  if (con.jacobian_det_vX) {
+    const ptrdiff_t *const perm = set_jacobian_permutation(DIM);
+    permute_Multiarray_T(jacobian_vX, perm, jacobian_vX->layout);
+
+    compute_detJV_T((struct const_Multiarray_T *)jacobian_vX,
+                    con.jacobian_det_vX);
+  }
+  destructor_Multiarray_T(jacobian_vX);
+}",0.0,0.0,--,--,--
+freeciv-freeciv-e4ead30/client/gui-sdl2/mapview.c,Typically an info box is provided to tell the player about the state of their civilization. This function is called when the label is changed.,2,"void update_info_label(void) {
+  SDL_Color bg_color = {0, 0, 0, 80};
+  SDL_Surface *pTmp = NULL;
+  char buffer[512];
+#ifdef SMALL_SCREEN
+  SDL_Rect area = {0, 0, 0, 0};
+#else
+  SDL_Rect area = {0, 3, 0, 0};
+#endif
+  struct utf8_str *ptext;
+
+  if (get_current_client_page() != PAGE_GAME) {
+    return;
+  }
+
+#ifdef SMALL_SCREEN
+  ptext = create_utf8_str(NULL, 0, 8);
+#else
+  ptext = create_utf8_str(NULL, 0, 10);
+#endif
+
+  ptext->style |= TTF_STYLE_BOLD;
+  ptext->fgcol = *get_theme_color(COLOR_THEME_MAPVIEW_INFO_TEXT);
+  ptext->bgcol = (SDL_Color){0, 0, 0, 0};
+
+  if (NULL != client.conn.playing) {
+#ifdef SMALL_SCREEN
+    fc_snprintf(buffer, sizeof(buffer),
+                _(""%s Population: %s  Year: %s  ""
+                  ""Gold %d ""),
+                nation_adjective_for_player(client.conn.playing),
+                population_to_text(civ_population(client.conn.playing)),
+                calendar_text(), client.conn.playing->economic.gold);
+#else
+    fc_snprintf(buffer, sizeof(buffer),
+                _(""%s Population: %s  Year: %s  ""
+                  ""Gold %d Tax: %d Lux: %d Sci: %d ""),
+                nation_adjective_for_player(client.conn.playing),
+                population_to_text(civ_population(client.conn.playing)),
+                calendar_text(), client.conn.playing->economic.gold,
+                client.conn.playing->economic.tax,
+                client.conn.playing->economic.luxury,
+                client.conn.playing->economic.science);
+#endif
+
+    copy_chars_to_utf8_str(ptext, buffer);
+    pTmp = create_text_surf_from_utf8(ptext);
+
+    area.x = (main_window_width() - pTmp->w) / 2 - adj_size(5);
+    area.w = pTmp->w + adj_size(8);
+    area.h = pTmp->h + adj_size(4);
+
+    SDL_FillRect(Main.gui->surface, &area,
+                 map_rgba(Main.gui->surface->format, bg_color));
+
+    create_line(Main.gui->surface, area.x + 1, area.y, area.x + area.w - 2,
+                area.y, get_theme_color(COLOR_THEME_MAPVIEW_INFO_FRAME));
+    create_line(Main.gui->surface, area.x + 1, area.y + area.h - 1,
+                area.x + area.w - 2, area.y + area.h - 1,
+                get_theme_color(COLOR_THEME_MAPVIEW_INFO_FRAME));
+
+    create_line(Main.gui->surface, area.x + area.w - 1, area.y + 1,
+                area.x + area.w - 1, area.y + area.h - 2,
+                get_theme_color(COLOR_THEME_MAPVIEW_INFO_FRAME));
+    create_line(Main.gui->surface, area.x, area.y + 1, area.x,
+                area.y + area.h - 2,
+                get_theme_color(COLOR_THEME_MAPVIEW_INFO_FRAME));
+
+    blit_entire_src(pTmp, Main.gui->surface, area.x + adj_size(5),
+                    area.y + adj_size(2));
+
+    dirty_sdl_rect(&area);
+
+    FREESURFACE(pTmp);
+  }
+
+  set_indicator_icons(client_research_sprite(), client_warming_sprite(),
+                      client_cooling_sprite(), client_government_sprite());
+
+  update_timeout_label();
+
+  FREEUTF8STR(ptext);
+
+  queue_flush();
+}",0.0,0.0,--,--,--
+darktable-org-darktable-32fab21/src/iop/lowpass.c,"this initializes static, hardcoded presets for this module and is called only once per run of dt.",2,"void init_presets(dt_iop_module_so_t *self) {
+  DT_DEBUG_SQLITE3_EXEC(dt_database_get(darktable.db), ""BEGIN"", NULL, NULL,
+                        NULL);
+
+  dt_gui_presets_add_generic(
+      _(""local contrast mask""), self->op, self->version(),
+      &(dt_iop_lowpass_params_t){0, 50.0f, -1.0f, 0.0f, 0.0f,
+                                 LOWPASS_ALGO_GAUSSIAN, 1},
+      sizeof(dt_iop_lowpass_params_t), 1);
+
+  DT_DEBUG_SQLITE3_EXEC(dt_database_get(darktable.db), ""COMMIT"", NULL, NULL,
+                        NULL);
+}",0.0,0.0,--,--,--
+ARM-software-scmi-tests-24dd373/protocols/performance/performance_exe.c,The function is called by the test engine before sending the performance limits set command and testing the received values.,3,"void arm_scmi_custom_test_performance_limits_set(
+    struct arm_scmi_protocol_execution_context *protocol_execution_context,
+    arm_scmi_test_case_t *test_case) {
+  uint32_t domain_id;
+  struct performance_protocol_data *ptr_data = &performance_protocol_data;
+
+  test_case->parameters = (uint32_t[MAX_PARAMETERS_SIZE]){};
+  test_case->parameter_count = 3;
+
+  if (test_case->invalid_parameter ==
+      OFFSET_INVALID_PARAM(struct arm_scmi_performance_limits_set, domain_id)) {
+
+    test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                       domain_id)] =
+        ptr_data->num_performance_domains + 1;
+    test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                       range_max)] =
+        ptr_data->domain_runtime_values[0].levels[PERF_MAX - 1];
+    test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                       range_min)] =
+        ptr_data->domain_runtime_values[0].levels[PERF_MIN + 1];
+    arm_scmi_execute_and_assert_test_case(protocol_execution_context, test_case,
+                                          &received);
+  } else if (test_case->invalid_parameter ==
+             OFFSET_INVALID_PARAM(struct arm_scmi_performance_limits_set,
+                                  range_max)) {
+
+    for (domain_id = 0; domain_id < ptr_data->num_performance_domains;
+         ++domain_id) {
+      test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                         domain_id)] = domain_id;
+      test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                         range_max)] =
+          ptr_data->domain_runtime_values[domain_id].levels[PERF_MAX] + 1;
+      test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                         range_min)] =
+          ptr_data->domain_runtime_values[domain_id].levels[PERF_MIN];
+      test_case->status =
+          arm_scmi_get_norm_bits(
+              ptr_data->domain_runtime_values[domain_id].attributes,
+              PERFORMANCE_DOMAIN_ATTR_LIMIT_SET,
+              PERFORMANCE_DOMAIN_ATTR_LIMIT_SET) == 1
+              ? SCMI_STATUS_OUT_OF_RANGE
+              : SCMI_STATUS_DENIED;
+      snprintf(description, NUM_ELEMS(description), ""\n\t\tDOMAIN ID %d"",
+               domain_id);
+      arm_scmi_log(&protocol_execution_context->test_stats, description);
+      arm_scmi_execute_and_assert_test_case(protocol_execution_context,
+                                            test_case, &received);
+    }
+  } else if (test_case->invalid_parameter ==
+             OFFSET_INVALID_PARAM(struct arm_scmi_performance_limits_set,
+                                  range_min)) {
+
+    for (domain_id = 0; domain_id < ptr_data->num_performance_domains;
+         ++domain_id) {
+      test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                         domain_id)] = domain_id;
+      test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                         range_max)] =
+          ptr_data->domain_runtime_values[domain_id].levels[PERF_MAX];
+      test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                         range_min)] =
+          ptr_data->domain_runtime_values[domain_id].levels[PERF_MIN] - 1;
+      test_case->status =
+          arm_scmi_get_norm_bits(
+              ptr_data->domain_runtime_values[domain_id].attributes,
+              PERFORMANCE_DOMAIN_ATTR_LIMIT_SET,
+              PERFORMANCE_DOMAIN_ATTR_LIMIT_SET) == 1
+              ? SCMI_STATUS_OUT_OF_RANGE
+              : SCMI_STATUS_DENIED;
+      snprintf(description, NUM_ELEMS(description), ""\n\t\tDOMAIN ID %d"",
+               domain_id);
+      arm_scmi_log(&protocol_execution_context->test_stats, description);
+      arm_scmi_execute_and_assert_test_case(protocol_execution_context,
+                                            test_case, &received);
+    }
+  } else {
+
+    for (domain_id = 0; domain_id < ptr_data->num_performance_domains;
+         ++domain_id) {
+      test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                         domain_id)] = domain_id;
+      test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                         range_max)] =
+          ptr_data->domain_runtime_values[domain_id].levels[PERF_MAX - 1];
+      test_case->parameters[OFFSET_PARAM(struct arm_scmi_performance_limits_set,
+                                         range_min)] =
+          ptr_data->domain_runtime_values[domain_id].levels[PERF_MIN + 1];
+      test_case->status =
+          arm_scmi_get_norm_bits(
+              ptr_data->domain_runtime_values[domain_id].attributes,
+              PERFORMANCE_DOMAIN_ATTR_LIMIT_SET,
+              PERFORMANCE_DOMAIN_ATTR_LIMIT_SET) == 1
+              ? SCMI_STATUS_SUCCESS
+              : SCMI_STATUS_DENIED;
+      snprintf(description, NUM_ELEMS(description), ""\n\t\tDOMAIN ID %d"",
+               domain_id);
+      arm_scmi_log(&protocol_execution_context->test_stats, description);
+      arm_scmi_execute_and_assert_test_case(protocol_execution_context,
+                                            test_case, &received);
+
+      if (received.status == SCMI_STATUS_SUCCESS) {
+        ptr_data->domain_runtime_values[domain_id].range_min =
+            test_case->parameters[OFFSET_PARAM(
+                struct arm_scmi_performance_limits_set, range_min)];
+        ptr_data->domain_runtime_values[domain_id].range_max =
+            test_case->parameters[OFFSET_PARAM(
+                struct arm_scmi_performance_limits_set, range_max)];
+      }
+    }
+  }
+}",0.0,0.0,--,--,--
+jperfetto-OpenPCR-1585d96/usb/LUFA101122/Demos/Device/LowLevel/RNDISEthernet/RNDISEthernet.c,"Task to manage the sending and receiving of encapsulated RNDIS data and notifications. This removes the RNDIS wrapper from received Ethernet frames and places them in the FrameIN global buffer, or adds the RNDIS wrapper to a frame in the FrameOUT global before sending the buffer contents to the host.",2,"void RNDIS_Task(void) {
+
+  Endpoint_SelectEndpoint(CDC_NOTIFICATION_EPNUM);
+
+  if (Endpoint_IsINReady() && ResponseReady) {
+    USB_Request_Header_t Notification = (USB_Request_Header_t){
+        .bmRequestType =
+            (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE),
+        .bRequest = RNDIS_NOTIF_ResponseAvailable,
+        .wValue = 0,
+        .wIndex = 0,
+        .wLength = 0,
+    };
+
+    Endpoint_Write_Stream_LE(&Notification, sizeof(Notification));
+
+    Endpoint_ClearIN();
+
+    ResponseReady = false;
+  }
+
+  if ((CurrRNDISState == RNDIS_Data_Initialized) &&
+      !(MessageHeader->MessageLength)) {
+
+    RNDIS_Packet_Message_t RNDISPacketHeader;
+
+    Endpoint_SelectEndpoint(CDC_RX_EPNUM);
+
+    if (Endpoint_IsOUTReceived() && !(FrameIN.FrameInBuffer)) {
+
+      Endpoint_Read_Stream_LE(&RNDISPacketHeader,
+                              sizeof(RNDIS_Packet_Message_t));
+
+      if (RNDISPacketHeader.DataLength > ETHERNET_FRAME_SIZE_MAX) {
+        Endpoint_StallTransaction();
+        return;
+      }
+
+      Endpoint_Read_Stream_LE(FrameIN.FrameData, RNDISPacketHeader.DataLength);
+
+      Endpoint_ClearOUT();
+
+      FrameIN.FrameLength = RNDISPacketHeader.DataLength;
+
+      FrameIN.FrameInBuffer = true;
+    }
+
+    Endpoint_SelectEndpoint(CDC_TX_EPNUM);
+
+    if (Endpoint_IsINReady() && FrameOUT.FrameInBuffer) {
+
+      memset(&RNDISPacketHeader, 0, sizeof(RNDIS_Packet_Message_t));
+
+      RNDISPacketHeader.MessageType = REMOTE_NDIS_PACKET_MSG;
+      RNDISPacketHeader.MessageLength =
+          (sizeof(RNDIS_Packet_Message_t) + FrameOUT.FrameLength);
+      RNDISPacketHeader.DataOffset =
+          (sizeof(RNDIS_Packet_Message_t) - sizeof(RNDIS_Message_Header_t));
+      RNDISPacketHeader.DataLength = FrameOUT.FrameLength;
+
+      Endpoint_Write_Stream_LE(&RNDISPacketHeader,
+                               sizeof(RNDIS_Packet_Message_t));
+
+      Endpoint_Write_Stream_LE(FrameOUT.FrameData,
+                               RNDISPacketHeader.DataLength);
+
+      Endpoint_ClearIN();
+
+      FrameOUT.FrameInBuffer = false;
+    }
+  }
+}",0.0,0.0,--,--,--
+dm-vdo-kvdo-8df6805/vdo/base/slab.c,Measure and initialize the configuration to use for each slab.,2,"int configureSlab(BlockCount slabSize, BlockCount slabJournalBlocks,
+                  SlabConfig *slabConfig) {
+  if (slabJournalBlocks >= slabSize) {
+    return VDO_BAD_CONFIGURATION;
+  }
+
+  BlockCount refBlocks =
+      getSavedReferenceCountSize(slabSize - slabJournalBlocks);
+  BlockCount metaBlocks = (refBlocks + slabJournalBlocks);
+
+  if (metaBlocks >= slabSize) {
+    return VDO_BAD_CONFIGURATION;
+  }
+
+  BlockCount dataBlocks = slabSize - metaBlocks;
+  if ((slabSize < 1024) && !isPowerOfTwo(dataBlocks)) {
+    dataBlocks = ((BlockCount)1 << logBaseTwo(dataBlocks));
+  }
+
+  BlockCount flushingThreshold = ((slabJournalBlocks * 3) + 3) / 4;
+
+  BlockCount remaining = slabJournalBlocks - flushingThreshold;
+  BlockCount blockingThreshold = flushingThreshold + ((remaining * 5) / 7);
+
+  BlockCount minimalExtraSpace =
+      1 + (MAXIMUM_USER_VIOS / SLAB_JOURNAL_FULL_ENTRIES_PER_BLOCK);
+  BlockCount scrubbingThreshold = blockingThreshold;
+  if (slabJournalBlocks > minimalExtraSpace) {
+    scrubbingThreshold = slabJournalBlocks - minimalExtraSpace;
+  }
+  if (blockingThreshold > scrubbingThreshold) {
+    blockingThreshold = scrubbingThreshold;
+  }
+
+  *slabConfig =
+      (SlabConfig){.slabBlocks = slabSize,
+                   .dataBlocks = dataBlocks,
+                   .referenceCountBlocks = refBlocks,
+                   .slabJournalBlocks = slabJournalBlocks,
+                   .slabJournalFlushingThreshold = flushingThreshold,
+                   .slabJournalBlockingThreshold = blockingThreshold,
+                   .slabJournalScrubbingThreshold = scrubbingThreshold};
+  return VDO_SUCCESS;
+}",0.0,0.0,--,--,--
+aybe-dosbox-svn-daum-bd7891d/src/libs/gui_tk/gui_tk.h,Paint menubar.,2,"virtual ~Font(){};
+
+virtual int getHeight() const = 0;
+
+virtual int getAscent() const = 0;
+
+template <typename STR>
+int getWidth(const STR s, Size start = 0, Size len = (Size)-1) const {
+  return this->getWidth(String(s), start, len);
+}
+
+virtual int getWidth(Char c = 'M') const = 0;
+
+virtual int getWidth(const String &s, Size start = 0,
+                     Size len = (Size)-1) const {
+  int width = 0;
+  if (start + len > s.size())
+    len = (Size)(s.size() - start);
+  while (len--)
+    width += getWidth(s[start++]);
+  return width;
+}",0.0,0.0,--,--,--
+satlab-bluebox-aa8bce8/software/firmware/LUFA/Drivers/USB/Core/HostStandardReq.c,"Retrieves the current alternative setting for the specified interface, via a GET INTERFACE standard request to the attached device.",1,"uint8_t USB_Host_GetInterfaceAltSetting(const uint8_t InterfaceIndex,
+                                        uint8_t *const AltSetting) {
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType =
+          (REQDIR_DEVICETOHOST | REQTYPE_STANDARD | REQREC_INTERFACE),
+      .bRequest = REQ_GetInterface,
+      .wValue = 0,
+      .wIndex = InterfaceIndex,
+      .wLength = sizeof(uint8_t),
+  };
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+  return USB_Host_SendControlRequest(AltSetting);
+}",0.0,0.0,--,--,--
+CANBus-Triple-CANBus-Triple-0637551/avr/bootloaders/caterina/LUFA-111009/LUFA/Drivers/USB/Class/Device/CDC.c,"Sends a Serial Control Line State Change notification to the host. This should be called when the virtual serial control lines (DCD, DSR, etc.) have changed states, or to give BREAK notifications to the host. Line states persist until they are cleared via a second notification. This should be called each time the CDC class driver's ControlLineStates.DeviceToHost value is updated to push the new states to the USB host.",2,"void CDC_Device_SendControlLineStateChange(
+    USB_ClassInfo_CDC_Device_t *const CDCInterfaceInfo) {
+  if ((USB_DeviceState != DEVICE_STATE_Configured) ||
+      !(CDCInterfaceInfo->State.LineEncoding.BaudRateBPS))
+    return;
+
+  Endpoint_SelectEndpoint(CDCInterfaceInfo->Config.NotificationEndpointNumber);
+
+  USB_Request_Header_t Notification = (USB_Request_Header_t){
+      .bmRequestType = (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE),
+      .bRequest = CDC_NOTIF_SerialState,
+      .wValue = CPU_TO_LE16(0),
+      .wIndex = CPU_TO_LE16(0),
+      .wLength = CPU_TO_LE16(
+          sizeof(CDCInterfaceInfo->State.ControlLineStates.DeviceToHost)),
+  };
+
+  Endpoint_Write_Stream_LE(&Notification, sizeof(USB_Request_Header_t), NULL);
+  Endpoint_Write_Stream_LE(
+      &CDCInterfaceInfo->State.ControlLineStates.DeviceToHost,
+      sizeof(CDCInterfaceInfo->State.ControlLineStates.DeviceToHost), NULL);
+  Endpoint_ClearIN();
+}",0.0,0.0,--,--,--
+vyos-legacy-vyatta-strongswan-92dd80c/src/pki/commands/verify.c,Register the command.,2,"static void __attribute__((constructor)) reg() {
+  command_register((command_t){
+      verify,
+      'v',
+      ""verify"",
+      ""verify a certificate using the CA certificate"",
+      {""[--in file] [--ca file]""},
+      {
+          {""help"", 'h', 0, ""show usage information""},
+          {""in"", 'i', 1, ""X.509 certificate to verify, default: stdin""},
+          {""cacert"", 'c', 1, ""CA certificate, default: verify self signed""},
+      }});
+}",0.0,0.0,--,--,--
+PJK-libcbor-87f977e/src/cbor/floats_ctrls.c,Constructs a new float item The width cannot be changed once the item is created,2,"cbor_item_t *cbor_new_float2() {
+  cbor_item_t *item = _CBOR_MALLOC(sizeof(cbor_item_t) + 4);
+  _CBOR_NOTNULL(item);
+
+  *item = (cbor_item_t){
+      .type = CBOR_TYPE_FLOAT_CTRL,
+      .data = (unsigned char *)item + sizeof(cbor_item_t),
+      .refcount = 1,
+      .metadata = {.float_ctrl_metadata = {.width = CBOR_FLOAT_16}}};
+  return item;
+}",0.0,0.0,--,--,--
+phase4ground-joco-2018-badge-782fd35/firmware/manbearpig/bling/mbp_custom_bling.c,Per-frame callback for rainbow Per-frame callback for animating the LEDs randomly Snake around the mouth of bender!,2,"static void __menu_custom_anim_callback(void *p_data) {
+  uint32_t err_code;
+
+  menu_t menu;
+  menu_item_t items[100];
+  menu.items = items;
+  menu.title = ""LED Mode"";
+  menu.count = 0;
+  menu.selected = 0;
+  menu.top = 0;
+
+  FRESULT result;
+  DIR dir;
+  static FILINFO fno;
+
+  result = f_opendir(&dir, ""BLING"");
+  if (result == FR_OK) {
+    for (;;) {
+      result = f_readdir(&dir, &fno);
+      if (result != FR_OK || fno.fname[0] == 0)
+        break;
+      if (fno.fattrib & AM_DIR) {
+
+      } else {
+        char *ext = strrchr(fno.fname, '.') + 1;
+
+        if (strcmp(ext, ""RGB"") == 0) {
+
+          menu_item_t item;
+          item.callback = NULL;
+          item.icon = NULL;
+          item.preview = NULL;
+          item.text = (char *)malloc(16);
+          item.data = (char *)malloc(20);
+
+          snprintf(item.text, ext - fno.fname, ""%s"", fno.fname);
+          sprintf(item.data, ""BLING/%s"", fno.fname);
+          items[menu.count++] = item;
+        }
+      }
+
+      if (menu.count >= 100) {
+        break;
+      }
+    }
+    f_closedir(&dir);
+  }
+
+  mbp_sort_menu(&menu);
+
+  menu.items[menu.count++] = (menu_item_t){""<None>"", NULL, NULL, NULL, NULL};
+
+  if (mbp_submenu(&menu) == MENU_QUIT) {
+    return;
+  }
+
+  util_button_clear();
+
+  void *p_timer_data = NULL;
+  app_timer_timeout_handler_t led_callback = NULL;
+
+  if (menu.selected < (menu.count - 1)) {
+    char *filename = (char *)menu.items[menu.selected].data;
+    util_led_load_rgb_file(filename, &m_anim);
+    p_timer_data = &m_anim;
+    led_callback = __led_rgb_callback;
+  }
+
+  if (led_callback != NULL) {
+    uint32_t ticks = APP_TIMER_TICKS(1000 / LED_FPS, UTIL_TIMER_PRESCALER);
+    err_code =
+        app_timer_create(&m_timer, APP_TIMER_MODE_REPEATED, led_callback);
+    APP_ERROR_CHECK(err_code);
+    err_code = app_timer_start(m_timer, ticks, p_timer_data);
+    APP_ERROR_CHECK(err_code);
+  }
+
+  if (p_data != NULL) {
+
+    mbp_tooth_eye_stop();
+    util_led_clear();
+    char *filename = (char *)p_data;
+    util_gfx_draw_raw_file(filename, 0, 0, 128, 128, NULL, true, NULL);
+  } else {
+    mbp_ui_cls();
+    util_button_wait();
+  }
+
+  if (led_callback != NULL) {
+    app_timer_stop(m_timer);
+  }
+
+  for (uint16_t i = 0; i < (menu.count - 1); i++) {
+    free((items[i].data));
+    free((items[i].text));
+  }
+
+  app_sched_execute();
+
+  util_led_clear();
+  mbp_tooth_eye_start();
+}",0.0,0.0,--,--,--
+ARMmbed-mbed-cloud-client-377c6b8/update-client-hub/modules/control-center/source/arm_uc_control_center.c,The firmware version is the SHA256 hash.,1,"arm_uc_error_t ARM_UC_ControlCenter_ReportVersion(uint64_t version) {
+  UC_CONT_TRACE(""ARM_UC_ControlCenter_ReportVersion: %"" PRIu64, version);
+
+  arm_uc_error_t result = (arm_uc_error_t){ERR_INVALID_PARAMETER};
+
+  if (arm_uc_monitor_struct) {
+    arm_uc_monitor_struct->SendVersion(version);
+    result.code = ERR_NONE;
+  }
+
+  return result;
+}",0.0,0.0,--,--,--
+dm7h-fpga-event-recorder-4e53bab/src/Logikanalysator/USB-TPLE/Microcontroller_Firmware/LUFA_Based/estick_firmware/LUFA090605/Demos/Host/MassStorageHost/Lib/MassStoreCommands.c,Issues a Mass Storage class specific request to determine the index of the highest numbered Logical Unit in the attached device.,1,"uint8_t MassStore_GetMaxLUN(uint8_t *const MaxLUNIndex) {
+  uint8_t ErrorCode;
+
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType = (REQDIR_DEVICETOHOST | REQTYPE_CLASS | REQREC_INTERFACE),
+      .bRequest = REQ_GetMaxLUN,
+      .wValue = 0,
+      .wIndex = 0,
+      .wLength = 1,
+  };
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+  if ((ErrorCode = USB_Host_SendControlRequest(MaxLUNIndex)) ==
+      HOST_SENDCONTROL_SetupStalled) {
+
+    Pipe_ClearStall();
+
+    *MaxLUNIndex = 0;
+  }
+
+  return ErrorCode;
+}",0.0,0.0,--,--,--
+boazsegev-iodine-b6bdf50/ext/iodine/http1.c,Creates an HTTP1 protocol object and handles any unread data in the buffer (if any).,2,"fio_protocol_s *http1_new(uintptr_t uuid, http_settings_s *settings,
+                          void *unread_data, size_t unread_length) {
+  if (unread_data && unread_length > HTTP_MAX_HEADER_LENGTH)
+    return NULL;
+  http1pr_s *p = fio_malloc(sizeof(*p) + HTTP_MAX_HEADER_LENGTH);
+
+  FIO_ASSERT_ALLOC(p);
+  *p = (http1pr_s){
+      .p.protocol =
+          {
+              .on_data = http1_on_data_first_time,
+              .on_close = http1_on_close,
+              .on_ready = http1_on_ready,
+          },
+      .p.uuid = uuid,
+      .p.settings = settings,
+      .max_header_size = settings->max_header_size,
+      .is_client = settings->is_client,
+  };
+  http_s_new(&p->request, &p->p, &HTTP1_VTABLE);
+  if (unread_data && unread_length <= HTTP_MAX_HEADER_LENGTH) {
+    memcpy(p->buf, unread_data, unread_length);
+    p->buf_len = unread_length;
+  }
+  fio_attach(uuid, &p->p.protocol);
+  if (unread_data && unread_length <= HTTP_MAX_HEADER_LENGTH) {
+    fio_force_event(uuid, FIO_EVENT_ON_DATA);
+  }
+  return &p->p.protocol;
+}",0.0,0.0,--,--,--
+Decawave-mynewt-dw1000-apps-be5c28a/apps/listener/src/bleprph.c,Enables advertising with the following parameters: o General discoverable mode. o Undirected connectable mode.,2,"bleprph_advertise(void) {
+  uint8_t own_addr_type;
+  struct ble_gap_adv_params adv_params;
+  struct ble_hs_adv_fields fields;
+  const char *name;
+  int rc;
+
+  rc = ble_hs_id_infer_auto(0, &own_addr_type);
+  if (rc != 0) {
+    BLEPRPH_LOG(ERROR, ""error determining address type; rc=%d\n"", rc);
+    return;
+  }
+
+  memset(&fields, 0, sizeof fields);
+
+  fields.flags = BLE_HS_ADV_F_DISC_GEN | BLE_HS_ADV_F_BREDR_UNSUP;
+
+  fields.tx_pwr_lvl_is_present = 1;
+  fields.tx_pwr_lvl = BLE_HS_ADV_TX_PWR_LVL_AUTO;
+
+  name = ble_svc_gap_device_name();
+  fields.name = (uint8_t *)name;
+  fields.name_len = strlen(name);
+  fields.name_is_complete = 1;
+
+  fields.uuids16 = (ble_uuid16_t[]){BLE_UUID16_INIT(GATT_SVR_SVC_ALERT_UUID)};
+  fields.num_uuids16 = 1;
+  fields.uuids16_is_complete = 1;
+
+  rc = ble_gap_adv_set_fields(&fields);
+  if (rc != 0) {
+    BLEPRPH_LOG(ERROR, ""error setting advertisement data; rc=%d\n"", rc);
+    return;
+  }
+
+  memset(&adv_params, 0, sizeof adv_params);
+  adv_params.conn_mode = BLE_GAP_CONN_MODE_UND;
+  adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
+  rc = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params,
+                         bleprph_gap_event, NULL);
+  if (rc != 0) {
+    BLEPRPH_LOG(ERROR, ""error enabling advertisement; rc=%d\n"", rc);
+    return;
+  }
+}",0.0,0.0,--,--,--
+TurboVNC-turbovnc-79d9fbd/unix/Xvnc/programs/Xserver/dix/events.c,Server-side protocol handling for GrabKey request. Creates a grab for the client's keyboard and adds it to the list of passive grabs.,2,"ProcGrabKey(ClientPtr client) {
+  WindowPtr pWin;
+
+  REQUEST(xGrabKeyReq);
+  GrabPtr grab;
+  DeviceIntPtr keybd = PickKeyboard(client);
+  int rc;
+  GrabParameters param;
+  GrabMask mask;
+
+  REQUEST_SIZE_MATCH(xGrabKeyReq);
+
+  param = (GrabParameters){.grabtype = CORE,
+                           .ownerEvents = stuff->ownerEvents,
+                           .this_device_mode = stuff->keyboardMode,
+                           .other_devices_mode = stuff->pointerMode,
+                           .modifiers = stuff->modifiers};
+
+  rc = CheckGrabValues(client, &param);
+  if (rc != Success)
+    return rc;
+
+  if (((stuff->key > keybd->key->xkbInfo->desc->max_key_code) ||
+       (stuff->key < keybd->key->xkbInfo->desc->min_key_code)) &&
+      (stuff->key != AnyKey)) {
+    client->errorValue = stuff->key;
+    return BadValue;
+  }
+  rc = dixLookupWindow(&pWin, stuff->grabWindow, client, DixSetAttrAccess);
+  if (rc != Success)
+    return rc;
+
+  mask.core = (KeyPressMask | KeyReleaseMask);
+
+  grab = CreateGrab(client->index, keybd, keybd, pWin, CORE, &mask, &param,
+                    KeyPress, stuff->key, NullWindow, NullCursor);
+  if (!grab)
+    return BadAlloc;
+  return AddPassiveGrabToList(client, grab);
+}",0.0,0.0,--,--,--
+satlab-bluebox-aa8bce8/software/firmware/LUFA/Drivers/USB/Class/Host/AndroidAccessoryClassHost.c,"Starts Accessory Mode in the attached Android device. This function will validate the device's Android Open Accessory protocol version, send the configured property strings, and request a switch to Android Open Accessory mode.",1,"uint8_t
+AOA_Host_StartAccessoryMode(USB_ClassInfo_AOA_Host_t *const AOAInterfaceInfo) {
+  uint8_t ErrorCode;
+
+  uint16_t AccessoryProtocol;
+  if ((ErrorCode = AOA_Host_GetAccessoryProtocol(&AccessoryProtocol)) !=
+      HOST_WAITERROR_Successful)
+    return ErrorCode;
+
+  if (AccessoryProtocol != CPU_TO_LE16(AOA_PROTOCOL_AccessoryV1))
+    return AOA_ERROR_LOGICAL_CMD_FAILED;
+
+  for (uint8_t PropertyIndex = 0; PropertyIndex < AOA_STRING_TOTAL_STRINGS;
+       PropertyIndex++) {
+    if ((ErrorCode = AOA_Host_SendPropertyString(
+             AOAInterfaceInfo, PropertyIndex)) != HOST_WAITERROR_Successful)
+      return ErrorCode;
+  }
+
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType = (REQDIR_HOSTTODEVICE | REQTYPE_VENDOR | REQREC_DEVICE),
+      .bRequest = AOA_REQ_StartAccessoryMode,
+      .wValue = 0,
+      .wIndex = 0,
+      .wLength = 0,
+  };
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+  return USB_Host_SendControlRequest(NULL);
+}",0.0,0.0,--,--,--
+JohnCoatesOSS-Limitless-7246efd/External/oclint/lib/clang/5.0.0/include/emmintrin.h,This intrinsic is a utility function and does not correspond to a specific instruction.,4,"_mm_set1_epi64(__m64 __q) { return (__m128i){(long long)__q, (long long)__q}; }",0.0,0.0,--,--,--
+Davion8948-AndroidVideoPlayer-3f492c5/jni/ffmpeg-2.0.1/libavfilter/fifo.c,Move data pointers and pts offset samples forward.,2,"static void buffer_offset(AVFilterLink *link, AVFrame *frame, int offset) {
+  int nb_channels = av_get_channel_layout_nb_channels(link->channel_layout);
+  int planar = av_sample_fmt_is_planar(link->format);
+  int planes = planar ? nb_channels : 1;
+  int block_align =
+      av_get_bytes_per_sample(link->format) * (planar ? 1 : nb_channels);
+  int i;
+
+  av_assert0(frame->nb_samples > offset);
+
+  for (i = 0; i < planes; i++)
+    frame->extended_data[i] += block_align * offset;
+  if (frame->data != frame->extended_data)
+    memcpy(frame->data, frame->extended_data,
+           FFMIN(planes, FF_ARRAY_ELEMS(frame->data)) * sizeof(*frame->data));
+  frame->linesize[0] -= block_align * offset;
+  frame->nb_samples -= offset;
+
+  if (frame->pts != AV_NOPTS_VALUE) {
+    frame->pts += av_rescale_q(offset, (AVRational){1, link->sample_rate},
+                               link->time_base);
+  }
+}",0.0,0.0,--,--,--
+vasyutin-qnetmap-3e0b0a1/lib/src/qnetmap_label.h,draw the geometry,2,"virtual ~TLabel(){};
+
+virtual void drawGeometry(QPainter *Painter_, const QRect &Viewport_,
+                          const QPoint Offset_ = QPoint());
+
+virtual const QString &text(void) const { return m_Text; }
+
+virtual void setText(QString &Text_) {
+  m_Text = Text_;
+  calculateBoundingBox();
+}",0.0,0.0,--,--,--
+PhilipZwanenburg-DPGSolver-b48e04b/src/testing/integration/test_integration.c,Adapt the initial mesh if a adaptation parameters are provided in the input file.,2,"void adapt_initial_mesh_if_required(struct Simulation *const sim) {
+  const int *count_to_find = (int[]){2, 3};
+  int count_found = 0;
+
+  struct Adaptation_Data adapt_data = {
+      .adapt_h =
+          {
+              0,
+              0,
+          },
+      .xyz_ve_refine = NULL,
+      .xyz_ve_ml = NULL,
+      .xyz_ve_p = NULL,
+  };
+
+  char line[STRLEN_MAX];
+  FILE *input_file = fopen_input('t', NULL, NULL);
+  while (fgets(line, sizeof(line), input_file)) {
+    read_skip_name_i(""n_adapt_h_refine"", line, &adapt_data.adapt_h[0]);
+    if (strstr(line, ""xyz_ve_refine"")) {
+      ++count_found;
+      adapt_data.xyz_ve_refine =
+          constructor_file_const_Multiarray_d(input_file, true);
+    }
+    if (strstr(line, ""xyz_ve_mesh_level"")) {
+      ++count_found;
+      adapt_data.xyz_ve_ml = constructor_file_const_Vector_i(input_file, true);
+    }
+    if (strstr(line, ""xyz_ve_polynomial_order"")) {
+      ++count_found;
+      adapt_data.xyz_ve_p = constructor_file_const_Vector_i(input_file, true);
+    }
+  }
+  fclose(input_file);
+
+  if (adapt_data.xyz_ve_refine == NULL) {
+    assert(adapt_data.xyz_ve_ml == NULL || adapt_data.xyz_ve_p == NULL);
+    return;
+  }
+
+  if (count_found < count_to_find[0] || count_found > count_to_find[1])
+    EXIT_ERROR(
+        ""Did not find the required number of variables (Found: %d/[%d,%d]).\n"",
+        count_found, count_to_find[0], count_to_find[1]);
+
+  adapt_hp(sim, ADAPT_S_XYZ_VE, &adapt_data);
+  for (int i = 0; i < adapt_data.adapt_h[0]; ++i)
+    adapt_hp(sim, ADAPT_S_H_REFINE, NULL);
+  for (int i = 0; i < adapt_data.adapt_h[1]; ++i)
+    adapt_hp(sim, ADAPT_S_H_COARSE, NULL);
+
+  destructor_const_Multiarray_d(adapt_data.xyz_ve_refine);
+  destructor_conditional_const_Vector_i(adapt_data.xyz_ve_ml);
+  destructor_conditional_const_Vector_i(adapt_data.xyz_ve_p);
+}",0.0,0.0,--,--,--
+w4ilun-pocket-keyboard-d87c861/firmware/tmk_core/protocol/lufa/LUFA-git/Demos/Host/LowLevel/AudioInputHost/AudioInputHost.c,Event handler for the USB_DeviceEnumerationComplete event. This indicates that a device has been successfully enumerated by the host and is now ready to be used by the application.,0,"void EVENT_USB_Host_DeviceEnumerationComplete(void) {
+  puts_P(PSTR(""Getting Config Data.\r\n""));
+
+  uint8_t ErrorCode;
+
+  if ((ErrorCode = ProcessConfigurationDescriptor()) != SuccessfulConfigRead) {
+    if (ErrorCode == ControlError)
+      puts_P(PSTR(ESC_FG_RED ""Control Error (Get Configuration).\r\n""));
+    else
+      puts_P(PSTR(ESC_FG_RED ""Invalid Device.\r\n""));
+
+    printf_P(PSTR("" -- Error Code: %d\r\n"" ESC_FG_WHITE), ErrorCode);
+
+    LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
+    return;
+  }
+
+  if ((ErrorCode = USB_Host_SetDeviceConfiguration(1)) !=
+      HOST_SENDCONTROL_Successful) {
+    printf_P(PSTR(ESC_FG_RED ""Control Error (Set Configuration).\r\n""
+                             "" -- Error Code: %d\r\n"" ESC_FG_WHITE),
+             ErrorCode);
+
+    LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
+    return;
+  }
+
+  if ((ErrorCode = USB_Host_SetInterfaceAltSetting(
+           StreamingInterfaceIndex, StreamingInterfaceAltSetting)) !=
+      HOST_SENDCONTROL_Successful) {
+    printf_P(PSTR(ESC_FG_RED
+                  ""Could not set alternative streaming interface setting.\r\n""
+                  "" -- Error Code: %d\r\n"" ESC_FG_WHITE),
+             ErrorCode);
+
+    LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
+    USB_Host_SetDeviceConfiguration(0);
+    return;
+  }
+
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType = (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_ENDPOINT),
+      .bRequest = AUDIO_REQ_SetCurrent,
+      .wValue = (AUDIO_EPCONTROL_SamplingFreq << 8),
+      .wIndex = StreamingEndpointAddress,
+      .wLength = sizeof(USB_Audio_SampleFreq_t),
+  };
+
+  USB_Audio_SampleFreq_t SampleRate = AUDIO_SAMPLE_FREQ(48000);
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+  if ((ErrorCode = USB_Host_SendControlRequest(&SampleRate)) !=
+      HOST_SENDCONTROL_Successful) {
+    printf_P(PSTR(ESC_FG_RED ""Could not set requested Audio sample rate.\r\n""
+                             "" -- Error Code: %d\r\n"" ESC_FG_WHITE),
+             ErrorCode);
+
+    LEDs_SetAllLEDs(LEDMASK_USB_ERROR);
+    USB_Host_SetDeviceConfiguration(0);
+    return;
+  }
+
+  TIMSK0 = (1 << OCIE0A);
+  OCR0A = ((F_CPU / 8 / 48000) - 1);
+  TCCR0A = (1 << WGM01);
+  TCCR0B = (1 << CS01);
+
+  DDRC |= (1 << 6);
+
+  TCCR3A = ((1 << WGM30) | (1 << COM3A1) | (1 << COM3A0));
+  TCCR3B = ((1 << WGM32) | (1 << CS30));
+
+  puts_P(PSTR(""Microphone Enumerated.\r\n""));
+  LEDs_SetAllLEDs(LEDMASK_USB_READY);
+}",0.0,0.0,--,--,--
+gexpander-gex-client-c-9f870ec/gex/gex_settings.c,Read the settings INI file via TinyFrame,2,"uint32_t GEX_IniRead(GexClient *gex, char *buffer, uint32_t maxlen) {
+  GexBulk br = (GexBulk){
+      .buffer = (uint8_t *)buffer, .capacity = maxlen, .req_cmd = MSG_INI_READ};
+
+  uint32_t actuallyRead = GEX_BulkRead(GEX_SysUnit(gex), &br);
+
+  if (actuallyRead == maxlen) {
+    actuallyRead--;
+  }
+
+  buffer[actuallyRead] = 0;
+  return actuallyRead;
+}",0.0,0.0,--,--,--
+etri-cicn-nrs-440d6a7/ccnxlibs/libccnx-common/ccnx/common/codec/schema_v1/test/testrig_encoder.c,"Wraps a packet like commonSetup, but will do the whole packet including headers not just the message body. This is used by the PacketEncoder tests.",2,"testrigencoder_CommonSetupWholePacket(uint8_t *packet, size_t length,
+                                      TruthTableEntry *truthTable) {
+  TestData *data = parcMemory_AllocateAndClear(sizeof(TestData));
+  assertNotNull(data, ""parcMemory_AllocateAndClear(%zu) returned NULL"",
+                sizeof(TestData));
+
+  data->memoryRegion = parcBuffer_Wrap(packet, length, 0, length);
+  data->encoder = ccnxCodecTlvEncoder_Create();
+
+  data->dictionary = ccnxTlvDictionary_Create(
+      CCNxCodecSchemaV1TlvDictionary_MessageFastArray_END,
+      CCNxCodecSchemaV1TlvDictionary_Lists_END);
+
+  data->packet = packet;
+  data->packetLength = length;
+  data->truthTable = truthTable;
+
+  buildPacketDictionary(data, data->dictionary, (TlvExtent){0, length});
+
+  return data;
+}",0.0,0.0,--,--,--
+ryankurte-micro-gui-1e3ce05/source/graphics.c,This performs bounds checking and translation based on the graphics context,2,"static void plot(ugui_graphics_t *graphics, uint32_t x, uint32_t y) {
+
+  uint32_t new_x = x + graphics->offset_x;
+  uint32_t new_y = y + graphics->offset_y;
+
+  if ((new_x < graphics->w) && (x < graphics->limit_w) &&
+      (new_y < graphics->h) && (y < graphics->limit_h)) {
+    _ugui_buffer_set(graphics->buffer, &(ugui_point_t){.x = new_x, .y = new_y},
+                     1);
+  }
+}",0.0,0.0,--,--,--
+darktable-org-darktable-32fab21/src/iop/borders.c,"callback methods for gui. synch gtk interface with gui params, if necessary. gui callbacks, these are needed.",2,"void gui_update(struct dt_iop_module_t *self) {
+  dt_iop_borders_gui_data_t *g = (dt_iop_borders_gui_data_t *)self->gui_data;
+  dt_iop_borders_params_t *p = (dt_iop_borders_params_t *)self->params;
+  dt_bauhaus_slider_set(g->size, p->size * 100.0f);
+
+  int k = 0;
+  for (; k < DT_IOP_BORDERS_ASPECT_COUNT; k++) {
+    if (fabsf(p->aspect - g->aspect_ratios[k]) < 0.0001f) {
+      dt_bauhaus_combobox_set(g->aspect, k);
+      break;
+    }
+  }
+  if (k == DT_IOP_BORDERS_ASPECT_COUNT) {
+    dt_bauhaus_combobox_set_text(g->aspect, p->aspect_text);
+    dt_bauhaus_combobox_set(g->aspect, -1);
+  }
+
+  dt_bauhaus_combobox_set(g->aspect_orient, p->aspect_orient);
+
+  for (k = 0; k < DT_IOP_BORDERS_POSITION_H_COUNT; k++) {
+    if (fabsf(p->pos_h - g->pos_h_ratios[k]) < 0.0001f) {
+      dt_bauhaus_combobox_set(g->pos_h, k);
+      break;
+    }
+  }
+  if (k == DT_IOP_BORDERS_POSITION_H_COUNT) {
+    dt_bauhaus_combobox_set_text(g->pos_h, p->pos_h_text);
+    dt_bauhaus_combobox_set(g->pos_h, -1);
+  }
+
+  for (k = 0; k < DT_IOP_BORDERS_POSITION_V_COUNT; k++) {
+    if (fabsf(p->pos_v - g->pos_v_ratios[k]) < 0.0001f) {
+      dt_bauhaus_combobox_set(g->pos_v, k);
+      break;
+    }
+  }
+  if (k == DT_IOP_BORDERS_POSITION_V_COUNT) {
+    dt_bauhaus_combobox_set_text(g->pos_v, p->pos_v_text);
+    dt_bauhaus_combobox_set(g->pos_v, -1);
+  }
+
+  dt_bauhaus_slider_set(g->frame_size, p->frame_size * 100.0f);
+  dt_bauhaus_slider_set(g->frame_offset, p->frame_offset * 100.0f);
+
+  GdkRGBA c = (GdkRGBA){.red = p->color[0],
+                        .green = p->color[1],
+                        .blue = p->color[2],
+                        .alpha = 1.0};
+  gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(g->colorpick), &c);
+
+  GdkRGBA fc = (GdkRGBA){.red = p->frame_color[0],
+                         .green = p->frame_color[1],
+                         .blue = p->frame_color[2],
+                         .alpha = 1.0};
+  gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(g->frame_colorpick), &fc);
+}",0.0,0.0,--,--,--
+captain-mayhem-captainsengine-fe7d76a/extern/ffmpeg/libavutil/rational.c,"Convert a double precision floating point number to a rational. inf is expressed as {1,0} or {-1,0} depending on the sign.",2,"AVRational av_d2q(double d, int max) {
+  AVRational a;
+  int exponent;
+  int64_t den;
+  if (isnan(d))
+    return (AVRational){0, 0};
+  if (fabs(d) > INT_MAX + 3LL)
+    return (AVRational){d < 0 ? -1 : 1, 0};
+  frexp(d, &exponent);
+  exponent = FFMAX(exponent - 1, 0);
+  den = 1LL << (61 - exponent);
+
+  av_reduce(&a.num, &a.den, floor(d * den + 0.5), den, max);
+  if ((!a.num || !a.den) && d && max > 0 && max < INT_MAX)
+    av_reduce(&a.num, &a.den, floor(d * den + 0.5), den, INT_MAX);
+
+  return a;
+}",0.0,0.0,--,--,--
+ThierryNg-pokecopy-57caaae/Pokecopy.spritebuilder/Source/libs/cocos2d-iphone/cocos2d/ccTypes.h,helper that creates a ccColor4f type,2,"static inline ccColor4F ccc4f(const GLfloat r, const GLfloat g, const GLfloat b,
+                              const GLfloat a) {
+  return (ccColor4F){r, g, b, a};
+}",0.0,0.0,--,--,--
+dm7h-fpga-event-recorder-4e53bab/src/Logikanalysator/USB-TPLE/Microcontroller_Firmware/LUFA_Based/DualSerial/LUFA_100219/LUFA/Drivers/USB/LowLevel/Host.c,"Clears a stall condition on the given pipe, via a ClearFeature request to the attached device.",2,"uint8_t USB_Host_ClearPipeStall(uint8_t EndpointNum) {
+  if (Pipe_GetPipeToken() == PIPE_TOKEN_IN)
+    EndpointNum |= ENDPOINT_DESCRIPTOR_DIR_IN;
+
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType =
+          (REQDIR_HOSTTODEVICE | REQTYPE_STANDARD | REQREC_ENDPOINT),
+      .bRequest = REQ_ClearFeature,
+      .wValue = FEATURE_ENDPOINT_HALT,
+      .wIndex = EndpointNum,
+      .wLength = 0,
+  };
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+  return USB_Host_SendControlRequest(NULL);
+}",0.0,0.0,--,--,--
+dm7h-fpga-event-recorder-4e53bab/src/Logikanalysator/USB-TPLE/Microcontroller_Firmware/LUFA_Based/DualSerial/LUFA_100219/LUFA/Drivers/USB/Class/Host/MassStorage.c,"Retrieves the Mass Storage device's inquiry data for the specified LUN, indicating the device characteristics and properties.",0,"uint8_t MS_Host_GetInquiryData(USB_ClassInfo_MS_Host_t *const MSInterfaceInfo,
+                               const uint8_t LUNIndex,
+                               SCSI_Inquiry_Response_t *const InquiryData) {
+  if ((USB_HostState != HOST_STATE_Configured) ||
+      !(MSInterfaceInfo->State.IsActive))
+    return HOST_SENDCONTROL_DeviceDisconnected;
+
+  uint8_t ErrorCode;
+
+  MS_CommandBlockWrapper_t SCSICommandBlock = (MS_CommandBlockWrapper_t){
+      .Signature = CBW_SIGNATURE,
+      .DataTransferLength = sizeof(SCSI_Inquiry_Response_t),
+      .Flags = COMMAND_DIRECTION_DATA_IN,
+      .LUN = LUNIndex,
+      .SCSICommandLength = 6,
+      .SCSICommandData = {SCSI_CMD_INQUIRY, 0x00, 0x00, 0x00,
+                          sizeof(SCSI_Inquiry_Response_t), 0x00}};
+
+  MS_CommandStatusWrapper_t SCSICommandStatus;
+
+  if ((ErrorCode = MS_Host_SendCommand(MSInterfaceInfo, &SCSICommandBlock,
+                                       InquiryData)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  if ((ErrorCode = MS_Host_GetReturnedStatus(
+           MSInterfaceInfo, &SCSICommandStatus)) != PIPE_RWSTREAM_NoError)
+    return ErrorCode;
+
+  return PIPE_RWSTREAM_NoError;
+}",0.0,0.0,--,--,--
+varunjampani-video_prop_networks-4f4a398/lib/caffe/include/caffe/malabar_layers.hpp,"Using the CPU device, compute the gradients for any parameters and for the bottom blobs if propagate_down is true.",2,"template <typename Dtype> class MatMulLayer : public Layer<Dtype> {
+public:
+  explicit MatMulLayer(const LayerParameter &param) : Layer<Dtype>(param) {
+    LayerParameter tmp_param;
+    tmp_param.mutable_concat_param()->set_concat_dim(3);
+    concat_layer_.reset(new ConcatLayer<Dtype>(tmp_param));
+  }
+  virtual void LayerSetUp(const vector<Blob<Dtype> *> &bottom,
+                          const vector<Blob<Dtype> *> &top);
+  virtual void Reshape(const vector<Blob<Dtype> *> &bottom,
+                       const vector<Blob<Dtype> *> &top);
+
+  virtual inline const char *type() const { return ""MatMul""; }
+  virtual inline int MinNumBottomBlobs() const { return 2; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
+
+protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype> *> &bottom,
+                           const vector<Blob<Dtype> *> &top);
+  virtual void Forward_gpu(const vector<Blob<Dtype> *> &bottom,
+                           const vector<Blob<Dtype> *> &top);
+  virtual void Backward_cpu(const vector<Blob<Dtype> *> &top,
+                            const vector<bool> &propagate_down,
+                            const vector<Blob<Dtype> *> &bottom);
+  virtual void Backward_gpu(const vector<Blob<Dtype> *> &top,
+                            const vector<bool> &propagate_down,
+                            const vector<Blob<Dtype> *> &bottom);
+  Blob<Dtype> tmp_k_;
+  boost::shared_ptr<ConcatLayer<Dtype>> concat_layer_;
+};
+
+template <typename Dtype> class MatMul2Layer : public Layer<Dtype> {
+public:
+  explicit MatMul2Layer(const LayerParameter &param) : Layer<Dtype>(param){};
+  virtual void LayerSetUp(const vector<Blob<Dtype> *> &bottom,
+                          const vector<Blob<Dtype> *> &top);
+  virtual void Reshape(const vector<Blob<Dtype> *> &bottom,
+                       const vector<Blob<Dtype> *> &top);
+
+  virtual inline const char *type() const { return ""MatMul2""; }",0.0,0.0,--,--,--
+moehriegitt-hob3l-40cfda8/src/csg3.c,"From an array of points in the rough shape of a tower, make a polyhedron. 'Tower' means the shape consists of layers of polygon points stack on each other. This function also handles the case of the top collapsing into a single point. So this shape works for (polyhedronized) cylinders, cones, spheres, cubes, and linear_extrudes. If the connecting quads are not planar, then tri_side can be set to non-false to split them into triangles. This shape is probably not nice, but correct in that the faces are planar, since every triangle is trivially planar). The top and bottom faces must be planar. rev^(m->d < 0) inverts face vertex order to allow managing mirroring and negative determinants. This also gives some freedom for the construction: if top and bottom are swapped (i.e., the points 0..fn-1 are the top, not the bottom), then rev be passed as non-false. This also runs xform and minmax, but not make_edges.",2,"static bool faces_n_edges_from_tower(cp_csg3_poly_t *o, ctxt_t *c,
+                                     cp_mat3wi_t const *m, cp_loc_t loc,
+                                     size_t fn, size_t fnz, bool rev,
+                                     unsigned tri_side, bool may_need_tri) {
+
+  unsigned orient = 0;
+  bool need_tri = false;
+  if (may_need_tri) {
+    for (cp_size_each(i, fn)) {
+      size_t j = cp_wrap_add1(i, fn);
+      size_t k = cp_wrap_add1(j, fn);
+      orient |=
+          1U << (1 + cp_vec2_right_normal3_z(&cp_v_nth(&o->point, i).coord.b,
+                                             &cp_v_nth(&o->point, j).coord.b,
+                                             &cp_v_nth(&o->point, k).coord.b));
+      if ((orient & 5) == 5) {
+        need_tri = true;
+        break;
+      }
+    }
+  }
+
+  cp_v_size3_t tri = {0};
+  if (need_tri) {
+    cp_vec2_arr_ref_t a2;
+    cp_vec2_arr_ref_from_a_vec3_loc_xy(&a2, &o->point);
+    if (!cp_csg2_tri_vec2_arr_ref(&tri, c->tmp, c->err, loc, &a2, fn)) {
+      return false;
+    }
+  }
+
+  if (m->d < 0) {
+    rev = !rev;
+  }
+
+  for (cp_v_each(i, &o->point)) {
+    cp_vec3w_xform(&cp_v_nth(&o->point, i).coord, &m->n,
+                   &cp_v_nth(&o->point, i).coord);
+  }
+
+  bool has_top = (o->point.size == fn * fnz);
+  assert(has_top || (o->point.size == 1 + (fn * (fnz - 1))));
+
+  size_t k = 0;
+  size_t bt_cnt = tri.size ? tri.size : 1U;
+  cp_v_init0(&o->face, (bt_cnt * (1U + !!has_top)) +
+                           ((fnz - 2) * fn * (1U + !!tri_side)) +
+                           (fn * (1U + !!(tri_side && has_top))));
+
+  face_from_tri_or_poly(&k, o, &tri, loc, fn, rev, false);
+
+  if (has_top) {
+    face_from_tri_or_poly(&k, o, &tri, loc, fn, rev, true);
+  }
+
+  cp_v_fini(&tri);
+
+  cp_csg3_face_t *f;
+  for (cp_size_each(i, fnz, 1, !has_top)) {
+    size_t k1 = i * fn;
+    size_t k0 = k1 - fn;
+    for (cp_size_each(j0, fn)) {
+      size_t j1 = cp_wrap_add1(j0, fn);
+      f = &cp_v_nth(&o->face, k++);
+      switch (tri_side) {
+      case TRI_LEFT:
+        face_init_from_point_ref(f, o, (size_t[4]){k0 + j0, k0 + j1, k1 + j0},
+                                 3, !rev, loc);
+        f = &cp_v_nth(&o->face, k++);
+        face_init_from_point_ref(f, o, (size_t[4]){k1 + j1, k1 + j0, k0 + j1},
+                                 3, !rev, loc);
+        break;
+      case TRI_RIGHT:
+        face_init_from_point_ref(f, o, (size_t[4]){k0 + j0, k0 + j1, k1 + j1},
+                                 3, !rev, loc);
+        f = &cp_v_nth(&o->face, k++);
+        face_init_from_point_ref(f, o, (size_t[4]){k1 + j1, k1 + j0, k0 + j0},
+                                 3, !rev, loc);
+        break;
+      case TRI_NONE:
+        face_init_from_point_ref(
+            f, o, (size_t[4]){k0 + j0, k0 + j1, k1 + j1, k1 + j0}, 4, !rev,
+            loc);
+        break;
+      default:
+        assert(0);
+      }
+    }
+  }
+
+  if (!has_top) {
+
+    size_t kw = o->point.size - 1;
+    size_t kv = kw - fn;
+    for (cp_size_each(j0, fn)) {
+      size_t j1 = cp_wrap_add1(j0, fn);
+      f = &cp_v_nth(&o->face, k++);
+      face_init_from_point_ref(f, o, (size_t[4]){kv + j0, kv + j1, kw}, 3, !rev,
+                               loc);
+    }
+  }
+
+  assert(o->face.size == k);
+  return poly_make_edges(o, c);
+}",0.0,0.0,--,--,--
+alidili-FFmpeg4Android-ee1266c/ffmpeg-4.0/libavformat/utils.c,"Parse a packet, add all split parts to parse_queue.",2,"static int parse_packet(AVFormatContext *s, AVPacket *pkt, int stream_index) {
+  AVPacket out_pkt = {0}, flush_pkt = {0};
+  AVStream *st = s->streams[stream_index];
+  uint8_t *data = pkt ? pkt->data : NULL;
+  int size = pkt ? pkt->size : 0;
+  int ret = 0, got_output = 0;
+
+  if (!pkt) {
+    av_init_packet(&flush_pkt);
+    pkt = &flush_pkt;
+    got_output = 1;
+  } else if (!size && st->parser->flags & PARSER_FLAG_COMPLETE_FRAMES) {
+
+    compute_pkt_fields(s, st, st->parser, pkt, AV_NOPTS_VALUE, AV_NOPTS_VALUE);
+  }
+
+  while (size > 0 || (pkt == &flush_pkt && got_output)) {
+    int len;
+    int64_t next_pts = pkt->pts;
+    int64_t next_dts = pkt->dts;
+
+    av_init_packet(&out_pkt);
+    len = av_parser_parse2(st->parser, st->internal->avctx, &out_pkt.data,
+                           &out_pkt.size, data, size, pkt->pts, pkt->dts,
+                           pkt->pos);
+
+    pkt->pts = pkt->dts = AV_NOPTS_VALUE;
+    pkt->pos = -1;
+
+    data += len;
+    size -= len;
+
+    got_output = !!out_pkt.size;
+
+    if (!out_pkt.size)
+      continue;
+
+    if (pkt->buf && out_pkt.data == pkt->data) {
+
+      out_pkt.buf = av_buffer_ref(pkt->buf);
+      if (!out_pkt.buf) {
+        ret = AVERROR(ENOMEM);
+        goto fail;
+      }
+    } else {
+      ret = av_packet_make_refcounted(&out_pkt);
+      if (ret < 0)
+        goto fail;
+    }
+
+    if (pkt->side_data) {
+      out_pkt.side_data = pkt->side_data;
+      out_pkt.side_data_elems = pkt->side_data_elems;
+      pkt->side_data = NULL;
+      pkt->side_data_elems = 0;
+    }
+
+    out_pkt.duration =
+        (st->parser->flags & PARSER_FLAG_COMPLETE_FRAMES) ? pkt->duration : 0;
+    if (st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
+      if (st->internal->avctx->sample_rate > 0) {
+        out_pkt.duration =
+            av_rescale_q_rnd(st->parser->duration,
+                             (AVRational){1, st->internal->avctx->sample_rate},
+                             st->time_base, AV_ROUND_DOWN);
+      }
+    }
+
+    out_pkt.stream_index = st->index;
+    out_pkt.pts = st->parser->pts;
+    out_pkt.dts = st->parser->dts;
+    out_pkt.pos = st->parser->pos;
+    out_pkt.flags |= pkt->flags & AV_PKT_FLAG_DISCARD;
+
+    if (st->need_parsing == AVSTREAM_PARSE_FULL_RAW)
+      out_pkt.pos = st->parser->frame_offset;
+
+    if (st->parser->key_frame == 1 ||
+        (st->parser->key_frame == -1 &&
+         st->parser->pict_type == AV_PICTURE_TYPE_I))
+      out_pkt.flags |= AV_PKT_FLAG_KEY;
+
+    if (st->parser->key_frame == -1 &&
+        st->parser->pict_type == AV_PICTURE_TYPE_NONE &&
+        (pkt->flags & AV_PKT_FLAG_KEY))
+      out_pkt.flags |= AV_PKT_FLAG_KEY;
+
+    compute_pkt_fields(s, st, st->parser, &out_pkt, next_dts, next_pts);
+
+    ret = ff_packet_list_put(&s->internal->parse_queue,
+                             &s->internal->parse_queue_end, &out_pkt, 0);
+    if (ret < 0) {
+      av_packet_unref(&out_pkt);
+      goto fail;
+    }
+  }
+
+  if (pkt == &flush_pkt) {
+    av_parser_close(st->parser);
+    st->parser = NULL;
+  }
+
+fail:
+  av_packet_unref(pkt);
+  return ret;
+}",0.0,0.0,--,--,--
+satlab-bluebox-aa8bce8/software/firmware/LUFA/Drivers/USB/Class/Host/HIDClassHost.c,"Switches the attached HID device's reporting protocol over to the Boot Report protocol mode, on supported devices.",1,"uint8_t
+HID_Host_SetBootProtocol(USB_ClassInfo_HID_Host_t *const HIDInterfaceInfo) {
+  uint8_t ErrorCode;
+
+  if (!(HIDInterfaceInfo->State.SupportsBootProtocol))
+    return HID_ERROR_LOGICAL;
+
+  USB_ControlRequest = (USB_Request_Header_t){
+      .bmRequestType = (REQDIR_HOSTTODEVICE | REQTYPE_CLASS | REQREC_INTERFACE),
+      .bRequest = HID_REQ_SetProtocol,
+      .wValue = 0,
+      .wIndex = HIDInterfaceInfo->State.InterfaceNumber,
+      .wLength = 0,
+  };
+
+  Pipe_SelectPipe(PIPE_CONTROLPIPE);
+
+  if ((ErrorCode = USB_Host_SendControlRequest(NULL)) !=
+      HOST_SENDCONTROL_Successful)
+    return ErrorCode;
+
+  HIDInterfaceInfo->State.LargestReportSize = 8;
+  HIDInterfaceInfo->State.UsingBootProtocol = true;
+
+  return HOST_SENDCONTROL_Successful;
+}",0.0,0.0,--,--,--
+opticron-libuweave-2e5e385/src/macaroon_helpers.c,Mint an initial server authentication token (SAT).,2,"bool uw_macaroon_mint_server_authentication_token_(
+    const uint8_t *root_key, size_t root_key_len, const uint8_t *token_str,
+    size_t token_str_len,
+    const uint8_t nonce[UW_MACAROON_INIT_DELEGATION_NONCE_SIZE],
+    uint8_t *buffer, size_t buffer_size, UwMacaroon *new_macaroon) {
+  if (root_key == NULL || root_key_len == 0 || nonce == NULL ||
+      buffer == NULL || buffer_size == 0 || new_macaroon == NULL) {
+    return false;
+  }
+  if (token_str == NULL && token_str_len != 0) {
+    return false;
+  }
+
+  *new_macaroon = (UwMacaroon){};
+
+  const size_t num_caveats = 2;
+  UwMacaroonCaveat **caveat_list =
+      allocate_caveat_list_(num_caveats, &buffer, &buffer_size);
+  if (caveat_list == NULL) {
+    return false;
+  }
+
+  size_t needed_buffer_size = uw_macaroon_caveat_creation_get_buffsize_(
+      kUwMacaroonCaveatTypeServerAuthenticationTokenV1, token_str_len);
+  if ((needed_buffer_size == 0) || (needed_buffer_size > buffer_size) ||
+      !uw_macaroon_caveat_create_server_authentication_token_(
+          token_str, token_str_len, buffer, needed_buffer_size,
+          caveat_list[0])) {
+    return false;
+  }
+  buffer += needed_buffer_size;
+  buffer_size -= needed_buffer_size;
+
+  needed_buffer_size = uw_macaroon_caveat_creation_get_buffsize_(
+      kUwMacaroonCaveatTypeNonce, UW_MACAROON_INIT_DELEGATION_NONCE_SIZE);
+  if ((needed_buffer_size == 0) || (needed_buffer_size > buffer_size) ||
+      !uw_macaroon_caveat_create_nonce_(
+          nonce, UW_MACAROON_INIT_DELEGATION_NONCE_SIZE, buffer,
+          needed_buffer_size, caveat_list[1])) {
+    return false;
+  }
+
+  UwMacaroonContext context = {};
+  return uw_macaroon_create_from_root_key_(
+      new_macaroon, root_key, root_key_len, &context,
+      (const UwMacaroonCaveat *const *)caveat_list, num_caveats);
+}",0.0,0.0,--,--,--
+vsfteam-vsf-c4a58f3/release/kernel/beta/example/usrapp/template/main_fsm_simple.c,You cannot ignore fsm_initialiser at any time,4,"fsm_initialiser(user_task_b_t, args(vsf_sem_t *ptSEM))
+    init_body(this.psem = ptSEM;)
+
+        implement_fsm(user_task_b_t) def_states(PRINT, DELAY);
+
+    body(
+        on_start(
+            update_state_to(PRINT);
+        )
+        
+        state(PRINT){
+  printf(""hello world! \r\n"");
+  update_state_to(DELAY);                                              
+        }",0.0,0.0,--,--,--
+kernkonzept-l4re-core-0dd677e/l4sys/include/types.h,Create a message tag from the specified values.,2,"l4_msgtag_t l4_msgtag(long label, unsigned words, unsigned items,
+                      unsigned flags) L4_NOTHROW {
+  return (l4_msgtag_t){
+      (l4_mword_t)((l4_umword_t)label << 16) | (l4_mword_t)(words & 0x3f) |
+      (l4_mword_t)((items & 0x3f) << 6) | (l4_mword_t)(flags & 0xf000)};
+}",0.0,0.0,--,--,--
+cascadeo-monit-8857544/src/status.c,Show all services in the service list.,2,"boolean_t status(const char *level, const char *group, const char *service) {
+  boolean_t status = false;
+  if (!exist_daemon()) {
+    LogError(""Status not available -- the monit daemon is not running\n"");
+    return status;
+  }
+  Socket_T S = NULL;
+  if (Run.httpd.flags & Httpd_Net)
+
+    S = Socket_create(
+        Run.httpd.socket.net.address ? Run.httpd.socket.net.address
+                                     : ""localhost"",
+        Run.httpd.socket.net.port, Socket_Tcp, Socket_Ip4,
+        (SslOptions_T){.use_ssl = Run.httpd.flags & Httpd_Ssl,
+                       .clientpemfile = Run.httpd.socket.net.ssl.clientpem},
+        NET_TIMEOUT);
+  else if (Run.httpd.flags & Httpd_Unix)
+    S = Socket_createUnix(Run.httpd.socket.unix.path, Socket_Tcp, NET_TIMEOUT);
+  else
+    LogError(""Status not available - monit http interface is not enabled, ""
+             ""please add the 'set httpd' statement\n"");
+  if (S) {
+    Socket_print(S, ""GET /_status?format=text&level=%s"", level);
+    if (group) {
+      char *_group = Util_urlEncode((char *)group);
+      Socket_print(S, ""&group=%s"", _group);
+      FREE(_group);
+    }
+    if (service) {
+      char *_service = Util_urlEncode((char *)service);
+      Socket_print(S, ""&service=%s"", _service);
+      FREE(_service);
+    }
+    char *_auth = Util_getBasicAuthHeaderMonit();
+    Socket_print(S, "" HTTP/1.0\r\n%s\r\n"", _auth ? _auth : """");
+    FREE(_auth);
+
+    char buf[1024];
+    while (Socket_readLine(S, buf, sizeof(buf))) {
+      if (*buf == '\n' || *buf == '\r')
+        break;
+      if (Str_startsWith(buf, ""HTTP/1.0 200""))
+        status = true;
+    }
+
+    if (!status) {
+      LogError(""Cannot read status from the monit daemon\n"");
+    } else {
+      while (Socket_readLine(S, buf, sizeof(buf)))
+        printf(""%s"", buf);
+    }
+    Socket_free(&S);
+  }
+  return status;
+}",0.0,0.0,--,--,--
+boazsegev-iodine-b6bdf50/ext/iodine/fio_tls_missing.c,Schedules the ALPN protocol callback.,2,"FIO_FUNC inline void alpn_select(alpn_s *alpn, intptr_t uuid,
+                                 void *udata_connection) {
+  if (!alpn || !alpn->on_selected)
+    return;
+  alpn_task_s *t = fio_malloc(sizeof(*t));
+  *t = (alpn_task_s){
+      .alpn = *alpn,
+      .uuid = uuid,
+      .udata_connection = udata_connection,
+  };
+
+  fio_defer(alpn_select___task, t, NULL);
+}",0.0,0.0,--,--,--
+rockchip-linux-coreboot-adde3ea/src/cpu/intel/speedstep/speedstep.c,This is generic code and should work at least for Merom and Penryn processors. It is used to generate acpi tables and configure EMTTM.,4,"void speedstep_gen_pstates(sst_table_t *const table) {
+  sst_params_t params;
+
+  speedstep_get_limits(&params);
+
+  const int power_diff2 = (params.max.power - params.min.power) * 2;
+  const int vid_diff2 = (params.max.vid - params.min.vid) * 2;
+  const int max_ratio2 = SPEEDSTEP_DOUBLE_RATIO(params.max);
+  const int min_ratio2 = SPEEDSTEP_DOUBLE_RATIO(params.min);
+  const int ratio_diff2 = max_ratio2 - min_ratio2;
+
+  int states, step2 = 0;
+  do {
+    step2 += 2 * 2;
+    states = ratio_diff2 / step2 + 1;
+  } while (states > SPEEDSTEP_MAX_NORMAL_STATES);
+  if (step2 > 4)
+    printk(BIOS_INFO,
+           ""Enhanced Speedstep processor with ""
+           ""more than %d possible p-states.\n"",
+           SPEEDSTEP_MAX_NORMAL_STATES);
+  if (states < 2)
+    states = 2;
+
+  table->num_states = 0;
+
+  if (params.turbo.is_turbo)
+    table->states[table->num_states++] = params.turbo;
+
+  table->states[table->num_states] = params.max;
+
+  if ((params.max.dynfsb == params.min.dynfsb) &&
+      (params.max.nonint == params.min.nonint) &&
+      (params.max.ratio == params.min.ratio))
+    table->states[table->num_states].vid = params.min.vid;
+  ++table->num_states;
+  --states;
+
+  const int power_step = (power_diff2 / states) / 2;
+  const int vid_step = (vid_diff2 / states) / 2;
+  const int ratio_step = step2 / 2;
+  int power = params.min.power + (states - 1) * power_step;
+  int vid = params.min.vid + (states - 1) * vid_step;
+  int ratio = params.min.ratio + (states - 1) * ratio_step;
+  for (; states > 0; --states) {
+    table->states[table->num_states++] =
+        (sst_state_t){0, 0, ratio, vid, 0, 0, power};
+    power -= power_step;
+    vid -= vid_step;
+    ratio -= ratio_step;
+  }
+
+  if (params.slfm.is_slfm)
+    table->states[table->num_states++] = params.slfm;
+}",0.0,0.0,--,--,--
